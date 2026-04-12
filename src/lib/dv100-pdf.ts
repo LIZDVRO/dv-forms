@@ -9,6 +9,8 @@ import {
   PDFRadioGroup,
   PDFSignature,
   PDFTextField,
+  rgb,
+  StandardFonts,
 } from "pdf-lib";
 
 export const DV100_PDF_URL = "/dv100.pdf";
@@ -25,9 +27,21 @@ type Dv100RespondentGender = "Male" | "Female" | "Nonbinary";
 export const DV100_GENDER_OPTIONS = ["Male", "Female", "Nonbinary"] as const;
 export type Dv100GenderOption = (typeof DV100_GENDER_OPTIONS)[number] | "";
 
+export type Dv100ProtectedPerson = {
+  name: string;
+  age: string;
+  relationship: string;
+  livesWithYou: null | "Yes" | "No";
+};
+
+export type Dv100FirearmRow = {
+  description: string;
+  amount: string;
+  location: string;
+};
+
 /**
  * Wizard answers written into the PDF by {@link generateDV100PDF}.
- * Covers DV-100 pages 1–4 (wizard); extend as additional pages are implemented.
  */
 export type Dv100PdfFormData = {
   petitionerName: string;
@@ -96,6 +110,26 @@ export type Dv100PdfFormData = {
   secondAbuseFrequency: string;
   secondAbuseFrequencyOther: string;
   secondAbuseDates: string;
+  /** Section 7 — third incident of abuse (DV-100 Page 5) */
+  thirdAbuseDate: string;
+  thirdAbuseWitnesses: string;
+  thirdAbuseWitnessDetail: string;
+  thirdAbuseWeapon: string;
+  thirdAbuseWeaponDetail: string;
+  thirdAbuseHarm: string;
+  thirdAbuseHarmDetail: string;
+  thirdAbusePolice: string;
+  thirdAbuseDetails: string;
+  thirdAbuseFrequency: string;
+  thirdAbuseFrequencyOther: string;
+  thirdAbuseDates: string;
+  /** Section 8 — other people needing protection (DV-100 Page 6): no | yes | "" */
+  protectOtherPeople: "" | "no" | "yes";
+  protectedPeople: Dv100ProtectedPerson[];
+  protectedPeopleWhy: string;
+  /** Section 9 — firearms: idk | no | yes | "" */
+  hasFirearms: "" | "idk" | "no" | "yes";
+  firearms: Dv100FirearmRow[];
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -395,6 +429,80 @@ const PDF_PAGE4_FREQ_WEEKLY = "Weekly_2";
 const PDF_PAGE4_FREQ_OTHER = "Other_2";
 const PDF_PAGE4_FREQ_OTHER_TEXT = "undefined_8";
 const PDF_PAGE4_FREQ_DATES = "6g dates or estimates of when it happened";
+
+/** Section 7 — DV-100 Page 5 (exact AcroForm names) */
+const PDF_PAGE5_ABUSE_DATE =
+  "a Date of abuse give an estimate if you dont know the exact date_3";
+const PDF_PAGE5_WITNESSES_RADIO =
+  "b Did anyone else hear or see what happened on this day_2";
+const PDF_PAGE5_WITNESS_IDK_OPT = "I dont know_5";
+const PDF_PAGE5_WITNESS_NO_OPT = "No_12";
+const PDF_PAGE5_WITNESS_YES_OPT = "Yes_5";
+const PDF_PAGE5_WITNESS_DETAIL = "If yes give names";
+const PDF_PAGE5_WEAPON_NO = "No_13";
+const PDF_PAGE5_WEAPON_YES = "Yes If yes describe gun or weapon_2";
+const PDF_PAGE5_WEAPON_DETAIL = "2 use or threaten to use a gun or other weapon";
+const PDF_PAGE5_HARM_NO = "No_14";
+const PDF_PAGE5_HARM_YES = "Yes If yes describe harm_2";
+const PDF_PAGE5_HARM_DETAIL = "7d emotional or physical harm";
+const PDF_PAGE5_POLICE_IDK = "I dont know_6";
+const PDF_PAGE5_POLICE_NO = "No_15";
+const PDF_PAGE5_POLICE_YES =
+  "Yes If the police gave you a restraining order list it in  4_3";
+const PDF_PAGE5_ABUSE_DETAILS = "7f details of abuse";
+const PDF_PAGE5_NEED_MORE_SPACE =
+  "Check this box if you need more space to describe the abuse You can use form DV101 Description of";
+const PDF_PAGE5_FREQ_ONCE = "Just this once_3";
+const PDF_PAGE5_FREQ_25 = "25 times_3";
+const PDF_PAGE5_FREQ_WEEKLY = "Weekly_3";
+const PDF_PAGE5_FREQ_OTHER = "Other_3";
+const PDF_PAGE5_FREQ_OTHER_TEXT = "undefined_9";
+const PDF_PAGE5_FREQ_DATES = "7g dates or estimates of when it happened";
+
+/** Section 8–9 — DV-100 Page 6 */
+const PDF_PAGE6_8A_NO = "No_16";
+const PDF_PAGE6_8B_YES = "Yes If yes complete the section below";
+const PDF_PAGE6_PROTECTED_NAMES = [
+  "1 Full name 1",
+  "1 Full name 2",
+  "1 Full name 3",
+  "1 Full name 4",
+] as const;
+const PDF_PAGE6_PROTECTED_AGES = ["Age 1", "Age 2", "Age 3", "Age 4"] as const;
+const PDF_PAGE6_PROTECTED_REL = [
+  "Relationship to you 1",
+  "Relationship to you 2",
+  "Relationship to you 3",
+  "Relationship to you 4",
+] as const;
+const PDF_PAGE6_LIVES_YES = [
+  "lives_yes_1",
+  "lives_yes_2",
+  "lives_yes_3",
+  "lives_yes_4",
+] as const;
+const PDF_PAGE6_LIVES_NO = [
+  "lives_no_1",
+  "lives_no_2",
+  "lives_no_3",
+  "lives_no_4",
+] as const;
+const PDF_PAGE6_8B2_WHY = "8b2 why do these people need protection";
+const PDF_PAGE6_MORE_PEOPLE_BOX =
+  "Check this box if you need to list more people";
+const PDF_PAGE6_9A_IDK = "I dont know_7";
+const PDF_PAGE6_9B_NO = "No_21";
+const PDF_PAGE6_9C_YES = "Yes If you have information complete the section below";
+const PDF_PAGE6_FIREARM_DESC = ["1_5_1", "2_5", "3_2", "4", "5", "6"] as const;
+const PDF_PAGE6_FIREARM_AMT = ["1_5", "2_6", "3_3", "4_2", "5_2", "6_2"] as const;
+const PDF_PAGE6_FIREARM_LOC = [
+  "Location if known 1",
+  "Location if known 2",
+  "Location if known 3",
+  "Location if known 4",
+  "Location if known 5",
+  "Location if known 6",
+] as const;
 
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
@@ -1908,6 +2016,912 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
         label: "6g. Dates or estimates",
         pdfFieldName: PDF_PAGE4_FREQ_DATES,
       });
+    }
+  }
+
+  // --- DV-100 Page 5 — Section 7 (third incident of abuse) ---
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_ABUSE_DATE);
+    const v = (data.thirdAbuseDate ?? "").trim();
+    if (field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7a. Date of abuse (incident 3)",
+        pdfFieldName: PDF_PAGE5_ABUSE_DATE,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseDate", err);
+    if ((data.thirdAbuseDate ?? "").trim()) {
+      missing.push({
+        label: "7a. Date of abuse (incident 3)",
+        pdfFieldName: PDF_PAGE5_ABUSE_DATE,
+      });
+    }
+  }
+
+  const sec7Witness =
+    typeof data.thirdAbuseWitnesses === "string"
+      ? data.thirdAbuseWitnesses
+      : "";
+  try {
+    if (sec7Witness === "idk") {
+      const rg = pdfForm.getRadioGroup(PDF_PAGE5_WITNESSES_RADIO);
+      rg.select(PDF_PAGE5_WITNESS_IDK_OPT);
+      filled.push({
+        label: "7b. Witnesses (idk)",
+        pdfFieldName: PDF_PAGE5_WITNESSES_RADIO,
+      });
+    } else if (sec7Witness === "no") {
+      const rg = pdfForm.getRadioGroup(PDF_PAGE5_WITNESSES_RADIO);
+      rg.select(PDF_PAGE5_WITNESS_NO_OPT);
+      filled.push({
+        label: "7b. Witnesses (no)",
+        pdfFieldName: PDF_PAGE5_WITNESSES_RADIO,
+      });
+    } else if (sec7Witness === "yes") {
+      const rg = pdfForm.getRadioGroup(PDF_PAGE5_WITNESSES_RADIO);
+      rg.select(PDF_PAGE5_WITNESS_YES_OPT);
+      filled.push({
+        label: "7b. Witnesses (yes)",
+        pdfFieldName: PDF_PAGE5_WITNESSES_RADIO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7b witnesses radio", err);
+    if (sec7Witness === "idk" || sec7Witness === "no" || sec7Witness === "yes") {
+      missing.push({
+        label: "7b. Witnesses",
+        pdfFieldName: PDF_PAGE5_WITNESSES_RADIO,
+      });
+    }
+  }
+
+  try {
+    if (sec7Witness !== "yes") {
+      const field = pdfForm.getTextField(PDF_PAGE5_WITNESS_DETAIL);
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to clear 7b witness detail", err);
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_WITNESS_DETAIL);
+    const v = (data.thirdAbuseWitnessDetail ?? "").trim();
+    if (sec7Witness === "yes" && field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7b. Witness names / details",
+        pdfFieldName: PDF_PAGE5_WITNESS_DETAIL,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseWitnessDetail", err);
+    if (sec7Witness === "yes" && (data.thirdAbuseWitnessDetail ?? "").trim()) {
+      missing.push({
+        label: "7b. Witness names / details",
+        pdfFieldName: PDF_PAGE5_WITNESS_DETAIL,
+      });
+    }
+  }
+
+  const sec7Weapon =
+    typeof data.thirdAbuseWeapon === "string" ? data.thirdAbuseWeapon : "";
+  if (sec7Weapon === "no" || sec7Weapon === "yes") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_WEAPON_NO).uncheck();
+    } catch {
+      /* ignore */
+    }
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_WEAPON_YES).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    if (sec7Weapon === "no") {
+      pdfForm.getCheckBox(PDF_PAGE5_WEAPON_NO).check();
+      filled.push({
+        label: "7c. Weapon (no)",
+        pdfFieldName: PDF_PAGE5_WEAPON_NO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7c No_13", err);
+    if (sec7Weapon === "no") {
+      missing.push({
+        label: "7c. Weapon (no)",
+        pdfFieldName: PDF_PAGE5_WEAPON_NO,
+      });
+    }
+  }
+
+  try {
+    if (sec7Weapon === "yes") {
+      pdfForm.getCheckBox(PDF_PAGE5_WEAPON_YES).check();
+      filled.push({
+        label: "7c. Weapon (yes)",
+        pdfFieldName: PDF_PAGE5_WEAPON_YES,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7c weapon yes", err);
+    if (sec7Weapon === "yes") {
+      missing.push({
+        label: "7c. Weapon (yes)",
+        pdfFieldName: PDF_PAGE5_WEAPON_YES,
+      });
+    }
+  }
+
+  try {
+    if (sec7Weapon !== "yes") {
+      const field = pdfForm.getTextField(PDF_PAGE5_WEAPON_DETAIL);
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to clear 7c weapon detail", err);
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_WEAPON_DETAIL);
+    const v = (data.thirdAbuseWeaponDetail ?? "").trim();
+    if (sec7Weapon === "yes" && field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7c. Weapon description",
+        pdfFieldName: PDF_PAGE5_WEAPON_DETAIL,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseWeaponDetail", err);
+    if (sec7Weapon === "yes" && (data.thirdAbuseWeaponDetail ?? "").trim()) {
+      missing.push({
+        label: "7c. Weapon description",
+        pdfFieldName: PDF_PAGE5_WEAPON_DETAIL,
+      });
+    }
+  }
+
+  const sec7Harm =
+    typeof data.thirdAbuseHarm === "string" ? data.thirdAbuseHarm : "";
+  if (sec7Harm === "no" || sec7Harm === "yes") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_HARM_NO).uncheck();
+    } catch {
+      /* ignore */
+    }
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_HARM_YES).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    if (sec7Harm === "no") {
+      pdfForm.getCheckBox(PDF_PAGE5_HARM_NO).check();
+      filled.push({
+        label: "7d. Harm (no)",
+        pdfFieldName: PDF_PAGE5_HARM_NO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7d No_14", err);
+    if (sec7Harm === "no") {
+      missing.push({
+        label: "7d. Harm (no)",
+        pdfFieldName: PDF_PAGE5_HARM_NO,
+      });
+    }
+  }
+
+  try {
+    if (sec7Harm === "yes") {
+      pdfForm.getCheckBox(PDF_PAGE5_HARM_YES).check();
+      filled.push({
+        label: "7d. Harm (yes)",
+        pdfFieldName: PDF_PAGE5_HARM_YES,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7d harm yes", err);
+    if (sec7Harm === "yes") {
+      missing.push({
+        label: "7d. Harm (yes)",
+        pdfFieldName: PDF_PAGE5_HARM_YES,
+      });
+    }
+  }
+
+  try {
+    if (sec7Harm !== "yes") {
+      const field = pdfForm.getTextField(PDF_PAGE5_HARM_DETAIL);
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to clear 7d harm detail", err);
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_HARM_DETAIL);
+    const v = (data.thirdAbuseHarmDetail ?? "").trim();
+    if (sec7Harm === "yes" && field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7d. Harm description",
+        pdfFieldName: PDF_PAGE5_HARM_DETAIL,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseHarmDetail", err);
+    if (sec7Harm === "yes" && (data.thirdAbuseHarmDetail ?? "").trim()) {
+      missing.push({
+        label: "7d. Harm description",
+        pdfFieldName: PDF_PAGE5_HARM_DETAIL,
+      });
+    }
+  }
+
+  const sec7Police =
+    typeof data.thirdAbusePolice === "string" ? data.thirdAbusePolice : "";
+  if (sec7Police === "idk" || sec7Police === "no" || sec7Police === "yes") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_IDK).uncheck();
+    } catch {
+      /* ignore */
+    }
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_NO).uncheck();
+    } catch {
+      /* ignore */
+    }
+    try {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_YES).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    if (sec7Police === "idk") {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_IDK).check();
+      filled.push({
+        label: "7e. Police (idk)",
+        pdfFieldName: PDF_PAGE5_POLICE_IDK,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7e I dont know_6", err);
+    if (sec7Police === "idk") {
+      missing.push({
+        label: "7e. Police (idk)",
+        pdfFieldName: PDF_PAGE5_POLICE_IDK,
+      });
+    }
+  }
+
+  try {
+    if (sec7Police === "no") {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_NO).check();
+      filled.push({
+        label: "7e. Police (no)",
+        pdfFieldName: PDF_PAGE5_POLICE_NO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7e No_15", err);
+    if (sec7Police === "no") {
+      missing.push({
+        label: "7e. Police (no)",
+        pdfFieldName: PDF_PAGE5_POLICE_NO,
+      });
+    }
+  }
+
+  try {
+    if (sec7Police === "yes") {
+      pdfForm.getCheckBox(PDF_PAGE5_POLICE_YES).check();
+      filled.push({
+        label: "7e. Police (yes)",
+        pdfFieldName: PDF_PAGE5_POLICE_YES,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7e police yes", err);
+    if (sec7Police === "yes") {
+      missing.push({
+        label: "7e. Police (yes)",
+        pdfFieldName: PDF_PAGE5_POLICE_YES,
+      });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_ABUSE_DETAILS);
+    const v = (data.thirdAbuseDetails ?? "").trim();
+    if (field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7f. Details of abuse",
+        pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseDetails", err);
+    if ((data.thirdAbuseDetails ?? "").trim()) {
+      missing.push({
+        label: "7f. Details of abuse",
+        pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
+      });
+    }
+  }
+
+  const sec7DetailsTrimmed = (data.thirdAbuseDetails ?? "").trim();
+  try {
+    if (sec7DetailsTrimmed.length > 0) {
+      pdfForm.getCheckBox(PDF_PAGE5_NEED_MORE_SPACE).check();
+      filled.push({
+        label: "7f. Need more space (addendum)",
+        pdfFieldName: PDF_PAGE5_NEED_MORE_SPACE,
+      });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE5_NEED_MORE_SPACE).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map 7f need-more-space checkbox", err);
+    if (sec7DetailsTrimmed.length > 0) {
+      missing.push({
+        label: "7f. Need more space (addendum)",
+        pdfFieldName: PDF_PAGE5_NEED_MORE_SPACE,
+      });
+    }
+  }
+
+  const sec7Freq =
+    typeof data.thirdAbuseFrequency === "string"
+      ? data.thirdAbuseFrequency
+      : "";
+  const page5FreqBoxes = [
+    PDF_PAGE5_FREQ_ONCE,
+    PDF_PAGE5_FREQ_25,
+    PDF_PAGE5_FREQ_WEEKLY,
+    PDF_PAGE5_FREQ_OTHER,
+  ] as const;
+  for (const name of page5FreqBoxes) {
+    try {
+      pdfForm.getCheckBox(name).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    if (sec7Freq === "once") {
+      pdfForm.getCheckBox(PDF_PAGE5_FREQ_ONCE).check();
+      filled.push({
+        label: "7g. Frequency: once",
+        pdfFieldName: PDF_PAGE5_FREQ_ONCE,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7g Just this once_3", err);
+    if (sec7Freq === "once") {
+      missing.push({
+        label: "7g. Frequency: once",
+        pdfFieldName: PDF_PAGE5_FREQ_ONCE,
+      });
+    }
+  }
+
+  try {
+    if (sec7Freq === "2-5") {
+      pdfForm.getCheckBox(PDF_PAGE5_FREQ_25).check();
+      filled.push({
+        label: "7g. Frequency: 2–5",
+        pdfFieldName: PDF_PAGE5_FREQ_25,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7g 25 times_3", err);
+    if (sec7Freq === "2-5") {
+      missing.push({
+        label: "7g. Frequency: 2–5",
+        pdfFieldName: PDF_PAGE5_FREQ_25,
+      });
+    }
+  }
+
+  try {
+    if (sec7Freq === "weekly") {
+      pdfForm.getCheckBox(PDF_PAGE5_FREQ_WEEKLY).check();
+      filled.push({
+        label: "7g. Frequency: weekly",
+        pdfFieldName: PDF_PAGE5_FREQ_WEEKLY,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7g Weekly_3", err);
+    if (sec7Freq === "weekly") {
+      missing.push({
+        label: "7g. Frequency: weekly",
+        pdfFieldName: PDF_PAGE5_FREQ_WEEKLY,
+      });
+    }
+  }
+
+  try {
+    if (sec7Freq === "other") {
+      pdfForm.getCheckBox(PDF_PAGE5_FREQ_OTHER).check();
+      filled.push({
+        label: "7g. Frequency: other",
+        pdfFieldName: PDF_PAGE5_FREQ_OTHER,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 7g Other_3", err);
+    if (sec7Freq === "other") {
+      missing.push({
+        label: "7g. Frequency: other",
+        pdfFieldName: PDF_PAGE5_FREQ_OTHER,
+      });
+    }
+  }
+
+  try {
+    if (sec7Freq !== "other") {
+      const field = pdfForm.getTextField(PDF_PAGE5_FREQ_OTHER_TEXT);
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to clear 7g frequency other text", err);
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_FREQ_OTHER_TEXT);
+    const v = (data.thirdAbuseFrequencyOther ?? "").trim();
+    if (sec7Freq === "other" && field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7g. Frequency (other)",
+        pdfFieldName: PDF_PAGE5_FREQ_OTHER_TEXT,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseFrequencyOther", err);
+    if (sec7Freq === "other" && (data.thirdAbuseFrequencyOther ?? "").trim()) {
+      missing.push({
+        label: "7g. Frequency (other)",
+        pdfFieldName: PDF_PAGE5_FREQ_OTHER_TEXT,
+      });
+    }
+  }
+
+  const sec7DatesApply =
+    typeof sec7Freq === "string" &&
+    (sec7Freq === "2-5" || sec7Freq === "weekly" || sec7Freq === "other");
+
+  try {
+    if (!sec7DatesApply) {
+      const field = pdfForm.getTextField(PDF_PAGE5_FREQ_DATES);
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to clear 7g dates field", err);
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE5_FREQ_DATES);
+    const v = (data.thirdAbuseDates ?? "").trim();
+    if (sec7DatesApply && field && v) {
+      field.setText(v);
+      filled.push({
+        label: "7g. Dates or estimates",
+        pdfFieldName: PDF_PAGE5_FREQ_DATES,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map thirdAbuseDates", err);
+    if (sec7DatesApply && (data.thirdAbuseDates ?? "").trim()) {
+      missing.push({
+        label: "7g. Dates or estimates",
+        pdfFieldName: PDF_PAGE5_FREQ_DATES,
+      });
+    }
+  }
+
+  const protect =
+    data.protectOtherPeople === "no" || data.protectOtherPeople === "yes"
+      ? data.protectOtherPeople
+      : "";
+  const people = Array.isArray(data.protectedPeople) ? data.protectedPeople : [];
+  const sec8Why = (data.protectedPeopleWhy ?? "").trim();
+
+  try {
+    pdfForm.getCheckBox(PDF_PAGE6_8A_NO).uncheck();
+  } catch (err) {
+    console.warn("Failed to uncheck Section 8 No_16", err);
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE6_8B_YES).uncheck();
+  } catch (err) {
+    console.warn("Failed to uncheck Section 8 Yes", err);
+  }
+
+  if (protect === "no") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE6_8A_NO).check();
+      filled.push({ label: "8a. Protect other people (No)", pdfFieldName: PDF_PAGE6_8A_NO });
+    } catch (err) {
+      console.warn("Failed to map Section 8 No_16", err);
+      missing.push({ label: "8a. Protect other people (No)", pdfFieldName: PDF_PAGE6_8A_NO });
+    }
+  }
+
+  if (protect === "yes") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE6_8B_YES).check();
+      filled.push({
+        label: "8b. Protect other people (Yes)",
+        pdfFieldName: PDF_PAGE6_8B_YES,
+      });
+    } catch (err) {
+      console.warn("Failed to map Section 8 Yes", err);
+      missing.push({
+        label: "8b. Protect other people (Yes)",
+        pdfFieldName: PDF_PAGE6_8B_YES,
+      });
+    }
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const nameField = PDF_PAGE6_PROTECTED_NAMES[i];
+    const ageField = PDF_PAGE6_PROTECTED_AGES[i];
+    const relField = PDF_PAGE6_PROTECTED_REL[i];
+    const yesCb = PDF_PAGE6_LIVES_YES[i];
+    const noCb = PDF_PAGE6_LIVES_NO[i];
+    const person = people[i];
+    const rowActive = protect === "yes";
+
+    try {
+      pdfForm.getCheckBox(yesCb).uncheck();
+    } catch {
+      /* ignore */
+    }
+    try {
+      pdfForm.getCheckBox(noCb).uncheck();
+    } catch {
+      /* ignore */
+    }
+
+    if (!rowActive || !person) {
+      try {
+        const nf = pdfForm.getTextField(nameField);
+        nf.setText("");
+      } catch (err) {
+        console.warn(`Failed to clear protected name ${nameField}`, err);
+      }
+      try {
+        const af = pdfForm.getTextField(ageField);
+        af.setText("");
+      } catch (err) {
+        console.warn(`Failed to clear protected age ${ageField}`, err);
+      }
+      try {
+        const rf = pdfForm.getTextField(relField);
+        rf.setText("");
+      } catch (err) {
+        console.warn(`Failed to clear protected relationship ${relField}`, err);
+      }
+      continue;
+    }
+
+    try {
+      const field = pdfForm.getTextField(nameField);
+      const v = (person.name ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({ label: `8b. Protected person ${i + 1} name`, pdfFieldName: nameField });
+      }
+    } catch (err) {
+      console.warn(`Failed to map protected name ${nameField}`, err);
+      if ((person.name ?? "").trim()) {
+        missing.push({ label: `8b. Protected person ${i + 1} name`, pdfFieldName: nameField });
+      }
+    }
+
+    try {
+      const field = pdfForm.getTextField(ageField);
+      const v = (person.age ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({ label: `8b. Protected person ${i + 1} age`, pdfFieldName: ageField });
+      }
+    } catch (err) {
+      console.warn(`Failed to map protected age ${ageField}`, err);
+      if ((person.age ?? "").trim()) {
+        missing.push({ label: `8b. Protected person ${i + 1} age`, pdfFieldName: ageField });
+      }
+    }
+
+    try {
+      const field = pdfForm.getTextField(relField);
+      const v = (person.relationship ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({
+          label: `8b. Protected person ${i + 1} relationship`,
+          pdfFieldName: relField,
+        });
+      }
+    } catch (err) {
+      console.warn(`Failed to map protected relationship ${relField}`, err);
+      if ((person.relationship ?? "").trim()) {
+        missing.push({
+          label: `8b. Protected person ${i + 1} relationship`,
+          pdfFieldName: relField,
+        });
+      }
+    }
+
+    const lw = person.livesWithYou;
+    if (lw === "Yes") {
+      try {
+        pdfForm.getCheckBox(yesCb).check();
+        filled.push({
+          label: `8b. Person ${i + 1} lives with you (Yes)`,
+          pdfFieldName: yesCb,
+        });
+      } catch (err) {
+        console.warn(`Failed to map ${yesCb}`, err);
+        missing.push({
+          label: `8b. Person ${i + 1} lives with you (Yes)`,
+          pdfFieldName: yesCb,
+        });
+      }
+    } else if (lw === "No") {
+      try {
+        pdfForm.getCheckBox(noCb).check();
+        filled.push({
+          label: `8b. Person ${i + 1} lives with you (No)`,
+          pdfFieldName: noCb,
+        });
+      } catch (err) {
+        console.warn(`Failed to map ${noCb}`, err);
+        missing.push({
+          label: `8b. Person ${i + 1} lives with you (No)`,
+          pdfFieldName: noCb,
+        });
+      }
+    }
+  }
+
+  if (protect !== "yes") {
+    try {
+      const field = pdfForm.getTextField(PDF_PAGE6_8B2_WHY);
+      field.setText("");
+    } catch (err) {
+      console.warn("Failed to clear 8b(2) why", err);
+    }
+  }
+
+  try {
+    if (protect === "yes") {
+      const field = pdfForm.getTextField(PDF_PAGE6_8B2_WHY);
+      if (field && sec8Why) {
+        field.setText(sec8Why);
+        filled.push({
+          label: "8b(2). Why protection needed",
+          pdfFieldName: PDF_PAGE6_8B2_WHY,
+        });
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to map 8b(2) why", err);
+    if (protect === "yes" && sec8Why) {
+      missing.push({
+        label: "8b(2). Why protection needed",
+        pdfFieldName: PDF_PAGE6_8B2_WHY,
+      });
+    }
+  }
+
+  const overflowPeople = protect === "yes" && people.length > 4;
+  try {
+    if (overflowPeople) {
+      pdfForm.getCheckBox(PDF_PAGE6_MORE_PEOPLE_BOX).check();
+      filled.push({
+        label: "8. More protected people (overflow)",
+        pdfFieldName: PDF_PAGE6_MORE_PEOPLE_BOX,
+      });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE6_MORE_PEOPLE_BOX).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map more-people checkbox", err);
+    if (overflowPeople) {
+      missing.push({
+        label: "8. More protected people (overflow)",
+        pdfFieldName: PDF_PAGE6_MORE_PEOPLE_BOX,
+      });
+    }
+  }
+
+  if (overflowPeople) {
+    try {
+      let page = doc.addPage([612, 792]);
+      const titleFont = await doc.embedFont(StandardFonts.HelveticaBold);
+      const bodyFont = await doc.embedFont(StandardFonts.Helvetica);
+      const black = rgb(0, 0, 0);
+      page.drawText("DV-100, Other Protected People", {
+        x: 50,
+        y: 740,
+        size: 14,
+        font: titleFont,
+        color: black,
+      });
+      let y = 710;
+      const slice = people.slice(4);
+      for (let j = 0; j < slice.length; j++) {
+        const p = slice[j];
+        const n = (p?.name ?? "").trim() || "—";
+        const a = (p?.age ?? "").trim() || "—";
+        const r = (p?.relationship ?? "").trim() || "—";
+        const l =
+          p?.livesWithYou === "Yes" || p?.livesWithYou === "No"
+            ? p.livesWithYou
+            : "—";
+        const lines = [
+          `Person ${j + 5}`,
+          `Name: ${n}`,
+          `Age: ${a}`,
+          `Relationship: ${r}`,
+          `Lives with you: ${l}`,
+        ];
+        const blockHeight = lines.length * 16 + 8;
+        if (y - blockHeight < 50) {
+          page = doc.addPage([612, 792]);
+          page.drawText("(continued)", {
+            x: 50,
+            y: 740,
+            size: 10,
+            font: bodyFont,
+            color: black,
+          });
+          y = 718;
+        }
+        for (const line of lines) {
+          page.drawText(line, {
+            x: 50,
+            y,
+            size: 11,
+            font: bodyFont,
+            color: black,
+          });
+          y -= 16;
+        }
+        y -= 8;
+      }
+    } catch (err) {
+      console.warn("Failed to append Other Protected People page", err);
+    }
+  }
+
+  const firearmsAns = data.hasFirearms;
+  try {
+    pdfForm.getCheckBox(PDF_PAGE6_9A_IDK).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE6_9B_NO).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE6_9C_YES).uncheck();
+  } catch {
+    /* ignore */
+  }
+
+  if (firearmsAns === "idk") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE6_9A_IDK).check();
+      filled.push({ label: "9a. Firearms (I don't know)", pdfFieldName: PDF_PAGE6_9A_IDK });
+    } catch (err) {
+      console.warn("Failed to map 9a I dont know", err);
+      missing.push({ label: "9a. Firearms (I don't know)", pdfFieldName: PDF_PAGE6_9A_IDK });
+    }
+  }
+  if (firearmsAns === "no") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE6_9B_NO).check();
+      filled.push({ label: "9b. Firearms (No)", pdfFieldName: PDF_PAGE6_9B_NO });
+    } catch (err) {
+      console.warn("Failed to map 9b No", err);
+      missing.push({ label: "9b. Firearms (No)", pdfFieldName: PDF_PAGE6_9B_NO });
+    }
+  }
+  if (firearmsAns === "yes") {
+    try {
+      pdfForm.getCheckBox(PDF_PAGE6_9C_YES).check();
+      filled.push({ label: "9c. Firearms (Yes)", pdfFieldName: PDF_PAGE6_9C_YES });
+    } catch (err) {
+      console.warn("Failed to map 9c Yes", err);
+      missing.push({ label: "9c. Firearms (Yes)", pdfFieldName: PDF_PAGE6_9C_YES });
+    }
+  }
+
+  const guns = Array.isArray(data.firearms) ? data.firearms : [];
+  const fillGuns = firearmsAns === "yes";
+  for (let i = 0; i < 6; i++) {
+    const dName = PDF_PAGE6_FIREARM_DESC[i];
+    const aName = PDF_PAGE6_FIREARM_AMT[i];
+    const lName = PDF_PAGE6_FIREARM_LOC[i];
+    const row = guns[i];
+
+    if (!fillGuns || !row) {
+      try {
+        pdfForm.getTextField(dName).setText("");
+      } catch (err) {
+        console.warn(`Failed to clear firearm desc ${dName}`, err);
+      }
+      try {
+        pdfForm.getTextField(aName).setText("");
+      } catch (err) {
+        console.warn(`Failed to clear firearm amt ${aName}`, err);
+      }
+      try {
+        pdfForm.getTextField(lName).setText("");
+      } catch (err) {
+        console.warn(`Failed to clear firearm loc ${lName}`, err);
+      }
+      continue;
+    }
+
+    try {
+      const field = pdfForm.getTextField(dName);
+      const v = (row.description ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({ label: `9. Firearm ${i + 1} description`, pdfFieldName: dName });
+      }
+    } catch (err) {
+      console.warn(`Failed to map firearm desc ${dName}`, err);
+      if ((row.description ?? "").trim()) {
+        missing.push({ label: `9. Firearm ${i + 1} description`, pdfFieldName: dName });
+      }
+    }
+
+    try {
+      const field = pdfForm.getTextField(aName);
+      const v = (row.amount ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({ label: `9. Firearm ${i + 1} amount`, pdfFieldName: aName });
+      }
+    } catch (err) {
+      console.warn(`Failed to map firearm amt ${aName}`, err);
+      if ((row.amount ?? "").trim()) {
+        missing.push({ label: `9. Firearm ${i + 1} amount`, pdfFieldName: aName });
+      }
+    }
+
+    try {
+      const field = pdfForm.getTextField(lName);
+      const v = (row.location ?? "").trim();
+      if (field && v) {
+        field.setText(v);
+        filled.push({ label: `9. Firearm ${i + 1} location`, pdfFieldName: lName });
+      }
+    } catch (err) {
+      console.warn(`Failed to map firearm loc ${lName}`, err);
+      if ((row.location ?? "").trim()) {
+        missing.push({ label: `9. Firearm ${i + 1} location`, pdfFieldName: lName });
+      }
     }
   }
 
