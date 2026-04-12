@@ -15,8 +15,115 @@ const STEP_TITLES = [
   "Your Information",
   "Legal Representation",
   "Person You Want Protection From",
+  "Relationship to Other Party",
+  "Other Court Cases",
   "Review & Generate",
 ] as const;
+
+const STEP_BLURBS = [
+  "Enter your details as they should appear on DV-100 (Page 1). Fields match the official form.",
+  "If an attorney represents you in this case, provide their information for the form.",
+  "Provide identifying information for the person you are asking the court for protection from.",
+  "Describe how you are connected to the other person (DV-100 Section 3).",
+  "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
+  "Confirm everything below, then generate your filled PDF.",
+] as const;
+
+const RELATIONSHIP_OPTIONS: { value: string; label: string }[] = [
+  {
+    value: "children",
+    label: "We have a child or children together",
+  },
+  {
+    value: "married",
+    label: "We are married or registered domestic partners",
+  },
+  {
+    value: "usedToBeMarried",
+    label: "We used to be married or registered domestic partners",
+  },
+  {
+    value: "dating",
+    label: "We are dating or used to date",
+  },
+  {
+    value: "engaged",
+    label: "We are or used to be engaged to be married",
+  },
+  { value: "related", label: "We are related" },
+  {
+    value: "liveTogether",
+    label: "We live together or used to live together",
+  },
+];
+
+const RELATED_TYPE_OPTIONS: { value: string; label: string }[] = [
+  {
+    value: "parent",
+    label: "Parent/stepparent/parent-in-law",
+  },
+  {
+    value: "child",
+    label: "Child/stepchild/adopted child",
+  },
+  { value: "childsSpouse", label: "Child's spouse" },
+  {
+    value: "sibling",
+    label: "Sibling/stepsibling/sibling-in-law",
+  },
+  {
+    value: "grandparent",
+    label: "Grandparent/stepgrandparent/grandparent-in-law",
+  },
+  {
+    value: "grandchild",
+    label: "Grandchild/stepgrandchild/grandchild-in-law",
+  },
+];
+
+const CASE_TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: "custody", label: "Custody" },
+  { value: "divorce", label: "Divorce" },
+  {
+    value: "juvenile",
+    label: "Juvenile child welfare or juvenile justice",
+  },
+  { value: "guardianship", label: "Guardianship" },
+  { value: "criminal", label: "Criminal" },
+  { value: "other", label: "Other" },
+];
+
+/** Maps case-type checkbox value to its Section 4b detail field (not including `other`). */
+const CASE_TYPE_DETAIL_KEY: Partial<
+  Record<
+    string,
+    | "custodyCaseDetails"
+    | "divorceCaseDetails"
+    | "juvenileCaseDetails"
+    | "guardianshipCaseDetails"
+    | "criminalCaseDetails"
+  >
+> = {
+  custody: "custodyCaseDetails",
+  divorce: "divorceCaseDetails",
+  juvenile: "juvenileCaseDetails",
+  guardianship: "guardianshipCaseDetails",
+  criminal: "criminalCaseDetails",
+};
+
+function toggleInList(list: string[], value: string): string[] {
+  return list.includes(value) ? list.filter((x) => x !== value) : [...list, value];
+}
+
+function labelsForValues(
+  values: string[],
+  options: { value: string; label: string }[],
+): string {
+  if (values.length === 0) return "—";
+  return values
+    .map((v) => options.find((o) => o.value === v)?.label ?? v)
+    .join(", ");
+}
 
 const GENDER_OPTIONS = DV100_GENDER_OPTIONS;
 type FormData = Dv100PdfFormData;
@@ -39,6 +146,23 @@ const initialForm: FormData = {
   respondentDob: "",
   respondentGender: "",
   respondentRace: "",
+  relationshipChecks: [],
+  childrenNames: "",
+  relatedTypes: [],
+  livedTogether: "",
+  hasRestrainingOrders: "",
+  order1Date: "",
+  order1Expires: "",
+  order2Date: "",
+  order2Expires: "",
+  hasOtherCases: "",
+  caseTypes: [],
+  otherCaseType: "",
+  custodyCaseDetails: "",
+  divorceCaseDetails: "",
+  juvenileCaseDetails: "",
+  guardianshipCaseDetails: "",
+  criminalCaseDetails: "",
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -120,6 +244,8 @@ export default function FormWizardPage() {
     "mt-2 w-full rounded-xl border border-sky-100 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-200/80";
 
   const display = (v: string) => (v.trim() ? v : "—");
+  const displayYn = (v: string) =>
+    v === "yes" ? "Yes" : v === "no" ? "No" : "—";
 
   return (
     <div className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-gradient-to-b from-sky-50 via-white to-blue-50/80">
@@ -146,14 +272,7 @@ export default function FormWizardPage() {
               {STEP_TITLES[step]}
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 sm:text-base">
-              {step === 0 &&
-                "Enter your details as they should appear on DV-100 (Page 1). Fields match the official form."}
-              {step === 1 &&
-                "If an attorney represents you in this case, provide their information for the form."}
-              {step === 2 &&
-                "Provide identifying information for the person you are asking the court for protection from."}
-              {step === 3 &&
-                "Confirm everything below, then generate your filled PDF."}
+              {STEP_BLURBS[step]}
             </p>
 
             <div className="mt-8 flex flex-1 flex-col">
@@ -537,6 +656,412 @@ export default function FormWizardPage() {
               )}
 
               {step === 3 && (
+                <div className="space-y-6">
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Check all that apply
+                    </legend>
+                    <div className="space-y-3">
+                      {RELATIONSHIP_OPTIONS.map(({ value, label }) => (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={form.relationshipChecks.includes(value)}
+                            onChange={() => {
+                              const next = toggleInList(
+                                form.relationshipChecks,
+                                value,
+                              );
+                              update("relationshipChecks", next);
+                              if (!next.includes("children")) {
+                                update("childrenNames", "");
+                              }
+                              if (!next.includes("related")) {
+                                update("relatedTypes", []);
+                              }
+                              if (!next.includes("liveTogether")) {
+                                update("livedTogether", "");
+                              }
+                            }}
+                            className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            {label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  {form.relationshipChecks.includes("children") && (
+                    <div>
+                      <label
+                        htmlFor="childrenNames"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        Names of children
+                      </label>
+                      <input
+                        id="childrenNames"
+                        name="childrenNames"
+                        type="text"
+                        autoComplete="off"
+                        value={form.childrenNames}
+                        onChange={(e) =>
+                          update("childrenNames", e.target.value)
+                        }
+                        className={inputClass}
+                      />
+                    </div>
+                  )}
+
+                  {form.relationshipChecks.includes("related") && (
+                    <fieldset className="space-y-4 border-t border-sky-100/90 pt-6">
+                      <legend className="text-sm font-medium text-slate-800">
+                        The person in 2 is my (check all that apply)
+                      </legend>
+                      <div className="space-y-3">
+                        {RELATED_TYPE_OPTIONS.map(({ value, label }) => (
+                          <label
+                            key={value}
+                            className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={form.relatedTypes.includes(value)}
+                              onChange={() =>
+                                update(
+                                  "relatedTypes",
+                                  toggleInList(form.relatedTypes, value),
+                                )
+                              }
+                              className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              {label}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+                  )}
+
+                  {form.relationshipChecks.includes("liveTogether") && (
+                    <fieldset className="space-y-4 border-t border-sky-100/90 pt-6">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Have you lived together with the person in 2?
+                      </legend>
+                      <div className="space-y-3">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="livedTogether"
+                            checked={form.livedTogether === "yes"}
+                            onChange={() => update("livedTogether", "yes")}
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            Yes
+                          </span>
+                        </label>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="livedTogether"
+                            checked={form.livedTogether === "no"}
+                            onChange={() => update("livedTogether", "no")}
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            No
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+                  )}
+                </div>
+              )}
+
+              {step === 4 && (
+                <div className="space-y-8">
+                  <section className="space-y-6">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Other restraining or protective orders
+                    </h2>
+                    <fieldset className="space-y-4">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Do you have any other restraining/protective orders
+                        currently in effect?
+                      </legend>
+                      <div className="space-y-3">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="hasRestrainingOrders"
+                            checked={form.hasRestrainingOrders === "yes"}
+                            onChange={() =>
+                              update("hasRestrainingOrders", "yes")
+                            }
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            Yes
+                          </span>
+                        </label>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="hasRestrainingOrders"
+                            checked={form.hasRestrainingOrders === "no"}
+                            onChange={() =>
+                              update("hasRestrainingOrders", "no")
+                            }
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            No
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+                    {form.hasRestrainingOrders === "yes" && (
+                      <div className="space-y-6 border-t border-sky-100/90 pt-6">
+                        <p className="text-sm text-slate-600">
+                          For each order, enter the date of the order and when it
+                          expires.
+                        </p>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div>
+                            <label
+                              htmlFor="order1Date"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 1 — date of order
+                            </label>
+                            <input
+                              id="order1Date"
+                              name="order1Date"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order1Date}
+                              onChange={(e) =>
+                                update("order1Date", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="order1Expires"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 1 — date it expires
+                            </label>
+                            <input
+                              id="order1Expires"
+                              name="order1Expires"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order1Expires}
+                              onChange={(e) =>
+                                update("order1Expires", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div>
+                            <label
+                              htmlFor="order2Date"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 2 — date of order
+                            </label>
+                            <input
+                              id="order2Date"
+                              name="order2Date"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order2Date}
+                              onChange={(e) =>
+                                update("order2Date", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="order2Expires"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 2 — date it expires
+                            </label>
+                            <input
+                              id="order2Expires"
+                              name="order2Expires"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order2Expires}
+                              onChange={(e) =>
+                                update("order2Expires", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-6 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Other court cases
+                    </h2>
+                    <fieldset className="space-y-4">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Has any other court case involving you and this person
+                        been filed?
+                      </legend>
+                      <div className="space-y-3">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="hasOtherCases"
+                            checked={form.hasOtherCases === "yes"}
+                            onChange={() => update("hasOtherCases", "yes")}
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            Yes
+                          </span>
+                        </label>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                          <input
+                            type="radio"
+                            name="hasOtherCases"
+                            checked={form.hasOtherCases === "no"}
+                            onChange={() => update("hasOtherCases", "no")}
+                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            No
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    {form.hasOtherCases === "yes" && (
+                      <div className="space-y-6 border-t border-sky-100/90 pt-6">
+                        <fieldset className="space-y-4">
+                          <legend className="text-sm font-medium text-slate-800">
+                            Type of case (check all that apply)
+                          </legend>
+                          <div className="space-y-3">
+                            {CASE_TYPE_OPTIONS.map(({ value, label }) => {
+                              const checked = form.caseTypes.includes(value);
+                              const detailKey = CASE_TYPE_DETAIL_KEY[value];
+                              return (
+                                <div
+                                  key={value}
+                                  className="rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm"
+                                >
+                                  <label className="flex cursor-pointer items-start gap-3 transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => {
+                                        setForm((prev) => {
+                                          const wasIncluded =
+                                            prev.caseTypes.includes(value);
+                                          const nextTypes = toggleInList(
+                                            prev.caseTypes,
+                                            value,
+                                          );
+                                          const next: FormData = {
+                                            ...prev,
+                                            caseTypes: nextTypes,
+                                          };
+                                          if (
+                                            wasIncluded &&
+                                            !nextTypes.includes(value)
+                                          ) {
+                                            const dk = CASE_TYPE_DETAIL_KEY[value];
+                                            if (dk) next[dk] = "";
+                                            if (value === "other") {
+                                              next.otherCaseType = "";
+                                            }
+                                          }
+                                          return next;
+                                        });
+                                      }}
+                                      className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    />
+                                    <span className="text-sm leading-relaxed text-slate-800">
+                                      {label}
+                                    </span>
+                                  </label>
+                                  {checked && detailKey && (
+                                    <div className="mt-3 border-t border-sky-100/90 pt-3 pl-7">
+                                      <label
+                                        htmlFor={detailKey}
+                                        className="text-sm font-medium text-slate-800"
+                                      >
+                                        Case details (city, state, year, case
+                                        number)
+                                      </label>
+                                      <input
+                                        id={detailKey}
+                                        name={detailKey}
+                                        type="text"
+                                        autoComplete="off"
+                                        value={form[detailKey]}
+                                        onChange={(e) =>
+                                          update(detailKey, e.target.value)
+                                        }
+                                        className={`${inputClass} mt-1.5`}
+                                      />
+                                    </div>
+                                  )}
+                                  {checked && value === "other" && (
+                                    <div className="mt-3 border-t border-sky-100/90 pt-3 pl-7">
+                                      <label
+                                        htmlFor="otherCaseType"
+                                        className="text-sm font-medium text-slate-800"
+                                      >
+                                        What kind of case?
+                                      </label>
+                                      <input
+                                        id="otherCaseType"
+                                        name="otherCaseType"
+                                        type="text"
+                                        autoComplete="off"
+                                        value={form.otherCaseType}
+                                        onChange={(e) =>
+                                          update(
+                                            "otherCaseType",
+                                            e.target.value,
+                                          )
+                                        }
+                                        className={`${inputClass} mt-1.5`}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </fieldset>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {step === 5 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
@@ -692,6 +1217,143 @@ export default function FormWizardPage() {
                           <span className="text-slate-500">Race:</span>{" "}
                           {display(form.respondentRace)}
                         </p>
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                        Relationship to other party
+                      </dt>
+                      <dd className="mt-2 space-y-1 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">Applies:</span>{" "}
+                          {labelsForValues(
+                            form.relationshipChecks,
+                            RELATIONSHIP_OPTIONS,
+                          )}
+                        </p>
+                        {form.relationshipChecks.includes("children") && (
+                          <p>
+                            <span className="text-slate-500">
+                              Children&apos;s names:
+                            </span>{" "}
+                            {display(form.childrenNames)}
+                          </p>
+                        )}
+                        {form.relationshipChecks.includes("related") && (
+                          <p>
+                            <span className="text-slate-500">Related as:</span>{" "}
+                            {labelsForValues(
+                              form.relatedTypes,
+                              RELATED_TYPE_OPTIONS,
+                            )}
+                          </p>
+                        )}
+                        {form.relationshipChecks.includes("liveTogether") && (
+                          <p>
+                            <span className="text-slate-500">
+                              Lived together with person in 2:
+                            </span>{" "}
+                            {displayYn(form.livedTogether)}
+                          </p>
+                        )}
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                        Other court cases
+                      </dt>
+                      <dd className="mt-2 space-y-1 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Other restraining/protective orders in effect:
+                          </span>{" "}
+                          {displayYn(form.hasRestrainingOrders)}
+                        </p>
+                        {form.hasRestrainingOrders === "yes" && (
+                          <>
+                            <p>
+                              <span className="text-slate-500">
+                                Order 1 — date / expires:
+                              </span>{" "}
+                              {display(form.order1Date)} /{" "}
+                              {display(form.order1Expires)}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">
+                                Order 2 — date / expires:
+                              </span>{" "}
+                              {display(form.order2Date)} /{" "}
+                              {display(form.order2Expires)}
+                            </p>
+                          </>
+                        )}
+                        <p>
+                          <span className="text-slate-500">
+                            Other court case filed:
+                          </span>{" "}
+                          {displayYn(form.hasOtherCases)}
+                        </p>
+                        {form.hasOtherCases === "yes" && (
+                          <>
+                            <p>
+                              <span className="text-slate-500">
+                                Case types:
+                              </span>{" "}
+                              {labelsForValues(
+                                form.caseTypes,
+                                CASE_TYPE_OPTIONS,
+                              )}
+                            </p>
+                            {form.caseTypes.includes("custody") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Custody — case details:
+                                </span>{" "}
+                                {display(form.custodyCaseDetails)}
+                              </p>
+                            )}
+                            {form.caseTypes.includes("divorce") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Divorce — case details:
+                                </span>{" "}
+                                {display(form.divorceCaseDetails)}
+                              </p>
+                            )}
+                            {form.caseTypes.includes("juvenile") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Juvenile — case details:
+                                </span>{" "}
+                                {display(form.juvenileCaseDetails)}
+                              </p>
+                            )}
+                            {form.caseTypes.includes("guardianship") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Guardianship — case details:
+                                </span>{" "}
+                                {display(form.guardianshipCaseDetails)}
+                              </p>
+                            )}
+                            {form.caseTypes.includes("criminal") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Criminal — case details:
+                                </span>{" "}
+                                {display(form.criminalCaseDetails)}
+                              </p>
+                            )}
+                            {form.caseTypes.includes("other") && (
+                              <p>
+                                <span className="text-slate-500">
+                                  Other — what kind of case:
+                                </span>{" "}
+                                {display(form.otherCaseType)}
+                              </p>
+                            )}
+                          </>
+                        )}
                       </dd>
                     </div>
                   </dl>
