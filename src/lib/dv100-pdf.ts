@@ -40,6 +40,22 @@ export type Dv100FirearmRow = {
   location: string;
 };
 
+/** Section 16 — up to four animals (DV-100 Page 9). */
+export type Dv100ProtectedAnimal = {
+  name: string;
+  type: string;
+  breed: string;
+  color: string;
+};
+
+/** Section 22a — up to three debts (DV-100 Page 10). */
+export type Dv100PayDebtRow = {
+  payTo: string;
+  payFor: string;
+  amount: string;
+  dueDate: string;
+};
+
 /**
  * Wizard answers written into the PDF by {@link generateDV100PDF}.
  */
@@ -178,6 +194,45 @@ export type Dv100PdfFormData = {
   otherOrdersDescribe: string;
   /** Section 15 — checkbox only; DV-105 is separate */
   childCustodyVisitation: boolean;
+  /** Section 16 — Protect Animals (DV-100 Page 9) */
+  protectAnimals: boolean;
+  protectedAnimals: Dv100ProtectedAnimal[];
+  protectAnimalsStayAway: boolean;
+  /** 16b1 — '' | 'hundred' | 'other' */
+  protectAnimalsStayAwayDistance: "" | "hundred" | "other";
+  protectAnimalsStayAwayOtherYards: string;
+  protectAnimalsNotTake: boolean;
+  protectAnimalsSolePossession: boolean;
+  protectAnimalsSoleReasonAbuse: boolean;
+  protectAnimalsSoleReasonCare: boolean;
+  protectAnimalsSoleReasonPurchased: boolean;
+  protectAnimalsSoleReasonOther: boolean;
+  protectAnimalsSoleReasonOtherExplain: string;
+  /** Section 17 */
+  controlProperty: boolean;
+  controlPropertyDescribe: string;
+  controlPropertyWhy: string;
+  /** Section 18 */
+  healthOtherInsurance: boolean;
+  /** Section 19 */
+  recordCommunications: boolean;
+  /** Section 20 — property restraint (DV-100 Page 10) */
+  propertyRestraint: boolean;
+  /** Section 21 */
+  extendNoticeDeadline: boolean;
+  extendNoticeExplain: string;
+  /** Section 22 master & grid */
+  payDebtsForProperty: boolean;
+  payDebtsRows: Dv100PayDebtRow[];
+  payDebtsExplain: string;
+  /** Section 22b — '' | 'yes' | 'no' */
+  payDebtsSpecialDecision: "" | "yes" | "no";
+  payDebtsAbuseDebt1: boolean;
+  payDebtsAbuseDebt2: boolean;
+  payDebtsAbuseDebt3: boolean;
+  /** '' | 'yes' | 'no' */
+  payDebtsKnowHow: "" | "yes" | "no";
+  payDebtsExplainHow: string;
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -612,6 +667,101 @@ const PDF_PAGE8_13B_OTHER_TEXT = "13b other explain";
 const PDF_PAGE8_OTHER_ORDERS = "Other Orders";
 const PDF_PAGE8_14_DESCRIBE = "14 describe additional orders";
 const PDF_PAGE8_CHILD_CUSTODY = "Child Custody and Visitation";
+
+// --- DV-100 Page 9 — Sections 16–19 ---
+
+const PDF_16_MASTER = "Protect Animals";
+const PDF_16A_NAME_1 = "16a name 1";
+const PDF_16A_NAME_2 = "16a name 2";
+const PDF_16A_NAME_3 = "16a name 3";
+const PDF_16A_NAME_4 = "16a name 4";
+const PDF_16A_TYPE_1 = "Type of animal 1";
+const PDF_16A_TYPE_2 = "Type of animal 2";
+const PDF_16A_TYPE_3 = "Type of animal 3";
+const PDF_16A_TYPE_4 = "Type of animal 4";
+const PDF_16A_BREED_1 = "Breed if known 1";
+const PDF_16A_BREED_2 = "Breed if known 2";
+const PDF_16A_BREED_3 = "Breed if known 3";
+const PDF_16A_BREED_4 = "Breed if known 4";
+const PDF_16A_COLOR_1 = "Color 1";
+const PDF_16A_COLOR_2 = "Color 2";
+const PDF_16A_COLOR_3 = "Color 3";
+const PDF_16A_COLOR_4 = "Color 4";
+const PDF_16B1_STAY_AWAY_CHECK = "Stay away from the animals by at least";
+const PDF_16B1_100_YARDS = "100 yards 300 feet_2";
+const PDF_16B1_OTHER_YARDS_CHECK = "Other number of yards";
+const PDF_16B1_OTHER_YARDS_TEXT = "undefined_18";
+const PDF_16B2_NOT_TAKE = "Not take";
+const PDF_16B3_SOLE_POSSESSION = "Give me sole possession";
+const PDF_16B3_REASON_ABUSE = "Person in";
+const PDF_16B3_REASON_CARE = "I take care of these animals";
+const PDF_16B3_REASON_PURCHASED = "I purchased these animals";
+const PDF_16B3_REASON_OTHER_CHECK = "16b3 Other please explain_5";
+const PDF_16B3_REASON_OTHER_TEXT = "16b3 Other explain";
+const PDF_17_MASTER = "Control of Property";
+const PDF_17A_TEXT = "17a property list";
+const PDF_17B_TEXT = "17b property control explain";
+const PDF_18_MASTER = "Health and Other Insurance";
+const PDF_19_MASTER = "Record Communications";
+
+// Sections 20 & 21
+const PDF_20_MASTER = "Property Restraint";
+const PDF_21_MASTER = "Extend my deadline to give notice to person in 2";
+const PDF_21_TEXT = "21 explain more time";
+
+// Section 22 Master & Grid
+const PDF_22_MASTER = "Pay Debts Bills Owed for Property";
+const PDF_22A_PAY_TO_1 = "1 Pay to";
+const PDF_22A_PAY_TO_2 = "2 Pay to";
+const PDF_22A_PAY_TO_3 = "3 Pay to";
+const PDF_22A_FOR_1 = "For";
+const PDF_22A_FOR_2 = "For_2";
+const PDF_22A_FOR_3 = "For_3";
+const PDF_22A_AMOUNT_1 = "Amount";
+const PDF_22A_AMOUNT_2 = "Amount_2";
+const PDF_22A_AMOUNT_3 = "Amount_3";
+const PDF_22A_DUE_1 = "Due date";
+const PDF_22A_DUE_2 = "Due date_2";
+const PDF_22A_DUE_3 = "Due date_3";
+const PDF_22A_EXPLAIN = "22a explain pay debts";
+
+// Section 22b Special Decision
+const PDF_22B_SPECIAL_DECISION_RADIO_GROUP =
+  "Do you want the judge to make this special decision finding";
+const PDF_22B_SPECIAL_DECISION_YES = "Yes_10";
+const PDF_22B_SPECIAL_DECISION_NO = "No_24";
+const PDF_22B_DEBT_CHECK_1 = "a1";
+const PDF_22B_DEBT_CHECK_2 = "a2";
+const PDF_22B_DEBT_CHECK_3 = "a3";
+const PDF_22B_KNOW_HOW_RADIO_GROUP = "2 Do you know how the person in";
+const PDF_22B_KNOW_HOW_YES = "Yes_11";
+const PDF_22B_KNOW_HOW_NO = "No_25";
+const PDF_22B_EXPLAIN_HOW = "22b2 Explain how 2 made debts";
+
+const PDF_PAGE9_ANIMAL_NAMES = [
+  PDF_16A_NAME_1,
+  PDF_16A_NAME_2,
+  PDF_16A_NAME_3,
+  PDF_16A_NAME_4,
+] as const;
+const PDF_PAGE9_ANIMAL_TYPES = [
+  PDF_16A_TYPE_1,
+  PDF_16A_TYPE_2,
+  PDF_16A_TYPE_3,
+  PDF_16A_TYPE_4,
+] as const;
+const PDF_PAGE9_ANIMAL_BREEDS = [
+  PDF_16A_BREED_1,
+  PDF_16A_BREED_2,
+  PDF_16A_BREED_3,
+  PDF_16A_BREED_4,
+] as const;
+const PDF_PAGE9_ANIMAL_COLORS = [
+  PDF_16A_COLOR_1,
+  PDF_16A_COLOR_2,
+  PDF_16A_COLOR_3,
+  PDF_16A_COLOR_4,
+] as const;
 
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
@@ -3538,6 +3688,584 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
       missing.push({
         label: "Child Custody and Visitation",
         pdfFieldName: PDF_PAGE8_CHILD_CUSTODY,
+      });
+    }
+  }
+
+  // --- DV-100 Page 9 — Sections 16–19 ---
+  const s16 = data.protectAnimals === true;
+  const animals = data.protectedAnimals ?? [];
+
+  try {
+    if (s16) {
+      pdfForm.getCheckBox(PDF_16_MASTER).check();
+      filled.push({ label: "16. Protect Animals", pdfFieldName: PDF_16_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_16_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Protect Animals", err);
+    if (s16) {
+      missing.push({ label: "16. Protect Animals", pdfFieldName: PDF_16_MASTER });
+    }
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const row = animals[i] ?? { name: "", type: "", breed: "", color: "" };
+    const namePdf = PDF_PAGE9_ANIMAL_NAMES[i];
+    const typePdf = PDF_PAGE9_ANIMAL_TYPES[i];
+    const breedPdf = PDF_PAGE9_ANIMAL_BREEDS[i];
+    const colorPdf = PDF_PAGE9_ANIMAL_COLORS[i];
+    const n = (row.name ?? "").trim();
+    const t = (row.type ?? "").trim();
+    const b = (row.breed ?? "").trim();
+    const c = (row.color ?? "").trim();
+
+    const mapText = (pdfName: string, val: string, label: string) => {
+      try {
+        const field = pdfForm.getTextField(pdfName);
+        if (s16) {
+          field.setText(val);
+          if (val) {
+            filled.push({ label, pdfFieldName: pdfName });
+          }
+        } else {
+          field.setText("");
+        }
+      } catch (err) {
+        console.warn(`Failed to map animal field ${pdfName}`, err);
+        if (s16 && val) {
+          missing.push({ label, pdfFieldName: pdfName });
+        }
+      }
+    };
+
+    mapText(namePdf, n, `16a. Animal ${i + 1} name`);
+    mapText(typePdf, t, `16a. Animal ${i + 1} type`);
+    mapText(breedPdf, b, `16a. Animal ${i + 1} breed`);
+    mapText(colorPdf, c, `16a. Animal ${i + 1} color`);
+  }
+
+  try {
+    pdfForm.getCheckBox(PDF_16B1_100_YARDS).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_16B1_OTHER_YARDS_CHECK).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getTextField(PDF_16B1_OTHER_YARDS_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+
+  if (s16 && data.protectAnimalsStayAway) {
+    try {
+      pdfForm.getCheckBox(PDF_16B1_STAY_AWAY_CHECK).check();
+      filled.push({
+        label: "16b1. Stay away from animals (checkbox)",
+        pdfFieldName: PDF_16B1_STAY_AWAY_CHECK,
+      });
+    } catch (err) {
+      console.warn("Failed to map 16b1 stay away", err);
+      missing.push({
+        label: "16b1. Stay away from animals (checkbox)",
+        pdfFieldName: PDF_16B1_STAY_AWAY_CHECK,
+      });
+    }
+    const dist = data.protectAnimalsStayAwayDistance;
+    if (dist === "hundred") {
+      try {
+        pdfForm.getCheckBox(PDF_16B1_100_YARDS).check();
+        filled.push({ label: "16b1. 100 yards", pdfFieldName: PDF_16B1_100_YARDS });
+      } catch (err) {
+        console.warn("Failed to map 16b1 100 yards", err);
+        missing.push({ label: "16b1. 100 yards", pdfFieldName: PDF_16B1_100_YARDS });
+      }
+    } else if (dist === "other") {
+      try {
+        pdfForm.getCheckBox(PDF_16B1_OTHER_YARDS_CHECK).check();
+        filled.push({
+          label: "16b1. Other yards (checkbox)",
+          pdfFieldName: PDF_16B1_OTHER_YARDS_CHECK,
+        });
+      } catch (err) {
+        console.warn("Failed to map 16b1 other yards checkbox", err);
+        missing.push({
+          label: "16b1. Other yards (checkbox)",
+          pdfFieldName: PDF_16B1_OTHER_YARDS_CHECK,
+        });
+      }
+      try {
+        const field = pdfForm.getTextField(PDF_16B1_OTHER_YARDS_TEXT);
+        const yards = (data.protectAnimalsStayAwayOtherYards ?? "").trim();
+        if (yards) {
+          field.setText(yards);
+          filled.push({ label: "16b1. Other yards (text)", pdfFieldName: PDF_16B1_OTHER_YARDS_TEXT });
+        }
+      } catch (err) {
+        console.warn("Failed to map 16b1 other yards text", err);
+        if ((data.protectAnimalsStayAwayOtherYards ?? "").trim()) {
+          missing.push({
+            label: "16b1. Other yards (text)",
+            pdfFieldName: PDF_16B1_OTHER_YARDS_TEXT,
+          });
+        }
+      }
+    }
+  } else {
+    try {
+      pdfForm.getCheckBox(PDF_16B1_STAY_AWAY_CHECK).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+
+  const notTake = s16 && data.protectAnimalsNotTake === true;
+  try {
+    if (notTake) {
+      pdfForm.getCheckBox(PDF_16B2_NOT_TAKE).check();
+      filled.push({ label: "16b2. Not take / harm animals", pdfFieldName: PDF_16B2_NOT_TAKE });
+    } else {
+      pdfForm.getCheckBox(PDF_16B2_NOT_TAKE).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map 16b2 Not take", err);
+    if (notTake) {
+      missing.push({ label: "16b2. Not take / harm animals", pdfFieldName: PDF_16B2_NOT_TAKE });
+    }
+  }
+
+  const sole = s16 && data.protectAnimalsSolePossession === true;
+  try {
+    if (sole) {
+      pdfForm.getCheckBox(PDF_16B3_SOLE_POSSESSION).check();
+      filled.push({ label: "16b3. Sole possession", pdfFieldName: PDF_16B3_SOLE_POSSESSION });
+    } else {
+      pdfForm.getCheckBox(PDF_16B3_SOLE_POSSESSION).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map 16b3 sole possession", err);
+    if (sole) {
+      missing.push({ label: "16b3. Sole possession", pdfFieldName: PDF_16B3_SOLE_POSSESSION });
+    }
+  }
+
+  const map16b3Reason = (
+    checked: boolean,
+    pdfName: string,
+    label: string,
+  ) => {
+    try {
+      if (checked) {
+        pdfForm.getCheckBox(pdfName).check();
+        filled.push({ label, pdfFieldName: pdfName });
+      } else {
+        pdfForm.getCheckBox(pdfName).uncheck();
+      }
+    } catch (err) {
+      console.warn(`Failed to map 16b3 ${pdfName}`, err);
+      if (checked) {
+        missing.push({ label, pdfFieldName: pdfName });
+      }
+    }
+  };
+
+  map16b3Reason(
+    sole && data.protectAnimalsSoleReasonAbuse,
+    PDF_16B3_REASON_ABUSE,
+    "16b3. Reason: person in 2 abuses animals",
+  );
+  map16b3Reason(
+    sole && data.protectAnimalsSoleReasonCare,
+    PDF_16B3_REASON_CARE,
+    "16b3. Reason: I take care of these animals",
+  );
+  map16b3Reason(
+    sole && data.protectAnimalsSoleReasonPurchased,
+    PDF_16B3_REASON_PURCHASED,
+    "16b3. Reason: I purchased these animals",
+  );
+  map16b3Reason(
+    sole && data.protectAnimalsSoleReasonOther,
+    PDF_16B3_REASON_OTHER_CHECK,
+    "16b3. Reason: Other (checkbox)",
+  );
+
+  try {
+    const field = pdfForm.getTextField(PDF_16B3_REASON_OTHER_TEXT);
+    const ex = (data.protectAnimalsSoleReasonOtherExplain ?? "").trim();
+    if (sole && data.protectAnimalsSoleReasonOther && ex) {
+      field.setText(ex);
+      filled.push({ label: "16b3. Reason: Other (explain)", pdfFieldName: PDF_16B3_REASON_OTHER_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 16b3 other explain", err);
+    if (sole && data.protectAnimalsSoleReasonOther && (data.protectAnimalsSoleReasonOtherExplain ?? "").trim()) {
+      missing.push({
+        label: "16b3. Reason: Other (explain)",
+        pdfFieldName: PDF_16B3_REASON_OTHER_TEXT,
+      });
+    }
+  }
+
+  const s17 = data.controlProperty === true;
+  try {
+    if (s17) {
+      pdfForm.getCheckBox(PDF_17_MASTER).check();
+      filled.push({ label: "17. Control of Property", pdfFieldName: PDF_17_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_17_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Control of Property", err);
+    if (s17) {
+      missing.push({ label: "17. Control of Property", pdfFieldName: PDF_17_MASTER });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_17A_TEXT);
+    const a = (data.controlPropertyDescribe ?? "").trim();
+    if (s17 && a) {
+      field.setText(a);
+      filled.push({ label: "17a. Property list", pdfFieldName: PDF_17A_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 17a property", err);
+    if (s17 && (data.controlPropertyDescribe ?? "").trim()) {
+      missing.push({ label: "17a. Property list", pdfFieldName: PDF_17A_TEXT });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_17B_TEXT);
+    const b = (data.controlPropertyWhy ?? "").trim();
+    if (s17 && b) {
+      field.setText(b);
+      filled.push({ label: "17b. Why control", pdfFieldName: PDF_17B_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 17b explain", err);
+    if (s17 && (data.controlPropertyWhy ?? "").trim()) {
+      missing.push({ label: "17b. Why control", pdfFieldName: PDF_17B_TEXT });
+    }
+  }
+
+  const s18 = data.healthOtherInsurance === true;
+  try {
+    if (s18) {
+      pdfForm.getCheckBox(PDF_18_MASTER).check();
+      filled.push({ label: "18. Health and Other Insurance", pdfFieldName: PDF_18_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_18_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Health and Other Insurance", err);
+    if (s18) {
+      missing.push({ label: "18. Health and Other Insurance", pdfFieldName: PDF_18_MASTER });
+    }
+  }
+
+  const s19 = data.recordCommunications === true;
+  try {
+    if (s19) {
+      pdfForm.getCheckBox(PDF_19_MASTER).check();
+      filled.push({ label: "19. Record Communications", pdfFieldName: PDF_19_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_19_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Record Communications", err);
+    if (s19) {
+      missing.push({ label: "19. Record Communications", pdfFieldName: PDF_19_MASTER });
+    }
+  }
+
+  const s20 = data.propertyRestraint === true;
+  try {
+    if (s20) {
+      pdfForm.getCheckBox(PDF_20_MASTER).check();
+      filled.push({ label: "20. Property Restraint", pdfFieldName: PDF_20_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_20_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Property Restraint", err);
+    if (s20) {
+      missing.push({ label: "20. Property Restraint", pdfFieldName: PDF_20_MASTER });
+    }
+  }
+
+  const s21 = data.extendNoticeDeadline === true;
+  try {
+    if (s21) {
+      pdfForm.getCheckBox(PDF_21_MASTER).check();
+      filled.push({
+        label: "21. Extend deadline to give notice",
+        pdfFieldName: PDF_21_MASTER,
+      });
+    } else {
+      pdfForm.getCheckBox(PDF_21_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map extend notice master", err);
+    if (s21) {
+      missing.push({
+        label: "21. Extend deadline to give notice",
+        pdfFieldName: PDF_21_MASTER,
+      });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_21_TEXT);
+    const t21 = (data.extendNoticeExplain ?? "").trim();
+    if (s21 && t21) {
+      field.setText(t21);
+      filled.push({ label: "21. Explain more time", pdfFieldName: PDF_21_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 21 explain", err);
+    if (s21 && (data.extendNoticeExplain ?? "").trim()) {
+      missing.push({ label: "21. Explain more time", pdfFieldName: PDF_21_TEXT });
+    }
+  }
+
+  const s22 = data.payDebtsForProperty === true;
+  const rows = data.payDebtsRows ?? [];
+  const debtPdfCells: {
+    payTo: string;
+    payFor: string;
+    amount: string;
+    due: string;
+    label: string;
+  }[] = [
+    {
+      payTo: PDF_22A_PAY_TO_1,
+      payFor: PDF_22A_FOR_1,
+      amount: PDF_22A_AMOUNT_1,
+      due: PDF_22A_DUE_1,
+      label: "22a. Debt 1",
+    },
+    {
+      payTo: PDF_22A_PAY_TO_2,
+      payFor: PDF_22A_FOR_2,
+      amount: PDF_22A_AMOUNT_2,
+      due: PDF_22A_DUE_2,
+      label: "22a. Debt 2",
+    },
+    {
+      payTo: PDF_22A_PAY_TO_3,
+      payFor: PDF_22A_FOR_3,
+      amount: PDF_22A_AMOUNT_3,
+      due: PDF_22A_DUE_3,
+      label: "22a. Debt 3",
+    },
+  ];
+
+  try {
+    if (s22) {
+      pdfForm.getCheckBox(PDF_22_MASTER).check();
+      filled.push({
+        label: "22. Pay debts owed for property",
+        pdfFieldName: PDF_22_MASTER,
+      });
+    } else {
+      pdfForm.getCheckBox(PDF_22_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Pay Debts master", err);
+    if (s22) {
+      missing.push({
+        label: "22. Pay debts owed for property",
+        pdfFieldName: PDF_22_MASTER,
+      });
+    }
+  }
+
+  for (let i = 0; i < debtPdfCells.length; i++) {
+    const spec = debtPdfCells[i];
+    const row = rows[i];
+    const payToV = (row?.payTo ?? "").trim();
+    const payForV = (row?.payFor ?? "").trim();
+    const amountV = (row?.amount ?? "").trim();
+    const dueV = (row?.dueDate ?? "").trim();
+
+    const mapDebtText = (
+      pdfName: string,
+      value: string,
+      shortLabel: string,
+    ) => {
+      try {
+        const field = pdfForm.getTextField(pdfName);
+        if (s22 && value) {
+          field.setText(value);
+          filled.push({ label: `${spec.label} ${shortLabel}`, pdfFieldName: pdfName });
+        } else {
+          field.setText("");
+        }
+      } catch (err) {
+        console.warn(`Failed to map ${pdfName}`, err);
+        if (s22 && value) {
+          missing.push({ label: `${spec.label} ${shortLabel}`, pdfFieldName: pdfName });
+        }
+      }
+    };
+
+    mapDebtText(spec.payTo, payToV, "Pay to");
+    mapDebtText(spec.payFor, payForV, "For");
+    mapDebtText(spec.amount, amountV, "Amount");
+    mapDebtText(spec.due, dueV, "Due date");
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_22A_EXPLAIN);
+    const ex = (data.payDebtsExplain ?? "").trim();
+    if (s22 && ex) {
+      field.setText(ex);
+      filled.push({ label: "22a. Explain pay debts", pdfFieldName: PDF_22A_EXPLAIN });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 22a explain", err);
+    if (s22 && (data.payDebtsExplain ?? "").trim()) {
+      missing.push({ label: "22a. Explain pay debts", pdfFieldName: PDF_22A_EXPLAIN });
+    }
+  }
+
+  const specialYes = s22 && data.payDebtsSpecialDecision === "yes";
+  const specialNo = s22 && data.payDebtsSpecialDecision === "no";
+
+  try {
+    const rg = pdfForm.getRadioGroup(PDF_22B_SPECIAL_DECISION_RADIO_GROUP);
+    if (specialYes) {
+      rg.select(PDF_22B_SPECIAL_DECISION_YES);
+      filled.push({
+        label: "22b. Special decision: Yes",
+        pdfFieldName: PDF_22B_SPECIAL_DECISION_YES,
+      });
+    } else if (specialNo) {
+      rg.select(PDF_22B_SPECIAL_DECISION_NO);
+      filled.push({
+        label: "22b. Special decision: No",
+        pdfFieldName: PDF_22B_SPECIAL_DECISION_NO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 22b special decision radio", err);
+    if (specialYes) {
+      missing.push({
+        label: "22b. Special decision: Yes",
+        pdfFieldName: PDF_22B_SPECIAL_DECISION_YES,
+      });
+    } else if (specialNo) {
+      missing.push({
+        label: "22b. Special decision: No",
+        pdfFieldName: PDF_22B_SPECIAL_DECISION_NO,
+      });
+    }
+  }
+
+  const map22bDebtCheck = (
+    checked: boolean,
+    pdfName: string,
+    label: string,
+  ) => {
+    try {
+      if (checked) {
+        pdfForm.getCheckBox(pdfName).check();
+        filled.push({ label, pdfFieldName: pdfName });
+      } else {
+        pdfForm.getCheckBox(pdfName).uncheck();
+      }
+    } catch (err) {
+      console.warn(`Failed to map ${pdfName}`, err);
+      if (checked) {
+        missing.push({ label, pdfFieldName: pdfName });
+      }
+    }
+  };
+
+  map22bDebtCheck(
+    specialYes && data.payDebtsAbuseDebt1,
+    PDF_22B_DEBT_CHECK_1,
+    "22b. Debt 1 from abuse",
+  );
+  map22bDebtCheck(
+    specialYes && data.payDebtsAbuseDebt2,
+    PDF_22B_DEBT_CHECK_2,
+    "22b. Debt 2 from abuse",
+  );
+  map22bDebtCheck(
+    specialYes && data.payDebtsAbuseDebt3,
+    PDF_22B_DEBT_CHECK_3,
+    "22b. Debt 3 from abuse",
+  );
+
+  const knowYes = specialYes && data.payDebtsKnowHow === "yes";
+  const knowNo = specialYes && data.payDebtsKnowHow === "no";
+
+  try {
+    const rg = pdfForm.getRadioGroup(PDF_22B_KNOW_HOW_RADIO_GROUP);
+    if (knowYes) {
+      rg.select(PDF_22B_KNOW_HOW_YES);
+      filled.push({
+        label: "22b. Know how debts made: Yes",
+        pdfFieldName: PDF_22B_KNOW_HOW_YES,
+      });
+    } else if (knowNo) {
+      rg.select(PDF_22B_KNOW_HOW_NO);
+      filled.push({
+        label: "22b. Know how debts made: No",
+        pdfFieldName: PDF_22B_KNOW_HOW_NO,
+      });
+    }
+  } catch (err) {
+    console.warn("Failed to map 22b know-how radio", err);
+    if (knowYes) {
+      missing.push({
+        label: "22b. Know how debts made: Yes",
+        pdfFieldName: PDF_22B_KNOW_HOW_YES,
+      });
+    } else if (knowNo) {
+      missing.push({
+        label: "22b. Know how debts made: No",
+        pdfFieldName: PDF_22B_KNOW_HOW_NO,
+      });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_22B_EXPLAIN_HOW);
+    const how = (data.payDebtsExplainHow ?? "").trim();
+    if (knowYes && how) {
+      field.setText(how);
+      filled.push({
+        label: "22b2. Explain how debts made",
+        pdfFieldName: PDF_22B_EXPLAIN_HOW,
+      });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 22b2 explain how", err);
+    if (knowYes && (data.payDebtsExplainHow ?? "").trim()) {
+      missing.push({
+        label: "22b2. Explain how debts made",
+        pdfFieldName: PDF_22B_EXPLAIN_HOW,
       });
     }
   }

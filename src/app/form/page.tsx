@@ -10,6 +10,7 @@ import {
   type Dv100FirearmRow,
   type Dv100PdfFillRow,
   type Dv100PdfFormData,
+  type Dv100ProtectedAnimal,
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
 
@@ -25,6 +26,8 @@ const STEP_TITLES = [
   "Other Protected People & Firearms",
   "Orders You Want the Judge to Make",
   "Move Out, Other Orders, Custody",
+  "Property, Animals & Other Orders",
+  "Property, Notice & Debts",
   "Review & Generate",
 ] as const;
 
@@ -40,6 +43,8 @@ const STEP_BLURBS = [
   "List anyone else who needs protection (Section 8) and firearm information if known (Section 9), DV-100 Page 6.",
   "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
   "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
+  "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
+  "Property restraint, extended notice deadline, and pay-debts orders (DV-100 Sections 20-22, Page 10).",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
 
@@ -136,6 +141,13 @@ const MOVE_OUT_13A_MAX_LENGTH = 65;
 const MOVE_OUT_DURATION_MAX_LENGTH = 3;
 const MOVE_OUT_13B_OTHER_MAX_LENGTH = 400;
 const OTHER_ORDERS_14_MAX_LENGTH = 1000;
+const PAGE10_EXTEND_NOTICE_EXPLAIN_MAX = 300;
+const PAGE10_PAY_DEBTS_EXPLAIN_MAX = 300;
+const PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX = 300;
+const PAGE10_DEBT_PAY_TO_MAX = 20;
+const PAGE10_DEBT_FOR_MAX = 20;
+const PAGE10_DEBT_AMOUNT_MAX = 10;
+const PAGE10_DEBT_DUE_MAX = 15;
 
 function defaultProtectedPerson(): Dv100ProtectedPerson {
   return { name: "", age: "", relationship: "", livesWithYou: null };
@@ -143,6 +155,19 @@ function defaultProtectedPerson(): Dv100ProtectedPerson {
 
 function defaultFirearmRow(): Dv100FirearmRow {
   return { description: "", amount: "", location: "" };
+}
+
+function defaultProtectedAnimal(): Dv100ProtectedAnimal {
+  return { name: "", type: "", breed: "", color: "" };
+}
+
+function initialProtectedAnimals(): Dv100ProtectedAnimal[] {
+  return [
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+  ];
 }
 
 /** Maps case-type checkbox value to its Section 4b detail field (not including `other`). */
@@ -294,6 +319,39 @@ const initialForm: FormData = {
   otherOrders: false,
   otherOrdersDescribe: "",
   childCustodyVisitation: false,
+  protectAnimals: false,
+  protectedAnimals: initialProtectedAnimals(),
+  protectAnimalsStayAway: false,
+  protectAnimalsStayAwayDistance: "",
+  protectAnimalsStayAwayOtherYards: "",
+  protectAnimalsNotTake: false,
+  protectAnimalsSolePossession: false,
+  protectAnimalsSoleReasonAbuse: false,
+  protectAnimalsSoleReasonCare: false,
+  protectAnimalsSoleReasonPurchased: false,
+  protectAnimalsSoleReasonOther: false,
+  protectAnimalsSoleReasonOtherExplain: "",
+  controlProperty: false,
+  controlPropertyDescribe: "",
+  controlPropertyWhy: "",
+  healthOtherInsurance: false,
+  recordCommunications: false,
+  propertyRestraint: false,
+  extendNoticeDeadline: false,
+  extendNoticeExplain: "",
+  payDebtsForProperty: false,
+  payDebtsRows: [
+    { payTo: "", payFor: "", amount: "", dueDate: "" },
+    { payTo: "", payFor: "", amount: "", dueDate: "" },
+    { payTo: "", payFor: "", amount: "", dueDate: "" },
+  ],
+  payDebtsExplain: "",
+  payDebtsSpecialDecision: "",
+  payDebtsAbuseDebt1: false,
+  payDebtsAbuseDebt2: false,
+  payDebtsAbuseDebt3: false,
+  payDebtsKnowHow: "",
+  payDebtsExplainHow: "",
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -386,6 +444,49 @@ export default function FormWizardPage() {
       moveOutPaysRent: false,
       moveOutOther: false,
       moveOutOtherExplain: "",
+    }));
+
+  const resetProtectAnimals = () =>
+    setForm((prev) => ({
+      ...prev,
+      protectAnimals: false,
+      protectedAnimals: initialProtectedAnimals(),
+      protectAnimalsStayAway: false,
+      protectAnimalsStayAwayDistance: "",
+      protectAnimalsStayAwayOtherYards: "",
+      protectAnimalsNotTake: false,
+      protectAnimalsSolePossession: false,
+      protectAnimalsSoleReasonAbuse: false,
+      protectAnimalsSoleReasonCare: false,
+      protectAnimalsSoleReasonPurchased: false,
+      protectAnimalsSoleReasonOther: false,
+      protectAnimalsSoleReasonOtherExplain: "",
+    }));
+
+  const resetControlProperty = () =>
+    setForm((prev) => ({
+      ...prev,
+      controlProperty: false,
+      controlPropertyDescribe: "",
+      controlPropertyWhy: "",
+    }));
+
+  const resetPayDebtsForProperty = () =>
+    setForm((prev) => ({
+      ...prev,
+      payDebtsForProperty: false,
+      payDebtsRows: [
+        { payTo: "", payFor: "", amount: "", dueDate: "" },
+        { payTo: "", payFor: "", amount: "", dueDate: "" },
+        { payTo: "", payFor: "", amount: "", dueDate: "" },
+      ],
+      payDebtsExplain: "",
+      payDebtsSpecialDecision: "",
+      payDebtsAbuseDebt1: false,
+      payDebtsAbuseDebt2: false,
+      payDebtsAbuseDebt3: false,
+      payDebtsKnowHow: "",
+      payDebtsExplainHow: "",
     }));
 
   const canGoBack = step > 0;
@@ -3687,6 +3788,903 @@ export default function FormWizardPage() {
               )}
 
               {step === 11 && (
+                <div className="space-y-10">
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 16. Protect animals
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.protectAnimals}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            update("protectAnimals", true);
+                          } else {
+                            resetProtectAnimals();
+                          }
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Protect Animals
+                      </span>
+                    </label>
+
+                    {form.protectAnimals && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-slate-800">
+                            Animals (up to four)
+                          </h3>
+                          <div className="mt-3 space-y-4">
+                            {form.protectedAnimals.map((animal, idx) => (
+                              <div
+                                key={`animal-${idx}`}
+                                className="rounded-xl border border-sky-100/80 bg-white p-4 shadow-sm"
+                              >
+                                <p className="text-xs font-semibold uppercase tracking-wide text-sky-800/80">
+                                  Animal {idx + 1}
+                                </p>
+                                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                                  <div>
+                                    <label
+                                      htmlFor={`animal-name-${idx}`}
+                                      className="text-sm font-medium text-slate-800"
+                                    >
+                                      Name or other way to identify
+                                    </label>
+                                    <input
+                                      id={`animal-name-${idx}`}
+                                      type="text"
+                                      autoComplete="off"
+                                      value={animal.name}
+                                      onChange={(e) =>
+                                        setForm((prev) => {
+                                          const next = [...prev.protectedAnimals];
+                                          next[idx] = {
+                                            ...next[idx],
+                                            name: e.target.value,
+                                          };
+                                          return { ...prev, protectedAnimals: next };
+                                        })
+                                      }
+                                      className={inputClass}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label
+                                      htmlFor={`animal-type-${idx}`}
+                                      className="text-sm font-medium text-slate-800"
+                                    >
+                                      Type
+                                    </label>
+                                    <input
+                                      id={`animal-type-${idx}`}
+                                      type="text"
+                                      autoComplete="off"
+                                      value={animal.type}
+                                      onChange={(e) =>
+                                        setForm((prev) => {
+                                          const next = [...prev.protectedAnimals];
+                                          next[idx] = {
+                                            ...next[idx],
+                                            type: e.target.value,
+                                          };
+                                          return { ...prev, protectedAnimals: next };
+                                        })
+                                      }
+                                      className={inputClass}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label
+                                      htmlFor={`animal-breed-${idx}`}
+                                      className="text-sm font-medium text-slate-800"
+                                    >
+                                      Breed (if known)
+                                    </label>
+                                    <input
+                                      id={`animal-breed-${idx}`}
+                                      type="text"
+                                      autoComplete="off"
+                                      value={animal.breed}
+                                      onChange={(e) =>
+                                        setForm((prev) => {
+                                          const next = [...prev.protectedAnimals];
+                                          next[idx] = {
+                                            ...next[idx],
+                                            breed: e.target.value,
+                                          };
+                                          return { ...prev, protectedAnimals: next };
+                                        })
+                                      }
+                                      className={inputClass}
+                                    />
+                                  </div>
+                                  <div>
+                                    <label
+                                      htmlFor={`animal-color-${idx}`}
+                                      className="text-sm font-medium text-slate-800"
+                                    >
+                                      Color
+                                    </label>
+                                    <input
+                                      id={`animal-color-${idx}`}
+                                      type="text"
+                                      autoComplete="off"
+                                      value={animal.color}
+                                      onChange={(e) =>
+                                        setForm((prev) => {
+                                          const next = [...prev.protectedAnimals];
+                                          next[idx] = {
+                                            ...next[idx],
+                                            color: e.target.value,
+                                          };
+                                          return { ...prev, protectedAnimals: next };
+                                        })
+                                      }
+                                      className={inputClass}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <fieldset className="space-y-3 rounded-xl border border-sky-100/80 bg-sky-50/40 p-4">
+                          <legend className="text-sm font-medium text-slate-800">
+                            Orders regarding animals
+                          </legend>
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                            <input
+                              type="checkbox"
+                              checked={form.protectAnimalsStayAway}
+                              onChange={(e) => {
+                                const on = e.target.checked;
+                                setForm((prev) => ({
+                                  ...prev,
+                                  protectAnimalsStayAway: on,
+                                  ...(!on
+                                    ? {
+                                        protectAnimalsStayAwayDistance: "",
+                                        protectAnimalsStayAwayOtherYards: "",
+                                      }
+                                    : {}),
+                                }));
+                              }}
+                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            />
+                            <span className="text-sm text-slate-800">
+                              Stay away from animals by at least
+                            </span>
+                          </label>
+                          {form.protectAnimalsStayAway && (
+                            <div className="ml-7 space-y-3 border-l-2 border-sky-200/80 pl-4">
+                              <div className="flex flex-col gap-2">
+                                <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                                  <input
+                                    type="radio"
+                                    name="protectAnimalsStayAwayDistance"
+                                    checked={
+                                      form.protectAnimalsStayAwayDistance ===
+                                      "hundred"
+                                    }
+                                    onChange={() =>
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        protectAnimalsStayAwayDistance: "hundred",
+                                        protectAnimalsStayAwayOtherYards: "",
+                                      }))
+                                    }
+                                    className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  />
+                                  100 yards (300 feet)
+                                </label>
+                                <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                                  <input
+                                    type="radio"
+                                    name="protectAnimalsStayAwayDistance"
+                                    checked={
+                                      form.protectAnimalsStayAwayDistance ===
+                                      "other"
+                                    }
+                                    onChange={() =>
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        protectAnimalsStayAwayDistance: "other",
+                                      }))
+                                    }
+                                    className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  />
+                                  Other (yards)
+                                </label>
+                              </div>
+                              {form.protectAnimalsStayAwayDistance === "other" && (
+                                <div>
+                                  <label
+                                    htmlFor="protectAnimalsStayAwayOtherYards"
+                                    className="text-sm font-medium text-slate-800"
+                                  >
+                                    Number of yards
+                                  </label>
+                                  <input
+                                    id="protectAnimalsStayAwayOtherYards"
+                                    type="text"
+                                    inputMode="numeric"
+                                    autoComplete="off"
+                                    value={form.protectAnimalsStayAwayOtherYards}
+                                    onChange={(e) =>
+                                      update(
+                                        "protectAnimalsStayAwayOtherYards",
+                                        e.target.value,
+                                      )
+                                    }
+                                    className={inputClass}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                            <input
+                              type="checkbox"
+                              checked={form.protectAnimalsNotTake}
+                              onChange={(e) =>
+                                update("protectAnimalsNotTake", e.target.checked)
+                              }
+                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            />
+                            <span className="text-sm text-slate-800">
+                              Not take, sell, hide, molest, attack, strike,
+                              threaten, harm, or otherwise get rid of the
+                              animals; or get anyone else to do so
+                            </span>
+                          </label>
+
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                            <input
+                              type="checkbox"
+                              checked={form.protectAnimalsSolePossession}
+                              onChange={(e) => {
+                                const on = e.target.checked;
+                                setForm((prev) => ({
+                                  ...prev,
+                                  protectAnimalsSolePossession: on,
+                                  ...(!on
+                                    ? {
+                                        protectAnimalsSoleReasonAbuse: false,
+                                        protectAnimalsSoleReasonCare: false,
+                                        protectAnimalsSoleReasonPurchased: false,
+                                        protectAnimalsSoleReasonOther: false,
+                                        protectAnimalsSoleReasonOtherExplain: "",
+                                      }
+                                    : {}),
+                                }));
+                              }}
+                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            />
+                            <span className="text-sm text-slate-800">
+                              Give me sole possession, care, and control of the
+                              animals
+                            </span>
+                          </label>
+                          {form.protectAnimalsSolePossession && (
+                            <div className="ml-7 space-y-2 border-l-2 border-sky-200/80 pl-4">
+                              {(
+                                [
+                                  {
+                                    key: "protectAnimalsSoleReasonAbuse" as const,
+                                    label:
+                                      "Person in item 2 abuses the animals",
+                                  },
+                                  {
+                                    key: "protectAnimalsSoleReasonCare" as const,
+                                    label: "I take care of these animals",
+                                  },
+                                  {
+                                    key: "protectAnimalsSoleReasonPurchased" as const,
+                                    label: "I purchased these animals",
+                                  },
+                                ] as const
+                              ).map(({ key, label }) => (
+                                <label
+                                  key={key}
+                                  className="flex cursor-pointer items-start gap-3"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(form[key])}
+                                    onChange={(e) =>
+                                      update(key, e.target.checked)
+                                    }
+                                    className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  />
+                                  <span className="text-sm text-slate-800">
+                                    {label}
+                                  </span>
+                                </label>
+                              ))}
+                              <label className="flex cursor-pointer items-start gap-3">
+                                <input
+                                  type="checkbox"
+                                  checked={form.protectAnimalsSoleReasonOther}
+                                  onChange={(e) => {
+                                    const on = e.target.checked;
+                                    setForm((prev) => ({
+                                      ...prev,
+                                      protectAnimalsSoleReasonOther: on,
+                                      ...(!on
+                                        ? {
+                                            protectAnimalsSoleReasonOtherExplain:
+                                              "",
+                                          }
+                                        : {}),
+                                    }));
+                                  }}
+                                  className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                />
+                                <span className="text-sm text-slate-800">
+                                  Other
+                                </span>
+                              </label>
+                              {form.protectAnimalsSoleReasonOther && (
+                                <textarea
+                                  autoComplete="off"
+                                  value={form.protectAnimalsSoleReasonOtherExplain}
+                                  onChange={(e) =>
+                                    update(
+                                      "protectAnimalsSoleReasonOtherExplain",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className={textareaClass}
+                                />
+                              )}
+                            </div>
+                          )}
+                        </fieldset>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 17. Control of property
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.controlProperty}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            update("controlProperty", true);
+                          } else {
+                            resetControlProperty();
+                          }
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Control of Property
+                      </span>
+                    </label>
+                    {form.controlProperty && (
+                      <div className="space-y-4">
+                        <div>
+                          <label
+                            htmlFor="controlPropertyDescribe"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            17a. Describe the property
+                          </label>
+                          <textarea
+                            id="controlPropertyDescribe"
+                            autoComplete="off"
+                            value={form.controlPropertyDescribe}
+                            onChange={(e) =>
+                              update("controlPropertyDescribe", e.target.value)
+                            }
+                            className={textareaClass}
+                          />
+                        </div>
+                        <div>
+                          <label
+                            htmlFor="controlPropertyWhy"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            17b. Explain why you want control
+                          </label>
+                          <textarea
+                            id="controlPropertyWhy"
+                            autoComplete="off"
+                            value={form.controlPropertyWhy}
+                            onChange={(e) =>
+                              update("controlPropertyWhy", e.target.value)
+                            }
+                            className={textareaClass}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 18. Health and other insurance
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.healthOtherInsurance}
+                        onChange={(e) =>
+                          update("healthOtherInsurance", e.target.checked)
+                        }
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Health and Other Insurance
+                      </span>
+                    </label>
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 19. Record communications
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.recordCommunications}
+                        onChange={(e) =>
+                          update("recordCommunications", e.target.checked)
+                        }
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Record Communications
+                      </span>
+                    </label>
+                  </section>
+                </div>
+              )}
+
+              {step === 12 && (
+                <div className="space-y-10">
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 20. Property restraint
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.propertyRestraint}
+                        onChange={(e) =>
+                          update("propertyRestraint", e.target.checked)
+                        }
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Property Restraint
+                      </span>
+                    </label>
+                    <p className="text-xs leading-relaxed text-slate-500">
+                      Only check this if you are married or a registered domestic
+                      partner with the person you want protection from.
+                    </p>
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 21. Extend deadline to give notice
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.extendNoticeDeadline}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setForm((prev) => ({
+                            ...prev,
+                            extendNoticeDeadline: on,
+                            ...(!on ? { extendNoticeExplain: "" } : {}),
+                          }));
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Extend my deadline to give notice
+                      </span>
+                    </label>
+                    <p className="text-xs leading-relaxed text-slate-500">
+                      {`Usually, the judge will give you about two weeks to give notice, or to 'serve' the person of your request. `}
+                      If you need more time to serve, the judge may be able to
+                      give you a few extra days.
+                    </p>
+                    {form.extendNoticeDeadline && (
+                      <div>
+                        <label
+                          htmlFor="extendNoticeExplain"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Explain why you need more time
+                        </label>
+                        <textarea
+                          id="extendNoticeExplain"
+                          autoComplete="off"
+                          maxLength={PAGE10_EXTEND_NOTICE_EXPLAIN_MAX}
+                          value={form.extendNoticeExplain}
+                          onChange={(e) =>
+                            update("extendNoticeExplain", e.target.value)
+                          }
+                          className={textareaClass}
+                        />
+                        <p className="mt-1 text-xs text-slate-500">
+                          {form.extendNoticeExplain.length} /{" "}
+                          {PAGE10_EXTEND_NOTICE_EXPLAIN_MAX} characters
+                        </p>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 22. Pay debts owed for property
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.payDebtsForProperty}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            update("payDebtsForProperty", true);
+                          } else {
+                            resetPayDebtsForProperty();
+                          }
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Pay Debts (Bills) Owed for Property
+                      </span>
+                    </label>
+                    <p className="text-xs leading-relaxed text-slate-500">
+                      If you want the person to pay any debts owed for property,
+                      list them and explain why. The amount can be for the entire
+                      bill or only a portion. Some examples include rent,
+                      mortgage, car payment, etc.
+                    </p>
+
+                    {form.payDebtsForProperty && (
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-medium text-slate-800">
+                            Debts (up to three)
+                          </h3>
+                          <div className="mt-3 overflow-x-auto rounded-xl border border-sky-100/80 bg-white shadow-sm">
+                            <table className="w-full min-w-[36rem] text-left text-sm">
+                              <thead>
+                                <tr className="border-b border-sky-100 bg-sky-50/50 text-xs font-semibold uppercase tracking-wide text-sky-900/80">
+                                  <th className="px-3 py-2.5">Debt</th>
+                                  <th className="px-3 py-2.5">Pay to</th>
+                                  <th className="px-3 py-2.5">For</th>
+                                  <th className="px-3 py-2.5">Amount</th>
+                                  <th className="px-3 py-2.5">Due date</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {form.payDebtsRows.map((row, idx) => (
+                                  <tr
+                                    key={`debt-${idx}`}
+                                    className="border-b border-sky-100/80 last:border-b-0"
+                                  >
+                                    <td className="whitespace-nowrap px-3 py-3 text-xs font-medium text-slate-500">
+                                      {idx + 1}
+                                    </td>
+                                    <td className="px-3 py-2 align-top">
+                                      <label
+                                        htmlFor={`debt-payto-${idx}`}
+                                        className="sr-only"
+                                      >
+                                        Debt {idx + 1} pay to
+                                      </label>
+                                      <input
+                                        id={`debt-payto-${idx}`}
+                                        type="text"
+                                        autoComplete="off"
+                                        maxLength={PAGE10_DEBT_PAY_TO_MAX}
+                                        value={row.payTo}
+                                        onChange={(e) =>
+                                          setForm((prev) => {
+                                            const next = [...prev.payDebtsRows];
+                                            next[idx] = {
+                                              ...next[idx],
+                                              payTo: e.target.value,
+                                            };
+                                            return { ...prev, payDebtsRows: next };
+                                          })
+                                        }
+                                        className={inputClass}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2 align-top">
+                                      <label
+                                        htmlFor={`debt-for-${idx}`}
+                                        className="sr-only"
+                                      >
+                                        Debt {idx + 1} for
+                                      </label>
+                                      <input
+                                        id={`debt-for-${idx}`}
+                                        type="text"
+                                        autoComplete="off"
+                                        maxLength={PAGE10_DEBT_FOR_MAX}
+                                        value={row.payFor}
+                                        onChange={(e) =>
+                                          setForm((prev) => {
+                                            const next = [...prev.payDebtsRows];
+                                            next[idx] = {
+                                              ...next[idx],
+                                              payFor: e.target.value,
+                                            };
+                                            return { ...prev, payDebtsRows: next };
+                                          })
+                                        }
+                                        className={inputClass}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2 align-top">
+                                      <label
+                                        htmlFor={`debt-amt-${idx}`}
+                                        className="sr-only"
+                                      >
+                                        Debt {idx + 1} amount
+                                      </label>
+                                      <input
+                                        id={`debt-amt-${idx}`}
+                                        type="text"
+                                        autoComplete="off"
+                                        maxLength={PAGE10_DEBT_AMOUNT_MAX}
+                                        value={row.amount}
+                                        onChange={(e) =>
+                                          setForm((prev) => {
+                                            const next = [...prev.payDebtsRows];
+                                            next[idx] = {
+                                              ...next[idx],
+                                              amount: e.target.value,
+                                            };
+                                            return { ...prev, payDebtsRows: next };
+                                          })
+                                        }
+                                        className={inputClass}
+                                      />
+                                    </td>
+                                    <td className="px-3 py-2 align-top">
+                                      <label
+                                        htmlFor={`debt-due-${idx}`}
+                                        className="sr-only"
+                                      >
+                                        Debt {idx + 1} due date
+                                      </label>
+                                      <input
+                                        id={`debt-due-${idx}`}
+                                        type="text"
+                                        autoComplete="off"
+                                        maxLength={PAGE10_DEBT_DUE_MAX}
+                                        value={row.dueDate}
+                                        onChange={(e) =>
+                                          setForm((prev) => {
+                                            const next = [...prev.payDebtsRows];
+                                            next[idx] = {
+                                              ...next[idx],
+                                              dueDate: e.target.value,
+                                            };
+                                            return { ...prev, payDebtsRows: next };
+                                          })
+                                        }
+                                        className={inputClass}
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label
+                            htmlFor="payDebtsExplain"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Explain why you want the person to pay the debts
+                            listed above
+                          </label>
+                          <textarea
+                            id="payDebtsExplain"
+                            autoComplete="off"
+                            maxLength={PAGE10_PAY_DEBTS_EXPLAIN_MAX}
+                            value={form.payDebtsExplain}
+                            onChange={(e) =>
+                              update("payDebtsExplain", e.target.value)
+                            }
+                            className={textareaClass}
+                          />
+                          <p className="mt-1 text-xs text-slate-500">
+                            {form.payDebtsExplain.length} /{" "}
+                            {PAGE10_PAY_DEBTS_EXPLAIN_MAX} characters
+                          </p>
+                        </div>
+
+                        <fieldset className="space-y-2 rounded-xl border border-sky-100/80 bg-sky-50/40 p-4">
+                          <legend className="text-sm font-medium text-slate-800">
+                            Special decision (finding) by the judge if you did
+                            not agree to the debt (optional)
+                          </legend>
+                          <p className="text-xs leading-relaxed text-slate-500">
+                            If you did not agree to the debt or debts listed
+                            above, you can ask the judge to decide (find) that
+                            one or more debts was made without your permission
+                            and resulted from the abuse. This may help you defend
+                            against the debt if you are sued in another case.
+                          </p>
+                          <div className="flex flex-col gap-2 pt-1">
+                            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                              <input
+                                type="radio"
+                                name="payDebtsSpecialDecision"
+                                checked={form.payDebtsSpecialDecision === "yes"}
+                                onChange={() =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    payDebtsSpecialDecision: "yes",
+                                  }))
+                                }
+                                className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                              />
+                              Yes
+                            </label>
+                            <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                              <input
+                                type="radio"
+                                name="payDebtsSpecialDecision"
+                                checked={form.payDebtsSpecialDecision === "no"}
+                                onChange={() =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    payDebtsSpecialDecision: "no",
+                                    payDebtsAbuseDebt1: false,
+                                    payDebtsAbuseDebt2: false,
+                                    payDebtsAbuseDebt3: false,
+                                    payDebtsKnowHow: "",
+                                    payDebtsExplainHow: "",
+                                  }))
+                                }
+                                className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                              />
+                              No
+                            </label>
+                          </div>
+
+                          {form.payDebtsSpecialDecision === "yes" && (
+                            <div className="mt-4 space-y-4 border-t border-sky-200/60 pt-4">
+                              <p className="text-sm font-medium text-slate-800">
+                                Which of the debts listed above resulted from the
+                                abuse?
+                              </p>
+                              <div className="space-y-2">
+                                {(
+                                  [
+                                    {
+                                      key: "payDebtsAbuseDebt1" as const,
+                                      label: "Debt 1",
+                                    },
+                                    {
+                                      key: "payDebtsAbuseDebt2" as const,
+                                      label: "Debt 2",
+                                    },
+                                    {
+                                      key: "payDebtsAbuseDebt3" as const,
+                                      label: "Debt 3",
+                                    },
+                                  ] as const
+                                ).map(({ key, label }) => (
+                                  <label
+                                    key={key}
+                                    className="flex cursor-pointer items-center gap-2 text-sm text-slate-800"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={Boolean(form[key])}
+                                      onChange={(e) =>
+                                        update(key, e.target.checked)
+                                      }
+                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    />
+                                    {label}
+                                  </label>
+                                ))}
+                              </div>
+
+                              <div>
+                                <p className="text-sm font-medium text-slate-800">
+                                  Do you know how the person made the debt or
+                                  debts?
+                                </p>
+                                <div className="mt-2 flex flex-col gap-2">
+                                  <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                                    <input
+                                      type="radio"
+                                      name="payDebtsKnowHow"
+                                      checked={form.payDebtsKnowHow === "yes"}
+                                      onChange={() =>
+                                        setForm((prev) => ({
+                                          ...prev,
+                                          payDebtsKnowHow: "yes",
+                                        }))
+                                      }
+                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    />
+                                    Yes
+                                  </label>
+                                  <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
+                                    <input
+                                      type="radio"
+                                      name="payDebtsKnowHow"
+                                      checked={form.payDebtsKnowHow === "no"}
+                                      onChange={() =>
+                                        setForm((prev) => ({
+                                          ...prev,
+                                          payDebtsKnowHow: "no",
+                                          payDebtsExplainHow: "",
+                                        }))
+                                      }
+                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    />
+                                    No
+                                  </label>
+                                </div>
+                              </div>
+
+                              {form.payDebtsKnowHow === "yes" && (
+                                <div>
+                                  <label
+                                    htmlFor="payDebtsExplainHow"
+                                    className="text-sm font-medium text-slate-800"
+                                  >
+                                    Explain how they made the debt or debts
+                                  </label>
+                                  <textarea
+                                    id="payDebtsExplainHow"
+                                    autoComplete="off"
+                                    maxLength={
+                                      PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX
+                                    }
+                                    value={form.payDebtsExplainHow}
+                                    onChange={(e) =>
+                                      update("payDebtsExplainHow", e.target.value)
+                                    }
+                                    className={textareaClass}
+                                  />
+                                  <p className="mt-1 text-xs text-slate-500">
+                                    {form.payDebtsExplainHow.length} /{" "}
+                                    {PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX}{" "}
+                                    characters
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </fieldset>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {step === 13 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
@@ -4403,6 +5401,213 @@ export default function FormWizardPage() {
                           </span>{" "}
                           {form.childCustodyVisitation ? "Yes (complete DV-105)" : "No"}
                         </p>
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                        Property, animals &amp; other orders (Page 9)
+                      </dt>
+                      <dd className="mt-2 space-y-2 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Protect animals:
+                          </span>{" "}
+                          {form.protectAnimals ? "Yes" : "No"}
+                        </p>
+                        {form.protectAnimals ? (
+                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                            {form.protectedAnimals.map((a, i) => (
+                              <p key={`ra-${i}`}>
+                                <span className="text-slate-500">
+                                  Animal {i + 1}:
+                                </span>{" "}
+                                {display(a.name)} / {display(a.type)} /{" "}
+                                {display(a.breed)} / {display(a.color)}
+                              </p>
+                            ))}
+                            <p>
+                              <span className="text-slate-500">
+                                Stay away from animals:
+                              </span>{" "}
+                              {form.protectAnimalsStayAway
+                                ? form.protectAnimalsStayAwayDistance ===
+                                    "hundred"
+                                  ? "100 yards (300 feet)"
+                                  : form.protectAnimalsStayAwayDistance ===
+                                      "other"
+                                    ? form.protectAnimalsStayAwayOtherYards.trim()
+                                      ? `${form.protectAnimalsStayAwayOtherYards.trim()} yards`
+                                      : "Other (yards not specified)"
+                                    : "—"
+                                : "No"}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">
+                                Not take / harm animals:
+                              </span>{" "}
+                              {form.protectAnimalsNotTake ? "Yes" : "No"}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">
+                                Sole possession of animals:
+                              </span>{" "}
+                              {form.protectAnimalsSolePossession ? "Yes" : "No"}
+                            </p>
+                            {form.protectAnimalsSolePossession ? (
+                              <p>
+                                <span className="text-slate-500">
+                                  Reasons:
+                                </span>{" "}
+                                {(() => {
+                                  const parts: string[] = [];
+                                  if (form.protectAnimalsSoleReasonAbuse) {
+                                    parts.push("Person in 2 abuses the animals");
+                                  }
+                                  if (form.protectAnimalsSoleReasonCare) {
+                                    parts.push("I take care of these animals");
+                                  }
+                                  if (form.protectAnimalsSoleReasonPurchased) {
+                                    parts.push("I purchased these animals");
+                                  }
+                                  if (form.protectAnimalsSoleReasonOther) {
+                                    parts.push(
+                                      form.protectAnimalsSoleReasonOtherExplain.trim()
+                                        ? `Other (${form.protectAnimalsSoleReasonOtherExplain.trim()})`
+                                        : "Other",
+                                    );
+                                  }
+                                  return parts.length > 0 ? parts.join("; ") : "—";
+                                })()}
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">
+                            Control of property:
+                          </span>{" "}
+                          {form.controlProperty ? "Yes" : "No"}
+                        </p>
+                        {form.controlProperty ? (
+                          <>
+                            <p>
+                              <span className="text-slate-500">17a:</span>{" "}
+                              {display(form.controlPropertyDescribe)}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">17b:</span>{" "}
+                              {display(form.controlPropertyWhy)}
+                            </p>
+                          </>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">
+                            Health and other insurance:
+                          </span>{" "}
+                          {form.healthOtherInsurance ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">
+                            Record communications:
+                          </span>{" "}
+                          {form.recordCommunications ? "Yes" : "No"}
+                        </p>
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                        Property, notice &amp; debts (Page 10)
+                      </dt>
+                      <dd className="mt-2 space-y-2 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Property restraint:
+                          </span>{" "}
+                          {form.propertyRestraint ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">
+                            Extend deadline to give notice:
+                          </span>{" "}
+                          {form.extendNoticeDeadline ? "Yes" : "No"}
+                        </p>
+                        {form.extendNoticeDeadline ? (
+                          <p>
+                            <span className="text-slate-500">
+                              Why more time:
+                            </span>{" "}
+                            {display(form.extendNoticeExplain)}
+                          </p>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">
+                            Pay debts for property:
+                          </span>{" "}
+                          {form.payDebtsForProperty ? "Yes" : "No"}
+                        </p>
+                        {form.payDebtsForProperty ? (
+                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                            {form.payDebtsRows.map((d, i) => (
+                              <p key={`pd-${i}`}>
+                                <span className="text-slate-500">
+                                  Debt {i + 1}:
+                                </span>{" "}
+                                {display(d.payTo)} / {display(d.payFor)} /{" "}
+                                {display(d.amount)} / {display(d.dueDate)}
+                              </p>
+                            ))}
+                            <p>
+                              <span className="text-slate-500">
+                                Why they should pay:
+                              </span>{" "}
+                              {display(form.payDebtsExplain)}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">
+                                Special judge finding:
+                              </span>{" "}
+                              {form.payDebtsSpecialDecision === "yes"
+                                ? "Yes"
+                                : form.payDebtsSpecialDecision === "no"
+                                  ? "No"
+                                  : "—"}
+                            </p>
+                            {form.payDebtsSpecialDecision === "yes" ? (
+                              <>
+                                <p>
+                                  <span className="text-slate-500">
+                                    Debts from abuse:
+                                  </span>{" "}
+                                  {[
+                                    form.payDebtsAbuseDebt1 && "1",
+                                    form.payDebtsAbuseDebt2 && "2",
+                                    form.payDebtsAbuseDebt3 && "3",
+                                  ]
+                                    .filter(Boolean)
+                                    .join(", ") || "—"}
+                                </p>
+                                <p>
+                                  <span className="text-slate-500">
+                                    Know how debts were made:
+                                  </span>{" "}
+                                  {form.payDebtsKnowHow === "yes"
+                                    ? "Yes"
+                                    : form.payDebtsKnowHow === "no"
+                                      ? "No"
+                                      : "—"}
+                                </p>
+                                {form.payDebtsKnowHow === "yes" ? (
+                                  <p>
+                                    <span className="text-slate-500">
+                                      How:
+                                    </span>{" "}
+                                    {display(form.payDebtsExplainHow)}
+                                  </p>
+                                ) : null}
+                              </>
+                            ) : null}
+                          </div>
+                        ) : null}
                       </dd>
                     </div>
                     <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
