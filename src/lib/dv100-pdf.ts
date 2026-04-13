@@ -13,7 +13,38 @@ import {
   StandardFonts,
 } from "pdf-lib";
 
+import { fillLizInvoiceFromTemplate } from "@/utils/fillInvoice";
+
 export const DV100_PDF_URL = "/dv100.pdf";
+
+/** Section 23 — first row when “abuser pays LIZ fee” is selected (must match tiny PDF fields). */
+export const DV100_LIZ_PAYEE = "LIZ Break Free";
+/** Exact string for `For_1` when LIZ $250 line is used (period required). */
+export const DV100_LIZ_DOC_ASSIST_FOR = "Document Assist.";
+/** Amount string for Section 23 / invoice (no dollar sign, matches common court PDF numeric fields). */
+export const DV100_LIZ_FEE_AMOUNT = "250.00";
+/** Invoice line and table total (with currency symbol). */
+export const DV100_LIZ_INVOICE_LINE_AMOUNT = "$250.00";
+
+export type Dv100RestitutionExpenseRow = {
+  payTo: string;
+  forReason: string;
+  amount: string;
+};
+
+export function emptyRestitutionExpenses(): [
+  Dv100RestitutionExpenseRow,
+  Dv100RestitutionExpenseRow,
+  Dv100RestitutionExpenseRow,
+  Dv100RestitutionExpenseRow,
+] {
+  return [
+    { payTo: "", forReason: "", amount: "" },
+    { payTo: "", forReason: "", amount: "" },
+    { payTo: "", forReason: "", amount: "" },
+    { payTo: "", forReason: "", amount: "" },
+  ];
+}
 
 export type PdfFieldInspectRow = {
   name: string;
@@ -233,6 +264,26 @@ export type Dv100PdfFormData = {
   /** '' | 'yes' | 'no' */
   payDebtsKnowHow: "" | "yes" | "no";
   payDebtsExplainHow: string;
+  /** Section 23 — restitution / pay expenses caused by abuse (DV-100 Page 11) */
+  requestRestitution: boolean;
+  /** Request the $250 LIZ document assistance fee as a Section 23 line + appendix invoice. */
+  requestAbuserPayLizFee: boolean;
+  /** Four expense rows (Pay to / For / Amount); aligns with Section 23 grid. */
+  restitutionExpenses: [
+    Dv100RestitutionExpenseRow,
+    Dv100RestitutionExpenseRow,
+    Dv100RestitutionExpenseRow,
+    Dv100RestitutionExpenseRow,
+  ];
+  /** Section 24 */
+  requestChildSupport: boolean;
+  childSupportNoOrderWantOne: boolean;
+  childSupportHaveOrderWantChanged: boolean;
+  childSupportTANF: boolean;
+  /** Section 25 */
+  requestSpousalSupport: boolean;
+  /** Section 26 */
+  requestLawyerFees: boolean;
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -737,6 +788,48 @@ const PDF_22B_KNOW_HOW_RADIO_GROUP = "2 Do you know how the person in";
 const PDF_22B_KNOW_HOW_YES = "Yes_11";
 const PDF_22B_KNOW_HOW_NO = "No_25";
 const PDF_22B_EXPLAIN_HOW = "22b2 Explain how 2 made debts";
+
+/**
+ * DV-100 Page 11 — Sections 23–26 (restitution / pay expenses, child support, spousal support, lawyer fees).
+ *
+ * **Developer:** verify every AcroForm name below against `public/dv100.pdf` in Acrobat (names can change
+ * when re-flattening). Placeholder-style labels (`23_payTo_1`, `23_for_1`, …) are for readability only;
+ * the string constants are the actual field names pdf-lib uses.
+ *
+ * | Placeholder (guide) | AcroForm name (current template) |
+ * |---------------------|-----------------------------------|
+ * | 23_payTo_1 … 23_payTo_4 | Pay to_1 … Pay to_4 |
+ * | 23_for_1 … 23_for_4 | For_1 … For_4 |
+ * | 23_amount_1 … 23_amount_4 | Amount_1 … Amount_4 |
+ * | 23_master_checkbox | Pay Expenses Caused by the Abuse |
+ * | 24_child_support | Child Support |
+ * | 24a_checkbox, 24b_checkbox, 24c_checkbox | Section 24 sub-options (verify names in Acrobat) |
+ * | 25_spousal_support | Spousal Support |
+ * | 26_lawyer_fees | Lawyers Fees and Costs |
+ *
+ * Note: Section 22 also references names like `For_2` / `Amount_2` for Page 10; those are the same global
+ * field names as Section 23 rows 2–3—only one value can appear in the PDF for each name.
+ */
+const PDF_23_EXPENSE_MASTER = "Pay Expenses Caused by the Abuse";
+const PDF_23_EXPENSE_PAY_TO_1 = "Pay to_1";
+const PDF_23_EXPENSE_FOR_1 = "For_1";
+const PDF_23_EXPENSE_AMOUNT_1 = "Amount_1";
+const PDF_23_EXPENSE_PAY_TO_2 = "Pay to_2";
+const PDF_23_EXPENSE_FOR_2 = "For_2";
+const PDF_23_EXPENSE_AMOUNT_2 = "Amount_2";
+const PDF_23_EXPENSE_PAY_TO_3 = "Pay to_3";
+const PDF_23_EXPENSE_FOR_3 = "For_3";
+const PDF_23_EXPENSE_AMOUNT_3 = "Amount_3";
+const PDF_23_EXPENSE_PAY_TO_4 = "Pay to_4";
+const PDF_23_EXPENSE_FOR_4 = "For_4";
+const PDF_23_EXPENSE_AMOUNT_4 = "Amount_4";
+const PDF_24_CHILD_SUPPORT_MASTER = "Child Support";
+// TODO: Verify exact Acrobat field names for Section 24 sub-checkboxes
+const PDF_24_CHILD_SUPPORT_SUB_A = "24a_checkbox";
+const PDF_24_CHILD_SUPPORT_SUB_B = "24b_checkbox";
+const PDF_24_CHILD_SUPPORT_SUB_C = "24c_checkbox";
+const PDF_25_SPOUSAL_SUPPORT = "Spousal Support";
+const PDF_26_LAWYER_FEES = "Lawyers Fees and Costs";
 
 const PDF_PAGE9_ANIMAL_NAMES = [
   PDF_16A_NAME_1,
@@ -4270,7 +4363,166 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   }
 
+  // --- DV-100 Page 11: Sections 23–26 (see PDF_* constants and placeholder table above) ---
+  const s23 = data.requestRestitution === true;
+
+  /** Section 23 “For” lines can be long; trim for Acrobat widget limits. */
+  const clipFor = (s: string, max = 280) => {
+    const t = s.trim();
+    if (t.length <= max) return t;
+    return `${t.slice(0, max - 1)}…`;
+  };
+
+  const s23Grid = [
+    {
+      placePayTo: "23_payTo_1",
+      placeFor: "23_for_1",
+      placeAmount: "23_amount_1",
+      pdfPayTo: PDF_23_EXPENSE_PAY_TO_1,
+      pdfFor: PDF_23_EXPENSE_FOR_1,
+      pdfAmount: PDF_23_EXPENSE_AMOUNT_1,
+    },
+    {
+      placePayTo: "23_payTo_2",
+      placeFor: "23_for_2",
+      placeAmount: "23_amount_2",
+      pdfPayTo: PDF_23_EXPENSE_PAY_TO_2,
+      pdfFor: PDF_23_EXPENSE_FOR_2,
+      pdfAmount: PDF_23_EXPENSE_AMOUNT_2,
+    },
+    {
+      placePayTo: "23_payTo_3",
+      placeFor: "23_for_3",
+      placeAmount: "23_amount_3",
+      pdfPayTo: PDF_23_EXPENSE_PAY_TO_3,
+      pdfFor: PDF_23_EXPENSE_FOR_3,
+      pdfAmount: PDF_23_EXPENSE_AMOUNT_3,
+    },
+    {
+      placePayTo: "23_payTo_4",
+      placeFor: "23_for_4",
+      placeAmount: "23_amount_4",
+      pdfPayTo: PDF_23_EXPENSE_PAY_TO_4,
+      pdfFor: PDF_23_EXPENSE_FOR_4,
+      pdfAmount: PDF_23_EXPENSE_AMOUNT_4,
+    },
+  ] as const;
+
+  const mapExpenseText = (
+    pdfName: string,
+    value: string,
+    label: string,
+    /** When true, log “missing” if the value is non-empty but the field failed */
+    trackMissing: boolean,
+  ) => {
+    try {
+      const field = pdfForm.getTextField(pdfName);
+      if (s23 && value) {
+        field.setText(value);
+        filled.push({ label, pdfFieldName: pdfName });
+      } else {
+        field.setText("");
+      }
+    } catch (err) {
+      console.warn(`Failed to map ${pdfName} (${label})`, err);
+      if (trackMissing && s23 && value) {
+        missing.push({ label, pdfFieldName: pdfName });
+      }
+    }
+  };
+
+  try {
+    if (s23) {
+      pdfForm.getCheckBox(PDF_23_EXPENSE_MASTER).check();
+      filled.push({
+        label: "23. Pay expenses caused by abuse",
+        pdfFieldName: PDF_23_EXPENSE_MASTER,
+      });
+    } else {
+      pdfForm.getCheckBox(PDF_23_EXPENSE_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Pay Expenses master", err);
+    if (s23) {
+      missing.push({
+        label: "23. Pay expenses caused by abuse",
+        pdfFieldName: PDF_23_EXPENSE_MASTER,
+      });
+    }
+  }
+
+  const restitutionExpenseRows = data.restitutionExpenses ?? emptyRestitutionExpenses();
+  s23Grid.forEach((spec, idx) => {
+    const row = restitutionExpenseRows[idx] ?? { payTo: "", forReason: "", amount: "" };
+    const payTo = (row.payTo ?? "").trim();
+    const forReason = clipFor(row.forReason ?? "");
+    const amount = (row.amount ?? "").trim();
+    const line = idx + 1;
+    mapExpenseText(
+      spec.pdfPayTo,
+      s23 ? payTo : "",
+      `23. Pay expenses — pay to (line ${line}; ${spec.placePayTo})`,
+      true,
+    );
+    mapExpenseText(
+      spec.pdfFor,
+      s23 ? forReason : "",
+      `23. Pay expenses — for (line ${line}; ${spec.placeFor})`,
+      true,
+    );
+    mapExpenseText(
+      spec.pdfAmount,
+      s23 ? amount : "",
+      `23. Pay expenses — amount (line ${line}; ${spec.placeAmount})`,
+      true,
+    );
+  });
+
+  const mapPage11Check = (on: boolean, pdfName: string, label: string) => {
+    try {
+      if (on) {
+        pdfForm.getCheckBox(pdfName).check();
+        filled.push({ label, pdfFieldName: pdfName });
+      } else {
+        pdfForm.getCheckBox(pdfName).uncheck();
+      }
+    } catch (err) {
+      console.warn(`Failed to map ${pdfName}`, err);
+      if (on) {
+        missing.push({ label, pdfFieldName: pdfName });
+      }
+    }
+  };
+
+  const cs = data.requestChildSupport === true;
+  mapPage11Check(cs, PDF_24_CHILD_SUPPORT_MASTER, "24. Child support");
+  mapPage11Check(
+    cs && data.childSupportNoOrderWantOne === true,
+    PDF_24_CHILD_SUPPORT_SUB_A,
+    "24a. Child support — no order, want one",
+  );
+  mapPage11Check(
+    cs && data.childSupportHaveOrderWantChanged === true,
+    PDF_24_CHILD_SUPPORT_SUB_B,
+    "24b. Child support — have order, want changed",
+  );
+  mapPage11Check(cs && data.childSupportTANF === true, PDF_24_CHILD_SUPPORT_SUB_C, "24c. Child support — TANF / CalWORKS");
+
+  mapPage11Check(data.requestSpousalSupport === true, PDF_25_SPOUSAL_SUPPORT, "25. Spousal support");
+  mapPage11Check(data.requestLawyerFees === true, PDF_26_LAWYER_FEES, "26. Lawyer fees and costs");
+
   pdfForm.updateFieldAppearances();
+
+  if (data.requestAbuserPayLizFee === true) {
+    const inv = await fillLizInvoiceFromTemplate({
+      petitionerName: data.petitionerName,
+    });
+    const invPages = await doc.copyPages(inv, inv.getPageIndices());
+    for (const p of invPages) {
+      doc.addPage(p);
+    }
+  }
+
   const bytes = await doc.save();
   return { bytes, filled, missing };
 }

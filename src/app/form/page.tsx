@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import {
   DV100_GENDER_OPTIONS,
+  emptyRestitutionExpenses,
   generateDV100PDF,
   triggerPdfDownload,
   type Dv100FirearmRow,
@@ -13,6 +14,8 @@ import {
   type Dv100ProtectedAnimal,
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
+
+import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitutionStep";
 
 const STEP_TITLES = [
   "Your Information",
@@ -28,6 +31,7 @@ const STEP_TITLES = [
   "Move Out, Other Orders, Custody",
   "Property, Animals & Other Orders",
   "Property, Notice & Debts",
+  "Support, Fees & Restitution",
   "Review & Generate",
 ] as const;
 
@@ -45,6 +49,7 @@ const STEP_BLURBS = [
   "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
   "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
   "Property restraint, extended notice deadline, and pay-debts orders (DV-100 Sections 20-22, Page 10).",
+  "Request restitution for document preparation, and indicate child support, spousal support, and lawyer-fee orders (DV-100 Sections 23-26, Page 11).",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
 
@@ -352,6 +357,15 @@ const initialForm: FormData = {
   payDebtsAbuseDebt3: false,
   payDebtsKnowHow: "",
   payDebtsExplainHow: "",
+  requestRestitution: false,
+  requestAbuserPayLizFee: false,
+  restitutionExpenses: emptyRestitutionExpenses(),
+  requestChildSupport: false,
+  childSupportNoOrderWantOne: false,
+  childSupportHaveOrderWantChanged: false,
+  childSupportTANF: false,
+  requestSpousalSupport: false,
+  requestLawyerFees: false,
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -4690,6 +4704,14 @@ export default function FormWizardPage() {
               )}
 
               {step === 13 && (
+                <Page11SupportFeesRestitutionStep
+                  form={form}
+                  setForm={setForm}
+                  inputClass={inputClass}
+                />
+              )}
+
+              {step === 14 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
@@ -5613,6 +5635,71 @@ export default function FormWizardPage() {
                             ) : null}
                           </div>
                         ) : null}
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
+                        Support, fees &amp; restitution (Page 11)
+                      </dt>
+                      <dd className="mt-2 space-y-1 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Pay expenses caused by abuse (Section 23):
+                          </span>{" "}
+                          {form.requestRestitution ? "Yes" : "No"}
+                        </p>
+                        {form.requestRestitution ? (
+                          <>
+                            <p>
+                              <span className="text-slate-500">
+                                Abuser pays $250 LIZ fee (invoice appended):
+                              </span>{" "}
+                              {form.requestAbuserPayLizFee ? "Yes" : "No"}
+                            </p>
+                            <div className="mt-2 space-y-1">
+                              <p className="text-slate-500">Expense grid:</p>
+                              <ul className="list-inside list-disc text-slate-700">
+                                {form.restitutionExpenses.map((row, i) => (
+                                  <li key={i}>
+                                    {i + 1}. Pay to: {display(row.payTo)} · For:{" "}
+                                    {display(row.forReason)} · Amount:{" "}
+                                    {display(row.amount)}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">Child support:</span>{" "}
+                          {form.requestChildSupport ? "Yes" : "No"}
+                        </p>
+                        {form.requestChildSupport ? (
+                          <ul className="ml-4 list-inside list-disc space-y-0.5 text-slate-700">
+                            <li>
+                              No order, want one:{" "}
+                              {form.childSupportNoOrderWantOne ? "Yes" : "No"}
+                            </li>
+                            <li>
+                              Have order, want changed:{" "}
+                              {form.childSupportHaveOrderWantChanged ? "Yes" : "No"}
+                            </li>
+                            <li>
+                              TANF / Welfare / CalWORKS:{" "}
+                              {form.childSupportTANF ? "Yes" : "No"}
+                            </li>
+                          </ul>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">Spousal support:</span>{" "}
+                          {form.requestSpousalSupport ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">
+                            Lawyer&apos;s fees and costs:
+                          </span>{" "}
+                          {form.requestLawyerFees ? "Yes" : "No"}
+                        </p>
                       </dd>
                     </div>
                     <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
