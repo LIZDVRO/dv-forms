@@ -130,6 +130,38 @@ export type Dv100PdfFormData = {
   /** Section 9 — firearms: idk | no | yes | "" */
   hasFirearms: "" | "idk" | "no" | "yes";
   firearms: Dv100FirearmRow[];
+  /** Optional court case number (e.g. from clerk); copied to Page 7 `Case Number_7` when set */
+  caseNumber: string;
+  /** Section 10 */
+  orderToNotAbuse: boolean;
+  /** Section 11 */
+  noContactOrder: boolean;
+  /** Section 12 master */
+  stayAwayOrder: boolean;
+  stayAwayMe: boolean;
+  stayAwayHome: boolean;
+  stayAwayWork: boolean;
+  stayAwayVehicle: boolean;
+  stayAwaySchool: boolean;
+  stayAwayProtectedPersons: boolean;
+  stayAwayChildrenSchool: boolean;
+  stayAwayOther: boolean;
+  stayAwayOtherExplain: string;
+  /** 12b — distance: '' | 'hundred' | 'other' */
+  stayAwayDistance: "" | "hundred" | "other";
+  stayAwayDistanceOther: string;
+  /** 12c */
+  liveTogether: "" | "no" | "yes";
+  liveTogetherType: "" | "liveTogether" | "sameBuilding" | "sameNeighborhood" | "other";
+  liveTogetherOther: string;
+  /** 12d */
+  sameWorkplaceSchool: "" | "no" | "yes";
+  workTogether: boolean;
+  workTogetherCompany: string;
+  sameSchool: boolean;
+  sameSchoolName: string;
+  sameWorkplaceOther: boolean;
+  sameWorkplaceOtherExplain: string;
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -503,6 +535,43 @@ const PDF_PAGE6_FIREARM_LOC = [
   "Location if known 5",
   "Location if known 6",
 ] as const;
+
+/** Section 10–12 — DV-100 Page 7 (exact AcroForm names) */
+const PDF_PAGE7_CASE_NUMBER = "Case Number_7";
+const PDF_PAGE7_ORDER_NOT_ABUSE = "Order to Not Abuse";
+const PDF_PAGE7_NO_CONTACT = "NoContact Order";
+const PDF_PAGE7_STAY_AWAY_MASTER = "StayAway Order";
+const PDF_PAGE7_12A_CHECKBOXES: { dataKey: keyof Dv100PdfFormData; pdfName: string }[] = [
+  { dataKey: "stayAwayMe", pdfName: "Me" },
+  { dataKey: "stayAwayHome", pdfName: "My home" },
+  { dataKey: "stayAwayWork", pdfName: "My job or workplace" },
+  { dataKey: "stayAwayVehicle", pdfName: "My vehicle" },
+  { dataKey: "stayAwaySchool", pdfName: "My school" },
+  { dataKey: "stayAwayProtectedPersons", pdfName: "Each person in" },
+  { dataKey: "stayAwayChildrenSchool", pdfName: "My childrens school or childcare" },
+  { dataKey: "stayAwayOther", pdfName: "Other please explain" },
+];
+const PDF_PAGE7_12A_OTHER_TEXT = "12a Other please explain";
+const PDF_PAGE7_12B_100 = "100 yards 300 feet";
+const PDF_PAGE7_12B_OTHER_CB = "Other give distance in yards";
+const PDF_PAGE7_12B_OTHER_TEXT = "undefined_12";
+const PDF_PAGE7_12C_NO = "No_22";
+const PDF_PAGE7_12C_YES = "Yes If yes check one";
+/** PDF uses two spaces before `2` */
+const PDF_PAGE7_12C_LIVE_TOGETHER =
+  "Live together If you live together you can ask that the person in  2";
+const PDF_PAGE7_12C_SAME_BUILDING = "Live in the same building but not in the same home";
+const PDF_PAGE7_12C_SAME_NEIGHBORHOOD = "Live in the same neighborhood";
+const PDF_PAGE7_12C_OTHER_CB = "Other please explain_2";
+const PDF_PAGE7_12C_OTHER_TEXT = "undefined_13";
+const PDF_PAGE7_12D_NO = "No_23";
+const PDF_PAGE7_12D_YES = "Yes If yes check all that apply";
+const PDF_PAGE7_12D_WORK_CB = "Work together at name of company";
+const PDF_PAGE7_12D_WORK_TEXT = "undefined_14";
+const PDF_PAGE7_12D_SCHOOL_CB = "Go to the same school name of school";
+const PDF_PAGE7_12D_SCHOOL_TEXT = "undefined_15";
+const PDF_PAGE7_12D_OTHER_CB = "Other please explain_3";
+const PDF_PAGE7_12D_OTHER_TEXT = "12d Other please explain";
 
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
@@ -2921,6 +2990,378 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
       console.warn(`Failed to map firearm loc ${lName}`, err);
       if ((row.location ?? "").trim()) {
         missing.push({ label: `9. Firearm ${i + 1} location`, pdfFieldName: lName });
+      }
+    }
+  }
+
+  // --- DV-100 Page 7 — Sections 10–12 (orders) ---
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE7_CASE_NUMBER);
+    const v = (data.caseNumber ?? "").trim();
+    field.setText(v);
+    if (v) {
+      filled.push({ label: "Case number (page 7)", pdfFieldName: PDF_PAGE7_CASE_NUMBER });
+    }
+  } catch (err) {
+    console.warn("Failed to map Case Number_7", err);
+    if ((data.caseNumber ?? "").trim()) {
+      missing.push({ label: "Case number (page 7)", pdfFieldName: PDF_PAGE7_CASE_NUMBER });
+    }
+  }
+
+  try {
+    if (data.orderToNotAbuse) {
+      pdfForm.getCheckBox(PDF_PAGE7_ORDER_NOT_ABUSE).check();
+      filled.push({ label: "Order to Not Abuse", pdfFieldName: PDF_PAGE7_ORDER_NOT_ABUSE });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE7_ORDER_NOT_ABUSE).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Order to Not Abuse", err);
+    if (data.orderToNotAbuse) {
+      missing.push({ label: "Order to Not Abuse", pdfFieldName: PDF_PAGE7_ORDER_NOT_ABUSE });
+    }
+  }
+
+  try {
+    if (data.noContactOrder) {
+      pdfForm.getCheckBox(PDF_PAGE7_NO_CONTACT).check();
+      filled.push({ label: "No-Contact Order", pdfFieldName: PDF_PAGE7_NO_CONTACT });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE7_NO_CONTACT).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map NoContact Order", err);
+    if (data.noContactOrder) {
+      missing.push({ label: "No-Contact Order", pdfFieldName: PDF_PAGE7_NO_CONTACT });
+    }
+  }
+
+  try {
+    if (data.stayAwayOrder) {
+      pdfForm.getCheckBox(PDF_PAGE7_STAY_AWAY_MASTER).check();
+      filled.push({ label: "Stay-Away Order", pdfFieldName: PDF_PAGE7_STAY_AWAY_MASTER });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE7_STAY_AWAY_MASTER).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map StayAway Order", err);
+    if (data.stayAwayOrder) {
+      missing.push({ label: "Stay-Away Order", pdfFieldName: PDF_PAGE7_STAY_AWAY_MASTER });
+    }
+  }
+
+  const stayAway = data.stayAwayOrder === true;
+
+  for (const { dataKey, pdfName } of PDF_PAGE7_12A_CHECKBOXES) {
+    const checked = stayAway && Boolean(data[dataKey]);
+    try {
+      const cb = pdfForm.getCheckBox(pdfName);
+      if (checked) {
+        cb.check();
+        filled.push({ label: `12a: ${pdfName}`, pdfFieldName: pdfName });
+      } else {
+        cb.uncheck();
+      }
+    } catch (err) {
+      console.warn(`Failed to map 12a checkbox ${pdfName}`, err);
+      if (checked) {
+        missing.push({ label: `12a: ${pdfName}`, pdfFieldName: pdfName });
+      }
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE7_12A_OTHER_TEXT);
+    const explain = (data.stayAwayOtherExplain ?? "").trim();
+    if (stayAway && data.stayAwayOther && explain) {
+      field.setText(explain);
+      filled.push({ label: "12a Other (explain)", pdfFieldName: PDF_PAGE7_12A_OTHER_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 12a Other please explain text", err);
+    if (stayAway && data.stayAwayOther && (data.stayAwayOtherExplain ?? "").trim()) {
+      missing.push({ label: "12a Other (explain)", pdfFieldName: PDF_PAGE7_12A_OTHER_TEXT });
+    }
+  }
+
+  const dist = data.stayAwayDistance;
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12B_100).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12B_OTHER_CB).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getTextField(PDF_PAGE7_12B_OTHER_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+
+  if (stayAway) {
+    if (dist === "hundred") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12B_100).check();
+        filled.push({ label: "12b. 100 yards", pdfFieldName: PDF_PAGE7_12B_100 });
+      } catch (err) {
+        console.warn("Failed to map 12b 100 yards", err);
+        missing.push({ label: "12b. 100 yards", pdfFieldName: PDF_PAGE7_12B_100 });
+      }
+    } else if (dist === "other") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12B_OTHER_CB).check();
+        filled.push({ label: "12b. Other distance (checkbox)", pdfFieldName: PDF_PAGE7_12B_OTHER_CB });
+      } catch (err) {
+        console.warn("Failed to map 12b other distance checkbox", err);
+        missing.push({
+          label: "12b. Other distance (checkbox)",
+          pdfFieldName: PDF_PAGE7_12B_OTHER_CB,
+        });
+      }
+      try {
+        const field = pdfForm.getTextField(PDF_PAGE7_12B_OTHER_TEXT);
+        const yards = (data.stayAwayDistanceOther ?? "").trim();
+        if (yards) {
+          field.setText(yards);
+          filled.push({ label: "12b. Distance (yards)", pdfFieldName: PDF_PAGE7_12B_OTHER_TEXT });
+        }
+      } catch (err) {
+        console.warn("Failed to map 12b undefined_12", err);
+        if ((data.stayAwayDistanceOther ?? "").trim()) {
+          missing.push({ label: "12b. Distance (yards)", pdfFieldName: PDF_PAGE7_12B_OTHER_TEXT });
+        }
+      }
+    }
+  }
+
+  const twelveCSubs = [
+    PDF_PAGE7_12C_LIVE_TOGETHER,
+    PDF_PAGE7_12C_SAME_BUILDING,
+    PDF_PAGE7_12C_SAME_NEIGHBORHOOD,
+    PDF_PAGE7_12C_OTHER_CB,
+  ] as const;
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12C_NO).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12C_YES).uncheck();
+  } catch {
+    /* ignore */
+  }
+  for (const name of twelveCSubs) {
+    try {
+      pdfForm.getCheckBox(name).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+  try {
+    pdfForm.getTextField(PDF_PAGE7_12C_OTHER_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+
+  if (stayAway) {
+    const lt = data.liveTogether;
+    if (lt === "no") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12C_NO).check();
+        filled.push({ label: "12c. Live together/close (No)", pdfFieldName: PDF_PAGE7_12C_NO });
+      } catch (err) {
+        console.warn("Failed to map 12c No_22", err);
+        missing.push({ label: "12c. Live together/close (No)", pdfFieldName: PDF_PAGE7_12C_NO });
+      }
+    } else if (lt === "yes") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12C_YES).check();
+        filled.push({ label: "12c. Live together/close (Yes)", pdfFieldName: PDF_PAGE7_12C_YES });
+      } catch (err) {
+        console.warn("Failed to map 12c Yes If yes check one", err);
+        missing.push({
+          label: "12c. Live together/close (Yes)",
+          pdfFieldName: PDF_PAGE7_12C_YES,
+        });
+      }
+      const t = data.liveTogetherType;
+      const subMap: {
+        k: typeof t;
+        pdf: string;
+        label: string;
+      }[] = [
+        { k: "liveTogether", pdf: PDF_PAGE7_12C_LIVE_TOGETHER, label: "12c. Live together" },
+        { k: "sameBuilding", pdf: PDF_PAGE7_12C_SAME_BUILDING, label: "12c. Same building" },
+        {
+          k: "sameNeighborhood",
+          pdf: PDF_PAGE7_12C_SAME_NEIGHBORHOOD,
+          label: "12c. Same neighborhood",
+        },
+        { k: "other", pdf: PDF_PAGE7_12C_OTHER_CB, label: "12c. Other (checkbox)" },
+      ];
+      for (const { k, pdf, label } of subMap) {
+        if (t === k) {
+          try {
+            pdfForm.getCheckBox(pdf).check();
+            filled.push({ label, pdfFieldName: pdf });
+          } catch (err) {
+            console.warn(`Failed to map 12c sub ${pdf}`, err);
+            missing.push({ label, pdfFieldName: pdf });
+          }
+          break;
+        }
+      }
+      if (t === "other") {
+        try {
+          const field = pdfForm.getTextField(PDF_PAGE7_12C_OTHER_TEXT);
+          const ex = (data.liveTogetherOther ?? "").trim();
+          if (ex) {
+            field.setText(ex);
+            filled.push({ label: "12c. Other (explain)", pdfFieldName: PDF_PAGE7_12C_OTHER_TEXT });
+          }
+        } catch (err) {
+          console.warn("Failed to map 12c undefined_13", err);
+          if ((data.liveTogetherOther ?? "").trim()) {
+            missing.push({ label: "12c. Other (explain)", pdfFieldName: PDF_PAGE7_12C_OTHER_TEXT });
+          }
+        }
+      }
+    }
+  }
+
+  const twelveDSubs = [
+    PDF_PAGE7_12D_WORK_CB,
+    PDF_PAGE7_12D_SCHOOL_CB,
+    PDF_PAGE7_12D_OTHER_CB,
+  ] as const;
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12D_NO).uncheck();
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getCheckBox(PDF_PAGE7_12D_YES).uncheck();
+  } catch {
+    /* ignore */
+  }
+  for (const name of twelveDSubs) {
+    try {
+      pdfForm.getCheckBox(name).uncheck();
+    } catch {
+      /* ignore */
+    }
+  }
+  try {
+    pdfForm.getTextField(PDF_PAGE7_12D_WORK_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getTextField(PDF_PAGE7_12D_SCHOOL_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+  try {
+    pdfForm.getTextField(PDF_PAGE7_12D_OTHER_TEXT).setText("");
+  } catch {
+    /* ignore */
+  }
+
+  if (stayAway) {
+    const ws = data.sameWorkplaceSchool;
+    if (ws === "no") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12D_NO).check();
+        filled.push({ label: "12d. Same workplace/school (No)", pdfFieldName: PDF_PAGE7_12D_NO });
+      } catch (err) {
+        console.warn("Failed to map 12d No_23", err);
+        missing.push({ label: "12d. Same workplace/school (No)", pdfFieldName: PDF_PAGE7_12D_NO });
+      }
+    } else if (ws === "yes") {
+      try {
+        pdfForm.getCheckBox(PDF_PAGE7_12D_YES).check();
+        filled.push({
+          label: "12d. Same workplace/school (Yes)",
+          pdfFieldName: PDF_PAGE7_12D_YES,
+        });
+      } catch (err) {
+        console.warn("Failed to map 12d Yes If yes check all", err);
+        missing.push({
+          label: "12d. Same workplace/school (Yes)",
+          pdfFieldName: PDF_PAGE7_12D_YES,
+        });
+      }
+      if (data.workTogether) {
+        try {
+          pdfForm.getCheckBox(PDF_PAGE7_12D_WORK_CB).check();
+          filled.push({ label: "12d. Work together", pdfFieldName: PDF_PAGE7_12D_WORK_CB });
+        } catch (err) {
+          console.warn("Failed to map 12d work checkbox", err);
+          missing.push({ label: "12d. Work together", pdfFieldName: PDF_PAGE7_12D_WORK_CB });
+        }
+        try {
+          const field = pdfForm.getTextField(PDF_PAGE7_12D_WORK_TEXT);
+          const co = (data.workTogetherCompany ?? "").trim();
+          if (co) {
+            field.setText(co);
+            filled.push({ label: "12d. Company name", pdfFieldName: PDF_PAGE7_12D_WORK_TEXT });
+          }
+        } catch (err) {
+          console.warn("Failed to map 12d undefined_14", err);
+          if ((data.workTogetherCompany ?? "").trim()) {
+            missing.push({ label: "12d. Company name", pdfFieldName: PDF_PAGE7_12D_WORK_TEXT });
+          }
+        }
+      }
+      if (data.sameSchool) {
+        try {
+          pdfForm.getCheckBox(PDF_PAGE7_12D_SCHOOL_CB).check();
+          filled.push({ label: "12d. Same school", pdfFieldName: PDF_PAGE7_12D_SCHOOL_CB });
+        } catch (err) {
+          console.warn("Failed to map 12d school checkbox", err);
+          missing.push({ label: "12d. Same school", pdfFieldName: PDF_PAGE7_12D_SCHOOL_CB });
+        }
+        try {
+          const field = pdfForm.getTextField(PDF_PAGE7_12D_SCHOOL_TEXT);
+          const sn = (data.sameSchoolName ?? "").trim();
+          if (sn) {
+            field.setText(sn);
+            filled.push({ label: "12d. School name", pdfFieldName: PDF_PAGE7_12D_SCHOOL_TEXT });
+          }
+        } catch (err) {
+          console.warn("Failed to map 12d undefined_15", err);
+          if ((data.sameSchoolName ?? "").trim()) {
+            missing.push({ label: "12d. School name", pdfFieldName: PDF_PAGE7_12D_SCHOOL_TEXT });
+          }
+        }
+      }
+      if (data.sameWorkplaceOther) {
+        try {
+          pdfForm.getCheckBox(PDF_PAGE7_12D_OTHER_CB).check();
+          filled.push({ label: "12d. Other (checkbox)", pdfFieldName: PDF_PAGE7_12D_OTHER_CB });
+        } catch (err) {
+          console.warn("Failed to map 12d other checkbox", err);
+          missing.push({ label: "12d. Other (checkbox)", pdfFieldName: PDF_PAGE7_12D_OTHER_CB });
+        }
+        try {
+          const field = pdfForm.getTextField(PDF_PAGE7_12D_OTHER_TEXT);
+          const ox = (data.sameWorkplaceOtherExplain ?? "").trim();
+          if (ox) {
+            field.setText(ox);
+            filled.push({ label: "12d. Other (explain)", pdfFieldName: PDF_PAGE7_12D_OTHER_TEXT });
+          }
+        } catch (err) {
+          console.warn("Failed to map 12d Other please explain text", err);
+          if ((data.sameWorkplaceOtherExplain ?? "").trim()) {
+            missing.push({ label: "12d. Other (explain)", pdfFieldName: PDF_PAGE7_12D_OTHER_TEXT });
+          }
+        }
       }
     }
   }
