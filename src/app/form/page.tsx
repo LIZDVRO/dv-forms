@@ -24,6 +24,7 @@ const STEP_TITLES = [
   "Describe Abuse (Third Incident)",
   "Other Protected People & Firearms",
   "Orders You Want the Judge to Make",
+  "Move Out, Other Orders, Custody",
   "Review & Generate",
 ] as const;
 
@@ -38,6 +39,7 @@ const STEP_BLURBS = [
   "Describe a third incident of abuse (DV-100 Section 7, Page 5), or leave blank if there was no other incident.",
   "List anyone else who needs protection (Section 8) and firearm information if known (Section 9), DV-100 Page 6.",
   "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
+  "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
 
@@ -130,6 +132,10 @@ const SECTION5_ABUSE_EXAMPLES = [
 const HARM_DETAIL_MAX_LENGTH = 85;
 
 const PROTECTED_PEOPLE_WHY_MAX_LENGTH = 400;
+const MOVE_OUT_13A_MAX_LENGTH = 65;
+const MOVE_OUT_DURATION_MAX_LENGTH = 3;
+const MOVE_OUT_13B_OTHER_MAX_LENGTH = 400;
+const OTHER_ORDERS_14_MAX_LENGTH = 1000;
 
 function defaultProtectedPerson(): Dv100ProtectedPerson {
   return { name: "", age: "", relationship: "", livesWithYou: null };
@@ -250,7 +256,6 @@ const initialForm: FormData = {
   protectedPeopleWhy: "",
   hasFirearms: "",
   firearms: [defaultFirearmRow()],
-  caseNumber: "",
   orderToNotAbuse: false,
   noContactOrder: false,
   stayAwayOrder: false,
@@ -275,6 +280,20 @@ const initialForm: FormData = {
   sameSchoolName: "",
   sameWorkplaceOther: false,
   sameWorkplaceOtherExplain: "",
+  orderToMoveOut: false,
+  moveOutOrderPersonAsk: "",
+  moveOutOwnHome: false,
+  moveOutNameOnLease: false,
+  moveOutWithChildren: false,
+  moveOutLivedFor: false,
+  moveOutLivedYears: "",
+  moveOutLivedMonths: "",
+  moveOutPaysRent: false,
+  moveOutOther: false,
+  moveOutOtherExplain: "",
+  otherOrders: false,
+  otherOrdersDescribe: "",
+  childCustodyVisitation: false,
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -351,6 +370,22 @@ export default function FormWizardPage() {
       sameSchoolName: "",
       sameWorkplaceOther: false,
       sameWorkplaceOtherExplain: "",
+    }));
+
+  const resetMoveOutOrders = () =>
+    setForm((prev) => ({
+      ...prev,
+      orderToMoveOut: false,
+      moveOutOrderPersonAsk: "",
+      moveOutOwnHome: false,
+      moveOutNameOnLease: false,
+      moveOutWithChildren: false,
+      moveOutLivedFor: false,
+      moveOutLivedYears: "",
+      moveOutLivedMonths: "",
+      moveOutPaysRent: false,
+      moveOutOther: false,
+      moveOutOtherExplain: "",
     }));
 
   const canGoBack = step > 0;
@@ -599,27 +634,6 @@ export default function FormWizardPage() {
                       onChange={(e) =>
                         update("petitionerEmail", e.target.value)
                       }
-                      className={inputClass}
-                    />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="caseNumber"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      Case number (optional)
-                    </label>
-                    <p className="mt-1 text-xs text-slate-500">
-                      If the court already assigned a case number, enter it here.
-                      It will appear on Page 7 of the PDF when you generate the form.
-                    </p>
-                    <input
-                      id="caseNumber"
-                      name="caseNumber"
-                      type="text"
-                      autoComplete="off"
-                      value={form.caseNumber}
-                      onChange={(e) => update("caseNumber", e.target.value)}
                       className={inputClass}
                     />
                   </div>
@@ -3376,6 +3390,303 @@ export default function FormWizardPage() {
               )}
 
               {step === 10 && (
+                <div className="space-y-10">
+                  <section className="space-y-4">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 13. Order to move out
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.orderToMoveOut}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            update("orderToMoveOut", true);
+                          } else {
+                            resetMoveOutOrders();
+                          }
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Order to Move Out
+                      </span>
+                    </label>
+
+                    {form.orderToMoveOut && (
+                      <div className="space-y-6">
+                        <div>
+                          <label
+                            htmlFor="moveOutOrderPersonAsk"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            13a. I ask the judge to order the person in item 2
+                            to move out of (address)
+                          </label>
+                          <input
+                            id="moveOutOrderPersonAsk"
+                            type="text"
+                            autoComplete="off"
+                            maxLength={MOVE_OUT_13A_MAX_LENGTH}
+                            value={form.moveOutOrderPersonAsk}
+                            onChange={(e) =>
+                              update("moveOutOrderPersonAsk", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                          <p className="mt-1 text-xs text-slate-500">
+                            {form.moveOutOrderPersonAsk.length} /{" "}
+                            {MOVE_OUT_13A_MAX_LENGTH} characters
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-sm font-medium text-slate-800">
+                            13b. I ask the judge to find that (check all that
+                            apply)
+                          </h3>
+                          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                            {(
+                              [
+                                {
+                                  key: "moveOutOwnHome" as const,
+                                  label: "I own the home",
+                                },
+                                {
+                                  key: "moveOutNameOnLease" as const,
+                                  label: "My name is on the lease",
+                                },
+                                {
+                                  key: "moveOutWithChildren" as const,
+                                  label:
+                                    "I live at this address with my children",
+                                },
+                                {
+                                  key: "moveOutLivedFor" as const,
+                                  label:
+                                    "I have lived at this address for",
+                                },
+                                {
+                                  key: "moveOutPaysRent" as const,
+                                  label:
+                                    "I pay for some or all of the rent or mortgage",
+                                },
+                                {
+                                  key: "moveOutOther" as const,
+                                  label: "Other (please explain)",
+                                },
+                              ] as const
+                            ).map(({ key, label }) => (
+                              <label
+                                key={key}
+                                className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5"
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={Boolean(form[key])}
+                                  onChange={(e) => {
+                                    const on = e.target.checked;
+                                    if (key === "moveOutLivedFor" && !on) {
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        moveOutLivedFor: false,
+                                        moveOutLivedYears: "",
+                                        moveOutLivedMonths: "",
+                                      }));
+                                    } else if (key === "moveOutOther" && !on) {
+                                      setForm((prev) => ({
+                                        ...prev,
+                                        moveOutOther: false,
+                                        moveOutOtherExplain: "",
+                                      }));
+                                    } else {
+                                      update(key, on);
+                                    }
+                                  }}
+                                  className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                />
+                                <span className="text-sm text-slate-800">
+                                  {label}
+                                </span>
+                              </label>
+                            ))}
+                          </div>
+
+                          {form.moveOutLivedFor && (
+                            <div className="mt-4 flex flex-wrap gap-4">
+                              <div className="min-w-[7rem] flex-1">
+                                <label
+                                  htmlFor="moveOutLivedYears"
+                                  className="text-sm font-medium text-slate-800"
+                                >
+                                  Years
+                                </label>
+                                <input
+                                  id="moveOutLivedYears"
+                                  type="text"
+                                  inputMode="numeric"
+                                  autoComplete="off"
+                                  maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
+                                  value={form.moveOutLivedYears}
+                                  onChange={(e) =>
+                                    update(
+                                      "moveOutLivedYears",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className={inputClass}
+                                />
+                              </div>
+                              <div className="min-w-[7rem] flex-1">
+                                <label
+                                  htmlFor="moveOutLivedMonths"
+                                  className="text-sm font-medium text-slate-800"
+                                >
+                                  Months
+                                </label>
+                                <input
+                                  id="moveOutLivedMonths"
+                                  type="text"
+                                  inputMode="numeric"
+                                  autoComplete="off"
+                                  maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
+                                  value={form.moveOutLivedMonths}
+                                  onChange={(e) =>
+                                    update(
+                                      "moveOutLivedMonths",
+                                      e.target.value,
+                                    )
+                                  }
+                                  className={inputClass}
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {form.moveOutOther && (
+                            <div className="mt-4">
+                              <label
+                                htmlFor="moveOutOtherExplain"
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                13b. Other — explain
+                              </label>
+                              <textarea
+                                id="moveOutOtherExplain"
+                                autoComplete="off"
+                                maxLength={MOVE_OUT_13B_OTHER_MAX_LENGTH}
+                                value={form.moveOutOtherExplain}
+                                onChange={(e) =>
+                                  update(
+                                    "moveOutOtherExplain",
+                                    e.target.value,
+                                  )
+                                }
+                                className={textareaClass}
+                              />
+                              <p className="mt-1 text-xs text-slate-500">
+                                {form.moveOutOtherExplain.length} /{" "}
+                                {MOVE_OUT_13B_OTHER_MAX_LENGTH} characters
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 14. Other orders
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.otherOrders}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          if (!on) {
+                            setForm((prev) => ({
+                              ...prev,
+                              otherOrders: false,
+                              otherOrdersDescribe: "",
+                            }));
+                          } else {
+                            update("otherOrders", true);
+                          }
+                        }}
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Other Orders
+                      </span>
+                    </label>
+                    {form.otherOrders && (
+                      <div>
+                        <label
+                          htmlFor="otherOrdersDescribe"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          14. Describe additional orders you want the judge to
+                          make
+                        </label>
+                        <textarea
+                          id="otherOrdersDescribe"
+                          autoComplete="off"
+                          maxLength={OTHER_ORDERS_14_MAX_LENGTH}
+                          value={form.otherOrdersDescribe}
+                          onChange={(e) =>
+                            update("otherOrdersDescribe", e.target.value)
+                          }
+                          className={textareaClass}
+                        />
+                        <p className="mt-1 text-xs text-slate-500">
+                          {form.otherOrdersDescribe.length} /{" "}
+                          {OTHER_ORDERS_14_MAX_LENGTH} characters
+                        </p>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Section 15. Child custody
+                    </h2>
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <input
+                        type="checkbox"
+                        checked={form.childCustodyVisitation}
+                        onChange={(e) =>
+                          update("childCustodyVisitation", e.target.checked)
+                        }
+                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                      />
+                      <span className="text-sm font-medium text-slate-800">
+                        Child Custody and Visitation
+                      </span>
+                    </label>
+                    {form.childCustodyVisitation && (
+                      <div
+                        className="rounded-xl border border-sky-200/90 bg-sky-50/80 px-4 py-3 text-sm leading-relaxed text-sky-950"
+                        role="status"
+                      >
+                        You must fill out form{" "}
+                        <a
+                          href="https://www.courts.ca.gov/documents/dv105.pdf"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-medium text-sky-700 underline underline-offset-2 hover:text-sky-800"
+                        >
+                          DV-105
+                        </a>
+                        ...
+                      </div>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {step === 11 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
@@ -3477,14 +3788,6 @@ export default function FormWizardPage() {
                           <span className="text-slate-500">Email:</span>{" "}
                           {display(form.petitionerEmail)}
                         </p>
-                        {form.caseNumber.trim() ? (
-                          <p>
-                            <span className="text-slate-500">
-                              Case number:
-                            </span>{" "}
-                            {display(form.caseNumber)}
-                          </p>
-                        ) : null}
                       </dd>
                     </div>
                     <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
@@ -4026,6 +4329,80 @@ export default function FormWizardPage() {
                             </p>
                           </div>
                         ) : null}
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                        More orders (Page 8)
+                      </dt>
+                      <dd className="mt-2 space-y-2 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Order to move out:
+                          </span>{" "}
+                          {form.orderToMoveOut ? "Yes" : "No"}
+                        </p>
+                        {form.orderToMoveOut ? (
+                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                            <p>
+                              <span className="text-slate-500">13a:</span>{" "}
+                              {display(form.moveOutOrderPersonAsk)}
+                            </p>
+                            <p>
+                              <span className="text-slate-500">13b:</span>{" "}
+                              {(() => {
+                                const parts: string[] = [];
+                                if (form.moveOutOwnHome) parts.push("I own the home");
+                                if (form.moveOutNameOnLease) {
+                                  parts.push("My name is on the lease");
+                                }
+                                if (form.moveOutWithChildren) {
+                                  parts.push(
+                                    "I live at this address with my children",
+                                  );
+                                }
+                                if (form.moveOutLivedFor) {
+                                  const y = form.moveOutLivedYears.trim();
+                                  const m = form.moveOutLivedMonths.trim();
+                                  const dur =
+                                    y || m
+                                      ? `I have lived at this address for (${y || "—"} yr, ${m || "—"} mo)`
+                                      : "I have lived at this address for";
+                                  parts.push(dur);
+                                }
+                                if (form.moveOutPaysRent) {
+                                  parts.push(
+                                    "I pay for some or all of the rent or mortgage",
+                                  );
+                                }
+                                if (form.moveOutOther) {
+                                  parts.push(
+                                    form.moveOutOtherExplain.trim()
+                                      ? `Other (${form.moveOutOtherExplain.trim()})`
+                                      : "Other (please explain)",
+                                  );
+                                }
+                                return parts.length > 0 ? parts.join("; ") : "—";
+                              })()}
+                            </p>
+                          </div>
+                        ) : null}
+                        <p>
+                          <span className="text-slate-500">Other orders:</span>{" "}
+                          {form.otherOrders ? "Yes" : "No"}
+                        </p>
+                        {form.otherOrders && (
+                          <p>
+                            <span className="text-slate-500">14. Describe:</span>{" "}
+                            {display(form.otherOrdersDescribe)}
+                          </p>
+                        )}
+                        <p>
+                          <span className="text-slate-500">
+                            Child custody and visitation:
+                          </span>{" "}
+                          {form.childCustodyVisitation ? "Yes (complete DV-105)" : "No"}
+                        </p>
                       </dd>
                     </div>
                     <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">

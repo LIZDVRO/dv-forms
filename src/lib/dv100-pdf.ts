@@ -130,8 +130,6 @@ export type Dv100PdfFormData = {
   /** Section 9 — firearms: idk | no | yes | "" */
   hasFirearms: "" | "idk" | "no" | "yes";
   firearms: Dv100FirearmRow[];
-  /** Optional court case number (e.g. from clerk); copied to Page 7 `Case Number_7` when set */
-  caseNumber: string;
   /** Section 10 */
   orderToNotAbuse: boolean;
   /** Section 11 */
@@ -162,6 +160,24 @@ export type Dv100PdfFormData = {
   sameSchoolName: string;
   sameWorkplaceOther: boolean;
   sameWorkplaceOtherExplain: string;
+  /** Section 13 — DV-100 Page 8 */
+  orderToMoveOut: boolean;
+  /** 13a — maps to `a I ask the judge to order the person in  2` */
+  moveOutOrderPersonAsk: string;
+  moveOutOwnHome: boolean;
+  moveOutNameOnLease: boolean;
+  moveOutWithChildren: boolean;
+  moveOutLivedFor: boolean;
+  moveOutLivedYears: string;
+  moveOutLivedMonths: string;
+  moveOutPaysRent: boolean;
+  moveOutOther: boolean;
+  moveOutOtherExplain: string;
+  /** Section 14 */
+  otherOrders: boolean;
+  otherOrdersDescribe: string;
+  /** Section 15 — checkbox only; DV-105 is separate */
+  childCustodyVisitation: boolean;
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -537,7 +553,6 @@ const PDF_PAGE6_FIREARM_LOC = [
 ] as const;
 
 /** Section 10–12 — DV-100 Page 7 (exact AcroForm names) */
-const PDF_PAGE7_CASE_NUMBER = "Case Number_7";
 const PDF_PAGE7_ORDER_NOT_ABUSE = "Order to Not Abuse";
 const PDF_PAGE7_NO_CONTACT = "NoContact Order";
 const PDF_PAGE7_STAY_AWAY_MASTER = "StayAway Order";
@@ -572,6 +587,31 @@ const PDF_PAGE7_12D_SCHOOL_CB = "Go to the same school name of school";
 const PDF_PAGE7_12D_SCHOOL_TEXT = "undefined_15";
 const PDF_PAGE7_12D_OTHER_CB = "Other please explain_3";
 const PDF_PAGE7_12D_OTHER_TEXT = "12d Other please explain";
+
+/** Sections 13–15 — DV-100 Page 8 */
+const PDF_PAGE8_ORDER_MOVE_OUT = "Order to Move Out";
+const PDF_PAGE8_13A_PERSON_ASK = "a I ask the judge to order the person in  2";
+type Dv100Page8MoveOut13bKey =
+  | "moveOutOwnHome"
+  | "moveOutNameOnLease"
+  | "moveOutWithChildren"
+  | "moveOutLivedFor"
+  | "moveOutPaysRent"
+  | "moveOutOther";
+const PDF_PAGE8_13B_CHECKBOXES: { dataKey: Dv100Page8MoveOut13bKey; pdfName: string }[] = [
+  { dataKey: "moveOutOwnHome", pdfName: "I own the home" },
+  { dataKey: "moveOutNameOnLease", pdfName: "My name is on the lease" },
+  { dataKey: "moveOutWithChildren", pdfName: "I live at this address with my children" },
+  { dataKey: "moveOutLivedFor", pdfName: "I have lived at this address for" },
+  { dataKey: "moveOutPaysRent", pdfName: "I pay for some or all the rent or mortgage" },
+  { dataKey: "moveOutOther", pdfName: "Other please explain_4" },
+];
+const PDF_PAGE8_YEARS = "years";
+const PDF_PAGE8_MONTHS = "months";
+const PDF_PAGE8_13B_OTHER_TEXT = "13b other explain";
+const PDF_PAGE8_OTHER_ORDERS = "Other Orders";
+const PDF_PAGE8_14_DESCRIBE = "14 describe additional orders";
+const PDF_PAGE8_CHILD_CUSTODY = "Child Custody and Visitation";
 
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
@@ -2996,20 +3036,6 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
 
   // --- DV-100 Page 7 — Sections 10–12 (orders) ---
   try {
-    const field = pdfForm.getTextField(PDF_PAGE7_CASE_NUMBER);
-    const v = (data.caseNumber ?? "").trim();
-    field.setText(v);
-    if (v) {
-      filled.push({ label: "Case number (page 7)", pdfFieldName: PDF_PAGE7_CASE_NUMBER });
-    }
-  } catch (err) {
-    console.warn("Failed to map Case Number_7", err);
-    if ((data.caseNumber ?? "").trim()) {
-      missing.push({ label: "Case number (page 7)", pdfFieldName: PDF_PAGE7_CASE_NUMBER });
-    }
-  }
-
-  try {
     if (data.orderToNotAbuse) {
       pdfForm.getCheckBox(PDF_PAGE7_ORDER_NOT_ABUSE).check();
       filled.push({ label: "Order to Not Abuse", pdfFieldName: PDF_PAGE7_ORDER_NOT_ABUSE });
@@ -3363,6 +3389,156 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
           }
         }
       }
+    }
+  }
+
+  // --- DV-100 Page 8 — Sections 13–15 ---
+  const moveOut = data.orderToMoveOut === true;
+
+  try {
+    if (moveOut) {
+      pdfForm.getCheckBox(PDF_PAGE8_ORDER_MOVE_OUT).check();
+      filled.push({ label: "Order to Move Out", pdfFieldName: PDF_PAGE8_ORDER_MOVE_OUT });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE8_ORDER_MOVE_OUT).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Order to Move Out", err);
+    if (moveOut) {
+      missing.push({ label: "Order to Move Out", pdfFieldName: PDF_PAGE8_ORDER_MOVE_OUT });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE8_13A_PERSON_ASK);
+    const ask = (data.moveOutOrderPersonAsk ?? "").trim();
+    if (moveOut && ask) {
+      field.setText(ask);
+      filled.push({ label: "13a. Order person to move (address ask)", pdfFieldName: PDF_PAGE8_13A_PERSON_ASK });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 13a person ask", err);
+    if (moveOut && (data.moveOutOrderPersonAsk ?? "").trim()) {
+      missing.push({
+        label: "13a. Order person to move (address ask)",
+        pdfFieldName: PDF_PAGE8_13A_PERSON_ASK,
+      });
+    }
+  }
+
+  for (const { dataKey, pdfName } of PDF_PAGE8_13B_CHECKBOXES) {
+    const checked = moveOut && Boolean(data[dataKey]);
+    try {
+      const cb = pdfForm.getCheckBox(pdfName);
+      if (checked) {
+        cb.check();
+        filled.push({ label: `13b: ${pdfName}`, pdfFieldName: pdfName });
+      } else {
+        cb.uncheck();
+      }
+    } catch (err) {
+      console.warn(`Failed to map 13b checkbox ${pdfName}`, err);
+      if (checked) {
+        missing.push({ label: `13b: ${pdfName}`, pdfFieldName: pdfName });
+      }
+    }
+  }
+
+  try {
+    const yField = pdfForm.getTextField(PDF_PAGE8_YEARS);
+    const mField = pdfForm.getTextField(PDF_PAGE8_MONTHS);
+    const lived = moveOut && data.moveOutLivedFor;
+    const y = (data.moveOutLivedYears ?? "").trim();
+    const m = (data.moveOutLivedMonths ?? "").trim();
+    if (lived && y) {
+      yField.setText(y);
+      filled.push({ label: "13b. Years at address", pdfFieldName: PDF_PAGE8_YEARS });
+    } else {
+      yField.setText("");
+    }
+    if (lived && m) {
+      mField.setText(m);
+      filled.push({ label: "13b. Months at address", pdfFieldName: PDF_PAGE8_MONTHS });
+    } else {
+      mField.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 13b years/months", err);
+    const lived = moveOut && data.moveOutLivedFor;
+    if (lived && (data.moveOutLivedYears ?? "").trim()) {
+      missing.push({ label: "13b. Years at address", pdfFieldName: PDF_PAGE8_YEARS });
+    }
+    if (lived && (data.moveOutLivedMonths ?? "").trim()) {
+      missing.push({ label: "13b. Months at address", pdfFieldName: PDF_PAGE8_MONTHS });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE8_13B_OTHER_TEXT);
+    const ex = (data.moveOutOtherExplain ?? "").trim();
+    if (moveOut && data.moveOutOther && ex) {
+      field.setText(ex);
+      filled.push({ label: "13b. Other (explain)", pdfFieldName: PDF_PAGE8_13B_OTHER_TEXT });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 13b other explain", err);
+    if (moveOut && data.moveOutOther && (data.moveOutOtherExplain ?? "").trim()) {
+      missing.push({ label: "13b. Other (explain)", pdfFieldName: PDF_PAGE8_13B_OTHER_TEXT });
+    }
+  }
+
+  const otherOrd = data.otherOrders === true;
+  try {
+    if (otherOrd) {
+      pdfForm.getCheckBox(PDF_PAGE8_OTHER_ORDERS).check();
+      filled.push({ label: "Other Orders", pdfFieldName: PDF_PAGE8_OTHER_ORDERS });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE8_OTHER_ORDERS).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Other Orders", err);
+    if (otherOrd) {
+      missing.push({ label: "Other Orders", pdfFieldName: PDF_PAGE8_OTHER_ORDERS });
+    }
+  }
+
+  try {
+    const field = pdfForm.getTextField(PDF_PAGE8_14_DESCRIBE);
+    const d = (data.otherOrdersDescribe ?? "").trim();
+    if (otherOrd && d) {
+      field.setText(d);
+      filled.push({ label: "14. Additional orders (description)", pdfFieldName: PDF_PAGE8_14_DESCRIBE });
+    } else {
+      field.setText("");
+    }
+  } catch (err) {
+    console.warn("Failed to map 14 describe additional orders", err);
+    if (otherOrd && (data.otherOrdersDescribe ?? "").trim()) {
+      missing.push({
+        label: "14. Additional orders (description)",
+        pdfFieldName: PDF_PAGE8_14_DESCRIBE,
+      });
+    }
+  }
+
+  try {
+    if (data.childCustodyVisitation) {
+      pdfForm.getCheckBox(PDF_PAGE8_CHILD_CUSTODY).check();
+      filled.push({ label: "Child Custody and Visitation", pdfFieldName: PDF_PAGE8_CHILD_CUSTODY });
+    } else {
+      pdfForm.getCheckBox(PDF_PAGE8_CHILD_CUSTODY).uncheck();
+    }
+  } catch (err) {
+    console.warn("Failed to map Child Custody and Visitation", err);
+    if (data.childCustodyVisitation) {
+      missing.push({
+        label: "Child Custody and Visitation",
+        pdfFieldName: PDF_PAGE8_CHILD_CUSTODY,
+      });
     }
   }
 
