@@ -365,15 +365,15 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
   return (
     <div className="w-full space-y-3">
       <div className="flex items-center justify-between gap-4 text-sm text-slate-600">
-        <span className="font-medium text-slate-800">
+        <span className="font-medium text-liz">
           Step {currentStep + 1} of {TOTAL_STEPS}
         </span>
-        <span className="hidden text-slate-500 sm:inline">
+        <span className="hidden font-medium text-liz sm:inline">
           {STEP_TITLES[currentStep]}
         </span>
       </div>
       <div
-        className="h-2.5 overflow-hidden rounded-full bg-sky-100/90"
+        className="h-2.5 overflow-hidden rounded-full bg-liz/12"
         role="progressbar"
         aria-valuenow={currentStep + 1}
         aria-valuemin={1}
@@ -381,7 +381,7 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
         aria-label={`Step ${currentStep + 1} of ${TOTAL_STEPS}`}
       >
         <div
-          className="h-full rounded-full bg-sky-500 transition-[width] duration-300 ease-out"
+          className="h-full rounded-full bg-liz transition-[width] duration-300 ease-out"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -516,7 +516,7 @@ export default function FormWizardPage() {
   };
 
   const inputClass =
-    "mt-2 w-full rounded-xl border border-sky-100 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:ring-2 focus:ring-sky-200/80";
+    "mt-2 w-full rounded-xl border border-purple-100 bg-white px-4 py-3 text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-liz focus:ring-2 focus:ring-liz/30";
 
   const display = (v: string) => (v.trim() ? v : "—");
   const displayYn = (v: string) =>
@@ -551,17 +551,22 @@ export default function FormWizardPage() {
   const textareaClass = `${inputClass} min-h-[6.5rem] resize-y`;
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-gradient-to-b from-sky-50 via-white to-blue-50/80">
+    <div className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-gradient-to-b from-purple-50/80 via-white to-purple-100/40">
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(125,211,252,0.35),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(102,45,145,0.14),transparent)]"
         aria-hidden
       />
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12">
-        <header className="mb-8 flex flex-col gap-4 sm:mb-10">
+        <header className="mb-8 flex flex-col gap-6 sm:mb-10">
+          <div className="border-b border-purple-200/60 pb-8 text-center">
+            <p className="font-sans text-5xl font-light tracking-widest text-liz">
+              LIZ
+            </p>
+          </div>
           <div className="flex items-center justify-between gap-4">
             <Link
               href="/"
-              className="text-sm font-medium text-sky-700 underline-offset-4 hover:text-sky-800 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+              className="text-sm font-medium text-liz underline-offset-4 hover:text-purple-900 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
             >
               ← Back to home
             </Link>
@@ -570,7 +575,7 @@ export default function FormWizardPage() {
         </header>
 
         <main className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col rounded-2xl border border-sky-100/90 bg-white/90 p-6 shadow-[0_24px_80px_-32px_rgba(14,165,233,0.35)] backdrop-blur-sm sm:p-10">
+          <div className="flex flex-1 flex-col rounded-2xl border border-purple-100/90 bg-white/90 p-6 shadow-[0_24px_80px_-32px_rgba(102,45,145,0.22)] backdrop-blur-sm sm:p-10">
             <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
               {STEP_TITLES[step]}
             </h1>
@@ -758,25 +763,25 @@ export default function FormWizardPage() {
                       Do you have a lawyer for this case?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="hasLawyer"
                           checked={form.hasLawyer === true}
                           onChange={() => update("hasLawyer", true)}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="hasLawyer"
                           checked={form.hasLawyer === false}
                           onChange={() => update("hasLawyer", false)}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
@@ -786,7 +791,7 @@ export default function FormWizardPage() {
                   </fieldset>
 
                   {form.hasLawyer && (
-                    <div className="space-y-6 border-t border-sky-100/90 pt-6">
+                    <div className="space-y-6 border-t border-purple-100/90 pt-6">
                       <div>
                         <label
                           htmlFor="lawyerName"
@@ -917,7 +922,7 @@ export default function FormWizardPage() {
                       {GENDER_OPTIONS.map((option) => (
                         <label
                           key={option}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -927,7 +932,7 @@ export default function FormWizardPage() {
                             onChange={() =>
                               update("respondentGender", option)
                             }
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {option}
@@ -968,7 +973,7 @@ export default function FormWizardPage() {
                       {RELATIONSHIP_OPTIONS.map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="checkbox"
@@ -989,7 +994,7 @@ export default function FormWizardPage() {
                                 update("livedTogether", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 rounded border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -1022,7 +1027,7 @@ export default function FormWizardPage() {
                   )}
 
                   {form.relationshipChecks.includes("related") && (
-                    <fieldset className="space-y-4 border-t border-sky-100/90 pt-6">
+                    <fieldset className="space-y-4 border-t border-purple-100/90 pt-6">
                       <legend className="text-sm font-medium text-slate-800">
                         The person in 2 is my (check all that apply)
                       </legend>
@@ -1030,7 +1035,7 @@ export default function FormWizardPage() {
                         {RELATED_TYPE_OPTIONS.map(({ value, label }) => (
                           <label
                             key={value}
-                            className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                            className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                           >
                             <input
                               type="checkbox"
@@ -1041,7 +1046,7 @@ export default function FormWizardPage() {
                                   toggleInList(form.relatedTypes, value),
                                 )
                               }
-                              className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                              className="mt-1 size-4 shrink-0 rounded border-purple-200 accent-liz focus:ring-liz"
                             />
                             <span className="text-sm leading-relaxed text-slate-800">
                               {label}
@@ -1053,30 +1058,30 @@ export default function FormWizardPage() {
                   )}
 
                   {form.relationshipChecks.includes("liveTogether") && (
-                    <fieldset className="space-y-4 border-t border-sky-100/90 pt-6">
+                    <fieldset className="space-y-4 border-t border-purple-100/90 pt-6">
                       <legend className="text-sm font-medium text-slate-800">
                         Have you lived together with the person in 2?
                       </legend>
                       <div className="space-y-3">
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="livedTogether"
                             checked={form.livedTogether === "yes"}
                             onChange={() => update("livedTogether", "yes")}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             Yes
                           </span>
                         </label>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="livedTogether"
                             checked={form.livedTogether === "no"}
                             onChange={() => update("livedTogether", "no")}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             No
@@ -1100,7 +1105,7 @@ export default function FormWizardPage() {
                         currently in effect?
                       </legend>
                       <div className="space-y-3">
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="hasRestrainingOrders"
@@ -1108,13 +1113,13 @@ export default function FormWizardPage() {
                             onChange={() =>
                               update("hasRestrainingOrders", "yes")
                             }
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             Yes
                           </span>
                         </label>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="hasRestrainingOrders"
@@ -1122,7 +1127,7 @@ export default function FormWizardPage() {
                             onChange={() =>
                               update("hasRestrainingOrders", "no")
                             }
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             No
@@ -1131,7 +1136,7 @@ export default function FormWizardPage() {
                       </div>
                     </fieldset>
                     {form.hasRestrainingOrders === "yes" && (
-                      <div className="space-y-6 border-t border-sky-100/90 pt-6">
+                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
                         <p className="text-sm text-slate-600">
                           For each order, enter the date of the order and when it
                           expires.
@@ -1220,7 +1225,7 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-6 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-6 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Other court cases
                     </h2>
@@ -1230,25 +1235,25 @@ export default function FormWizardPage() {
                         been filed?
                       </legend>
                       <div className="space-y-3">
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="hasOtherCases"
                             checked={form.hasOtherCases === "yes"}
                             onChange={() => update("hasOtherCases", "yes")}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             Yes
                           </span>
                         </label>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                           <input
                             type="radio"
                             name="hasOtherCases"
                             checked={form.hasOtherCases === "no"}
                             onChange={() => update("hasOtherCases", "no")}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             No
@@ -1258,7 +1263,7 @@ export default function FormWizardPage() {
                     </fieldset>
 
                     {form.hasOtherCases === "yes" && (
-                      <div className="space-y-6 border-t border-sky-100/90 pt-6">
+                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
                         <fieldset className="space-y-4">
                           <legend className="text-sm font-medium text-slate-800">
                             Type of case (check all that apply)
@@ -1270,9 +1275,9 @@ export default function FormWizardPage() {
                               return (
                                 <div
                                   key={value}
-                                  className="rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm"
+                                  className="rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm"
                                 >
-                                  <label className="flex cursor-pointer items-start gap-3 transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                                  <label className="flex cursor-pointer items-start gap-3 transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                                     <input
                                       type="checkbox"
                                       checked={checked}
@@ -1301,14 +1306,14 @@ export default function FormWizardPage() {
                                           return next;
                                         });
                                       }}
-                                      className="mt-1 size-4 shrink-0 rounded border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="mt-1 size-4 shrink-0 rounded border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     <span className="text-sm leading-relaxed text-slate-800">
                                       {label}
                                     </span>
                                   </label>
                                   {checked && detailKey && (
-                                    <div className="mt-3 border-t border-sky-100/90 pt-3 pl-7">
+                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
                                       <label
                                         htmlFor={detailKey}
                                         className="text-sm font-medium text-slate-800"
@@ -1330,7 +1335,7 @@ export default function FormWizardPage() {
                                     </div>
                                   )}
                                   {checked && value === "other" && (
-                                    <div className="mt-3 border-t border-sky-100/90 pt-3 pl-7">
+                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
                                       <label
                                         htmlFor="otherCaseType"
                                         className="text-sm font-medium text-slate-800"
@@ -1367,16 +1372,16 @@ export default function FormWizardPage() {
               {step === 5 && (
                 <div className="space-y-8">
                   <div
-                    className="flex gap-3 rounded-xl border-2 border-sky-500 bg-sky-100 px-4 py-4 shadow-sm sm:px-5"
+                    className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
                     role="status"
                   >
                     <span
-                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-sky-600 text-sm font-bold text-white"
+                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-liz text-sm font-bold text-white"
                       aria-hidden
                     >
                       i
                     </span>
-                    <p className="text-sm font-medium leading-relaxed text-sky-950">
+                    <p className="text-sm font-medium leading-relaxed text-purple-950">
                       <span className="font-semibold">Tip:</span> You will have
                       the opportunity to describe up to THREE separate
                       incidents of abuse in this form. Start here with the MOST
@@ -1431,7 +1436,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -1443,7 +1448,7 @@ export default function FormWizardPage() {
                                 update("recentAbuseWitnessDetail", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -1481,7 +1486,7 @@ export default function FormWizardPage() {
                       weapon?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="recentAbuseWeapon"
@@ -1490,19 +1495,19 @@ export default function FormWizardPage() {
                             update("recentAbuseWeapon", "no");
                             update("recentAbuseWeaponDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="recentAbuseWeapon"
                           checked={form.recentAbuseWeapon === "yes"}
                           onChange={() => update("recentAbuseWeapon", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -1538,7 +1543,7 @@ export default function FormWizardPage() {
                       5d. Did the person cause you emotional or physical harm?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="recentAbuseHarm"
@@ -1547,19 +1552,19 @@ export default function FormWizardPage() {
                             update("recentAbuseHarm", "no");
                             update("recentAbuseHarmDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="recentAbuseHarm"
                           checked={form.recentAbuseHarm === "yes"}
                           onChange={() => update("recentAbuseHarm", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -1617,14 +1622,14 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
                             name="recentAbusePolice"
                             checked={form.recentAbusePolice === value}
                             onChange={() => update("recentAbusePolice", value)}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -1639,7 +1644,7 @@ export default function FormWizardPage() {
                   </fieldset>
 
                   <div
-                    className="rounded-xl border border-sky-200/90 bg-sky-50/90 px-4 py-4 sm:px-5"
+                    className="rounded-xl border border-purple-200/90 bg-purple-50/90 px-4 py-4 sm:px-5"
                     role="note"
                   >
                     <p className="text-sm font-bold leading-snug text-slate-900">
@@ -1701,7 +1706,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -1716,7 +1721,7 @@ export default function FormWizardPage() {
                                 update("recentAbuseDates", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -1776,16 +1781,16 @@ export default function FormWizardPage() {
               {step === 6 && (
                 <div className="space-y-8">
                   <div
-                    className="flex gap-3 rounded-xl border-2 border-sky-500 bg-sky-100 px-4 py-4 shadow-sm sm:px-5"
+                    className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
                     role="status"
                   >
                     <span
-                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-sky-600 text-sm font-bold text-white"
+                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-liz text-sm font-bold text-white"
                       aria-hidden
                     >
                       2
                     </span>
-                    <p className="text-sm font-medium leading-relaxed text-sky-950">
+                    <p className="text-sm font-medium leading-relaxed text-purple-950">
                       Incident 2 of 3: Use this page to describe a different
                       incident of abuse from the one you described on the
                       previous page.
@@ -1840,7 +1845,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -1852,7 +1857,7 @@ export default function FormWizardPage() {
                                 update("secondAbuseWitnessDetail", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -1890,7 +1895,7 @@ export default function FormWizardPage() {
                       weapon?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="secondAbuseWeapon"
@@ -1899,19 +1904,19 @@ export default function FormWizardPage() {
                             update("secondAbuseWeapon", "no");
                             update("secondAbuseWeaponDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="secondAbuseWeapon"
                           checked={form.secondAbuseWeapon === "yes"}
                           onChange={() => update("secondAbuseWeapon", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -1947,7 +1952,7 @@ export default function FormWizardPage() {
                       6d. Did the person cause you emotional or physical harm?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="secondAbuseHarm"
@@ -1956,19 +1961,19 @@ export default function FormWizardPage() {
                             update("secondAbuseHarm", "no");
                             update("secondAbuseHarmDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="secondAbuseHarm"
                           checked={form.secondAbuseHarm === "yes"}
                           onChange={() => update("secondAbuseHarm", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -2026,7 +2031,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2035,7 +2040,7 @@ export default function FormWizardPage() {
                             onChange={() =>
                               update("secondAbusePolice", value)
                             }
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2089,7 +2094,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2104,7 +2109,7 @@ export default function FormWizardPage() {
                                 update("secondAbuseDates", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2164,16 +2169,16 @@ export default function FormWizardPage() {
               {step === 7 && (
                 <div className="space-y-8">
                   <div
-                    className="flex gap-3 rounded-xl border-2 border-sky-500 bg-sky-100 px-4 py-4 shadow-sm sm:px-5"
+                    className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
                     role="status"
                   >
                     <span
-                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-sky-600 text-sm font-bold text-white"
+                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-liz text-sm font-bold text-white"
                       aria-hidden
                     >
                       3
                     </span>
-                    <p className="text-sm font-medium leading-relaxed text-sky-950">
+                    <p className="text-sm font-medium leading-relaxed text-purple-950">
                       Incident 3 of 3: Use this page to describe a third incident
                       of abuse. If there are no other incidents, you can leave
                       this page blank and continue.
@@ -2228,7 +2233,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2240,7 +2245,7 @@ export default function FormWizardPage() {
                                 update("thirdAbuseWitnessDetail", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2278,7 +2283,7 @@ export default function FormWizardPage() {
                       weapon?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="thirdAbuseWeapon"
@@ -2287,19 +2292,19 @@ export default function FormWizardPage() {
                             update("thirdAbuseWeapon", "no");
                             update("thirdAbuseWeaponDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="thirdAbuseWeapon"
                           checked={form.thirdAbuseWeapon === "yes"}
                           onChange={() => update("thirdAbuseWeapon", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -2335,7 +2340,7 @@ export default function FormWizardPage() {
                       7d. Did the person cause you emotional or physical harm?
                     </legend>
                     <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="thirdAbuseHarm"
@@ -2344,19 +2349,19 @@ export default function FormWizardPage() {
                             update("thirdAbuseHarm", "no");
                             update("thirdAbuseHarmDetail", "");
                           }}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           No
                         </span>
                       </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                         <input
                           type="radio"
                           name="thirdAbuseHarm"
                           checked={form.thirdAbuseHarm === "yes"}
                           onChange={() => update("thirdAbuseHarm", "yes")}
-                          className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
                         <span className="text-sm leading-relaxed text-slate-800">
                           Yes
@@ -2414,7 +2419,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2423,7 +2428,7 @@ export default function FormWizardPage() {
                             onChange={() =>
                               update("thirdAbusePolice", value)
                             }
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2477,7 +2482,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2492,7 +2497,7 @@ export default function FormWizardPage() {
                                 update("thirdAbuseDates", "");
                               }
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2574,7 +2579,7 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
@@ -2583,7 +2588,7 @@ export default function FormWizardPage() {
                             onChange={() => {
                               update("protectOtherPeople", value);
                             }}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2608,7 +2613,7 @@ export default function FormWizardPage() {
                         {form.protectedPeople.map((person, index) => (
                           <div
                             key={index}
-                            className="space-y-4 rounded-xl border border-sky-100 bg-sky-50/30 px-4 py-4"
+                            className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
                           >
                             <p className="text-sm font-medium text-slate-800">
                               Protected person {index + 1}
@@ -2707,7 +2712,7 @@ export default function FormWizardPage() {
                                 ).map(({ v, lab }) => (
                                   <label
                                     key={v}
-                                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5"
+                                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
                                   >
                                     <input
                                       type="radio"
@@ -2724,7 +2729,7 @@ export default function FormWizardPage() {
                                             ),
                                         }))
                                       }
-                                      className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     <span className="text-sm text-slate-800">
                                       {lab}
@@ -2748,7 +2753,7 @@ export default function FormWizardPage() {
                             ],
                           }))
                         }
-                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-sky-200 bg-white px-5 py-2.5 text-sm font-medium text-sky-800 shadow-sm transition hover:bg-sky-50"
+                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
                       >
                         Add Another Person
                       </button>
@@ -2787,7 +2792,7 @@ export default function FormWizardPage() {
                     </>
                   )}
 
-                  <div className="border-t border-sky-100/90 pt-8">
+                  <div className="border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 9. Firearms
                     </h2>
@@ -2811,14 +2816,14 @@ export default function FormWizardPage() {
                       ).map(({ value, label }) => (
                         <label
                           key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                         >
                           <input
                             type="radio"
                             name="hasFirearms"
                             checked={form.hasFirearms === value}
                             onChange={() => update("hasFirearms", value)}
-                            className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
                             {label}
@@ -2833,7 +2838,7 @@ export default function FormWizardPage() {
                       {form.firearms.map((row, index) => (
                         <div
                           key={index}
-                          className="space-y-4 rounded-xl border border-sky-100 bg-sky-50/30 px-4 py-4"
+                          className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
                         >
                           <p className="text-sm font-medium text-slate-800">
                             Firearm {index + 1}
@@ -2924,7 +2929,7 @@ export default function FormWizardPage() {
                             firearms: [...prev.firearms, defaultFirearmRow()],
                           }))
                         }
-                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-sky-200 bg-white px-5 py-2.5 text-sm font-medium text-sky-800 shadow-sm transition hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
                       >
                         Add Firearm
                       </button>
@@ -2939,20 +2944,20 @@ export default function FormWizardPage() {
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 10. Order to not abuse
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.orderToNotAbuse}
                         onChange={(e) =>
                           update("orderToNotAbuse", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Order to Not Abuse
                       </span>
                     </label>
-                    <p className="rounded-xl border border-sky-100/80 bg-sky-50/40 px-4 py-3 text-sm leading-relaxed text-slate-800">
+                    <p className="rounded-xl border border-purple-100/80 bg-purple-50/40 px-4 py-3 text-sm leading-relaxed text-slate-800">
                       I ask the judge to order the person in item 2 to not do
                       the following things to me or anyone listed in Section 8:
                       Harass, attack, strike, threaten, assault (sexually or
@@ -2969,7 +2974,7 @@ export default function FormWizardPage() {
                         href="https://courts.ca.gov/sites/default/files/courts/default/2024-11/dv500info.pdf"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="font-medium text-sky-600 underline underline-offset-2 hover:text-sky-700"
+                        className="font-medium text-liz underline underline-offset-2 hover:text-liz"
                       >
                         DV-500-INFO
                       </a>
@@ -2977,18 +2982,18 @@ export default function FormWizardPage() {
                     </p>
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 11. No-contact order
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.noContactOrder}
                         onChange={(e) =>
                           update("noContactOrder", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         No-Contact Order
@@ -3000,11 +3005,11 @@ export default function FormWizardPage() {
                     </p>
                   </section>
 
-                  <section className="space-y-6 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-6 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 12. Stay-away order
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.stayAwayOrder}
@@ -3015,7 +3020,7 @@ export default function FormWizardPage() {
                             resetStayAwayOrders();
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Stay-Away Order
@@ -3057,7 +3062,7 @@ export default function FormWizardPage() {
                               ).map(({ key, label }) => (
                                 <label
                                   key={key}
-                                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5"
+                                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
                                 >
                                   <input
                                     type="checkbox"
@@ -3065,7 +3070,7 @@ export default function FormWizardPage() {
                                     onChange={(e) =>
                                       update(key, e.target.checked)
                                     }
-                                    className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                   />
                                   <span className="text-sm text-slate-800">
                                     {label}
@@ -3096,7 +3101,7 @@ export default function FormWizardPage() {
                               ).map(({ key, label }) => (
                                 <label
                                   key={key}
-                                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5"
+                                  className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
                                 >
                                   <input
                                     type="checkbox"
@@ -3104,7 +3109,7 @@ export default function FormWizardPage() {
                                     onChange={(e) =>
                                       update(key, e.target.checked)
                                     }
-                                    className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                   />
                                   <span className="text-sm text-slate-800">
                                     {label}
@@ -3154,7 +3159,7 @@ export default function FormWizardPage() {
                             ).map(({ value, label }) => (
                               <label
                                 key={value}
-                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                               >
                                 <input
                                   type="radio"
@@ -3166,7 +3171,7 @@ export default function FormWizardPage() {
                                       update("stayAwayDistanceOther", "");
                                     }
                                   }}
-                                  className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                 />
                                 <span className="text-sm leading-relaxed text-slate-800">
                                   {label}
@@ -3214,7 +3219,7 @@ export default function FormWizardPage() {
                             ).map(({ value, label }) => (
                               <label
                                 key={value}
-                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                               >
                                 <input
                                   type="radio"
@@ -3228,7 +3233,7 @@ export default function FormWizardPage() {
                                       liveTogetherOther: "",
                                     }));
                                   }}
-                                  className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                 />
                                 <span className="text-sm leading-relaxed text-slate-800">
                                   {label}
@@ -3272,7 +3277,7 @@ export default function FormWizardPage() {
                                   return (
                                     <label
                                       key={value}
-                                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                                      className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                                     >
                                       <input
                                         type="radio"
@@ -3290,7 +3295,7 @@ export default function FormWizardPage() {
                                                 : "",
                                           }));
                                         }}
-                                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                       />
                                       <span className="text-sm leading-relaxed text-slate-800">
                                         {label}
@@ -3342,7 +3347,7 @@ export default function FormWizardPage() {
                             ).map(({ value, label }) => (
                               <label
                                 key={value}
-                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80"
+                                className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
                               >
                                 <input
                                   type="radio"
@@ -3360,7 +3365,7 @@ export default function FormWizardPage() {
                                       sameWorkplaceOtherExplain: "",
                                     }));
                                   }}
-                                  className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                 />
                                 <span className="text-sm leading-relaxed text-slate-800">
                                   {label}
@@ -3374,7 +3379,7 @@ export default function FormWizardPage() {
                                 If yes, check all that apply:
                               </p>
                               <div className="space-y-4">
-                                <div className="rounded-xl border border-sky-100/80 bg-white px-4 py-3">
+                                <div className="rounded-xl border border-purple-100/80 bg-white px-4 py-3">
                                   <label className="flex cursor-pointer items-start gap-3">
                                     <input
                                       type="checkbox"
@@ -3388,7 +3393,7 @@ export default function FormWizardPage() {
                                             : "",
                                         }))
                                       }
-                                      className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     <span className="text-sm text-slate-800">
                                       Work together at (name of company):
@@ -3410,7 +3415,7 @@ export default function FormWizardPage() {
                                     />
                                   )}
                                 </div>
-                                <div className="rounded-xl border border-sky-100/80 bg-white px-4 py-3">
+                                <div className="rounded-xl border border-purple-100/80 bg-white px-4 py-3">
                                   <label className="flex cursor-pointer items-start gap-3">
                                     <input
                                       type="checkbox"
@@ -3424,7 +3429,7 @@ export default function FormWizardPage() {
                                             : "",
                                         }))
                                       }
-                                      className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     <span className="text-sm text-slate-800">
                                       Go to the same school (name of school):
@@ -3443,7 +3448,7 @@ export default function FormWizardPage() {
                                     />
                                   )}
                                 </div>
-                                <div className="rounded-xl border border-sky-100/80 bg-white px-4 py-3">
+                                <div className="rounded-xl border border-purple-100/80 bg-white px-4 py-3">
                                   <label className="flex cursor-pointer items-start gap-3">
                                     <input
                                       type="checkbox"
@@ -3458,7 +3463,7 @@ export default function FormWizardPage() {
                                               : "",
                                         }))
                                       }
-                                      className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     <span className="text-sm text-slate-800">
                                       Other (please explain):
@@ -3496,7 +3501,7 @@ export default function FormWizardPage() {
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 13. Order to move out
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.orderToMoveOut}
@@ -3507,7 +3512,7 @@ export default function FormWizardPage() {
                             resetMoveOutOrders();
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Order to Move Out
@@ -3580,7 +3585,7 @@ export default function FormWizardPage() {
                             ).map(({ key, label }) => (
                               <label
                                 key={key}
-                                className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5"
+                                className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
                               >
                                 <input
                                   type="checkbox"
@@ -3604,7 +3609,7 @@ export default function FormWizardPage() {
                                       update(key, on);
                                     }
                                   }}
-                                  className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                 />
                                 <span className="text-sm text-slate-800">
                                   {label}
@@ -3696,11 +3701,11 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 14. Other orders
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.otherOrders}
@@ -3716,7 +3721,7 @@ export default function FormWizardPage() {
                             update("otherOrders", true);
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Other Orders
@@ -3749,18 +3754,18 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 15. Child custody
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.childCustodyVisitation}
                         onChange={(e) =>
                           update("childCustodyVisitation", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Child Custody and Visitation
@@ -3768,7 +3773,7 @@ export default function FormWizardPage() {
                     </label>
                     {form.childCustodyVisitation && (
                       <div
-                        className="rounded-xl border border-sky-200/90 bg-sky-50/80 px-4 py-3 text-sm leading-relaxed text-sky-950"
+                        className="rounded-xl border border-purple-200/90 bg-purple-50/80 px-4 py-3 text-sm leading-relaxed text-purple-950"
                         role="status"
                       >
                         You must fill out form{" "}
@@ -3776,7 +3781,7 @@ export default function FormWizardPage() {
                           href="https://www.courts.ca.gov/documents/dv105.pdf"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="font-medium text-sky-700 underline underline-offset-2 hover:text-sky-800"
+                          className="font-medium text-liz underline underline-offset-2 hover:text-purple-800"
                         >
                           DV-105
                         </a>
@@ -3793,7 +3798,7 @@ export default function FormWizardPage() {
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 16. Protect animals
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.protectAnimals}
@@ -3804,7 +3809,7 @@ export default function FormWizardPage() {
                             resetProtectAnimals();
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Protect Animals
@@ -3821,9 +3826,9 @@ export default function FormWizardPage() {
                             {form.protectedAnimals.map((animal, idx) => (
                               <div
                                 key={`animal-${idx}`}
-                                className="rounded-xl border border-sky-100/80 bg-white p-4 shadow-sm"
+                                className="rounded-xl border border-purple-100/80 bg-white p-4 shadow-sm"
                               >
-                                <p className="text-xs font-semibold uppercase tracking-wide text-sky-800/80">
+                                <p className="text-xs font-semibold uppercase tracking-wide text-purple-900/80">
                                   Animal {idx + 1}
                                 </p>
                                 <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -3933,11 +3938,11 @@ export default function FormWizardPage() {
                           </div>
                         </div>
 
-                        <fieldset className="space-y-3 rounded-xl border border-sky-100/80 bg-sky-50/40 p-4">
+                        <fieldset className="space-y-3 rounded-xl border border-purple-100/80 bg-purple-50/40 p-4">
                           <legend className="text-sm font-medium text-slate-800">
                             Orders regarding animals
                           </legend>
-                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5">
                             <input
                               type="checkbox"
                               checked={form.protectAnimalsStayAway}
@@ -3954,14 +3959,14 @@ export default function FormWizardPage() {
                                     : {}),
                                 }));
                               }}
-                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                              className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                             />
                             <span className="text-sm text-slate-800">
                               Stay away from animals by at least
                             </span>
                           </label>
                           {form.protectAnimalsStayAway && (
-                            <div className="ml-7 space-y-3 border-l-2 border-sky-200/80 pl-4">
+                            <div className="ml-7 space-y-3 border-l-2 border-purple-200/80 pl-4">
                               <div className="flex flex-col gap-2">
                                 <label className="flex cursor-pointer items-center gap-2 text-sm text-slate-800">
                                   <input
@@ -3978,7 +3983,7 @@ export default function FormWizardPage() {
                                         protectAnimalsStayAwayOtherYards: "",
                                       }))
                                     }
-                                    className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    className="size-4 border-purple-200 accent-liz focus:ring-liz"
                                   />
                                   100 yards (300 feet)
                                 </label>
@@ -3996,7 +4001,7 @@ export default function FormWizardPage() {
                                         protectAnimalsStayAwayDistance: "other",
                                       }))
                                     }
-                                    className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    className="size-4 border-purple-200 accent-liz focus:ring-liz"
                                   />
                                   Other (yards)
                                 </label>
@@ -4028,14 +4033,14 @@ export default function FormWizardPage() {
                             </div>
                           )}
 
-                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5">
                             <input
                               type="checkbox"
                               checked={form.protectAnimalsNotTake}
                               onChange={(e) =>
                                 update("protectAnimalsNotTake", e.target.checked)
                               }
-                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                              className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                             />
                             <span className="text-sm text-slate-800">
                               Not take, sell, hide, molest, attack, strike,
@@ -4044,7 +4049,7 @@ export default function FormWizardPage() {
                             </span>
                           </label>
 
-                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-sky-100/80 bg-white px-3 py-2.5">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5">
                             <input
                               type="checkbox"
                               checked={form.protectAnimalsSolePossession}
@@ -4064,7 +4069,7 @@ export default function FormWizardPage() {
                                     : {}),
                                 }));
                               }}
-                              className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                              className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                             />
                             <span className="text-sm text-slate-800">
                               Give me sole possession, care, and control of the
@@ -4072,7 +4077,7 @@ export default function FormWizardPage() {
                             </span>
                           </label>
                           {form.protectAnimalsSolePossession && (
-                            <div className="ml-7 space-y-2 border-l-2 border-sky-200/80 pl-4">
+                            <div className="ml-7 space-y-2 border-l-2 border-purple-200/80 pl-4">
                               {(
                                 [
                                   {
@@ -4100,7 +4105,7 @@ export default function FormWizardPage() {
                                     onChange={(e) =>
                                       update(key, e.target.checked)
                                     }
-                                    className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                    className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                   />
                                   <span className="text-sm text-slate-800">
                                     {label}
@@ -4124,7 +4129,7 @@ export default function FormWizardPage() {
                                         : {}),
                                     }));
                                   }}
-                                  className="mt-0.5 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                  className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                                 />
                                 <span className="text-sm text-slate-800">
                                   Other
@@ -4150,11 +4155,11 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 17. Control of property
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.controlProperty}
@@ -4165,7 +4170,7 @@ export default function FormWizardPage() {
                             resetControlProperty();
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Control of Property
@@ -4211,18 +4216,18 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 18. Health and other insurance
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.healthOtherInsurance}
                         onChange={(e) =>
                           update("healthOtherInsurance", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Health and Other Insurance
@@ -4230,18 +4235,18 @@ export default function FormWizardPage() {
                     </label>
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 19. Record communications
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.recordCommunications}
                         onChange={(e) =>
                           update("recordCommunications", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Record Communications
@@ -4257,14 +4262,14 @@ export default function FormWizardPage() {
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 20. Property restraint
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.propertyRestraint}
                         onChange={(e) =>
                           update("propertyRestraint", e.target.checked)
                         }
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Property Restraint
@@ -4276,11 +4281,11 @@ export default function FormWizardPage() {
                     </p>
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 21. Extend deadline to give notice
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.extendNoticeDeadline}
@@ -4292,7 +4297,7 @@ export default function FormWizardPage() {
                             ...(!on ? { extendNoticeExplain: "" } : {}),
                           }));
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Extend my deadline to give notice
@@ -4329,11 +4334,11 @@ export default function FormWizardPage() {
                     )}
                   </section>
 
-                  <section className="space-y-4 border-t border-sky-100/90 pt-8">
+                  <section className="space-y-4 border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 22. Pay debts owed for property
                     </h2>
-                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-sky-100 bg-white px-4 py-3 shadow-sm transition hover:border-sky-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-sky-200/80">
+                    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
                       <input
                         type="checkbox"
                         checked={form.payDebtsForProperty}
@@ -4344,7 +4349,7 @@ export default function FormWizardPage() {
                             resetPayDebtsForProperty();
                           }
                         }}
-                        className="mt-1 size-4 shrink-0 border-sky-200 text-sky-600 focus:ring-sky-500"
+                        className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                       />
                       <span className="text-sm font-medium text-slate-800">
                         Pay Debts (Bills) Owed for Property
@@ -4363,10 +4368,10 @@ export default function FormWizardPage() {
                           <h3 className="text-sm font-medium text-slate-800">
                             Debts (up to three)
                           </h3>
-                          <div className="mt-3 overflow-x-auto rounded-xl border border-sky-100/80 bg-white shadow-sm">
+                          <div className="mt-3 overflow-x-auto rounded-xl border border-purple-100/80 bg-white shadow-sm">
                             <table className="w-full min-w-[36rem] text-left text-sm">
                               <thead>
-                                <tr className="border-b border-sky-100 bg-sky-50/50 text-xs font-semibold uppercase tracking-wide text-sky-900/80">
+                                <tr className="border-b border-purple-100 bg-purple-50/50 text-xs font-semibold uppercase tracking-wide text-purple-900/80">
                                   <th className="px-3 py-2.5">Debt</th>
                                   <th className="px-3 py-2.5">Pay to</th>
                                   <th className="px-3 py-2.5">For</th>
@@ -4378,7 +4383,7 @@ export default function FormWizardPage() {
                                 {form.payDebtsRows.map((row, idx) => (
                                   <tr
                                     key={`debt-${idx}`}
-                                    className="border-b border-sky-100/80 last:border-b-0"
+                                    className="border-b border-purple-100/80 last:border-b-0"
                                   >
                                     <td className="whitespace-nowrap px-3 py-3 text-xs font-medium text-slate-500">
                                       {idx + 1}
@@ -4518,7 +4523,7 @@ export default function FormWizardPage() {
                           </p>
                         </div>
 
-                        <fieldset className="space-y-2 rounded-xl border border-sky-100/80 bg-sky-50/40 p-4">
+                        <fieldset className="space-y-2 rounded-xl border border-purple-100/80 bg-purple-50/40 p-4">
                           <legend className="text-sm font-medium text-slate-800">
                             Special decision (finding) by the judge if you did
                             not agree to the debt (optional)
@@ -4542,7 +4547,7 @@ export default function FormWizardPage() {
                                     payDebtsSpecialDecision: "yes",
                                   }))
                                 }
-                                className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                className="size-4 border-purple-200 accent-liz focus:ring-liz"
                               />
                               Yes
                             </label>
@@ -4562,14 +4567,14 @@ export default function FormWizardPage() {
                                     payDebtsExplainHow: "",
                                   }))
                                 }
-                                className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                className="size-4 border-purple-200 accent-liz focus:ring-liz"
                               />
                               No
                             </label>
                           </div>
 
                           {form.payDebtsSpecialDecision === "yes" && (
-                            <div className="mt-4 space-y-4 border-t border-sky-200/60 pt-4">
+                            <div className="mt-4 space-y-4 border-t border-purple-200/60 pt-4">
                               <p className="text-sm font-medium text-slate-800">
                                 Which of the debts listed above resulted from the
                                 abuse?
@@ -4601,7 +4606,7 @@ export default function FormWizardPage() {
                                       onChange={(e) =>
                                         update(key, e.target.checked)
                                       }
-                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="size-4 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     {label}
                                   </label>
@@ -4625,7 +4630,7 @@ export default function FormWizardPage() {
                                           payDebtsKnowHow: "yes",
                                         }))
                                       }
-                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="size-4 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     Yes
                                   </label>
@@ -4641,7 +4646,7 @@ export default function FormWizardPage() {
                                           payDebtsExplainHow: "",
                                         }))
                                       }
-                                      className="size-4 border-sky-200 text-sky-600 focus:ring-sky-500"
+                                      className="size-4 border-purple-200 accent-liz focus:ring-liz"
                                     />
                                     No
                                   </label>
@@ -4696,7 +4701,7 @@ export default function FormWizardPage() {
                   )}
                   {pdfInfo && (
                     <div
-                      className="space-y-2 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900"
+                      className="space-y-2 rounded-xl border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-900"
                       role="status"
                     >
                       <p>
@@ -4707,7 +4712,7 @@ export default function FormWizardPage() {
                         . Filled AcroForm fields:
                       </p>
                       {pdfInfo.filled.length === 0 ? (
-                        <p className="text-sky-950/80">
+                        <p className="text-purple-950/80">
                           None. Check the browser console for details. You can
                           verify field names with{" "}
                           <Link
@@ -4719,7 +4724,7 @@ export default function FormWizardPage() {
                           .
                         </p>
                       ) : (
-                        <ul className="list-inside list-disc text-sky-950/90">
+                        <ul className="list-inside list-disc text-purple-950/90">
                           {pdfInfo.filled.map((row) => (
                             <li key={`${row.pdfFieldName}-${row.label}`}>
                               {row.label} →{" "}
@@ -4731,7 +4736,7 @@ export default function FormWizardPage() {
                         </ul>
                       )}
                       {pdfInfo.missing.length > 0 && (
-                        <p className="border-t border-sky-200/80 pt-2 text-amber-950">
+                        <p className="border-t border-purple-200/80 pt-2 text-amber-950">
                           Could not fill:{" "}
                           {pdfInfo.missing
                             .map((m) => `${m.label} (${m.pdfFieldName})`)
@@ -4749,8 +4754,8 @@ export default function FormWizardPage() {
                     </div>
                   )}
                   <dl className="space-y-6 text-sm sm:text-base">
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Your information
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -4788,8 +4793,8 @@ export default function FormWizardPage() {
                         </p>
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Legal representation
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -4815,8 +4820,8 @@ export default function FormWizardPage() {
                         )}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Person you want protection from
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -4842,8 +4847,8 @@ export default function FormWizardPage() {
                         </p>
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Relationship to other party
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -4881,8 +4886,8 @@ export default function FormWizardPage() {
                         )}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Describe abuse (most recent)
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -4965,8 +4970,8 @@ export default function FormWizardPage() {
                           )}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Describe abuse (second incident)
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -5049,8 +5054,8 @@ export default function FormWizardPage() {
                           )}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Describe abuse (third incident)
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -5133,8 +5138,8 @@ export default function FormWizardPage() {
                           )}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Other protected people &amp; firearms
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -5189,8 +5194,8 @@ export default function FormWizardPage() {
                           ))}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Orders requested
                       </dt>
                       <dd className="mt-2 space-y-2 text-slate-800">
@@ -5213,7 +5218,7 @@ export default function FormWizardPage() {
                           {form.stayAwayOrder ? "Yes" : "No"}
                         </p>
                         {form.stayAwayOrder ? (
-                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3 text-slate-800">
+                          <div className="space-y-1 border-l-2 border-purple-200/80 pl-3 text-slate-800">
                             <p>
                               <span className="text-slate-500">
                                 Stay away from:
@@ -5329,8 +5334,8 @@ export default function FormWizardPage() {
                         ) : null}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         More orders (Page 8)
                       </dt>
                       <dd className="mt-2 space-y-2 text-slate-800">
@@ -5341,7 +5346,7 @@ export default function FormWizardPage() {
                           {form.orderToMoveOut ? "Yes" : "No"}
                         </p>
                         {form.orderToMoveOut ? (
-                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                          <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
                             <p>
                               <span className="text-slate-500">13a:</span>{" "}
                               {display(form.moveOutOrderPersonAsk)}
@@ -5403,8 +5408,8 @@ export default function FormWizardPage() {
                         </p>
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Property, animals &amp; other orders (Page 9)
                       </dt>
                       <dd className="mt-2 space-y-2 text-slate-800">
@@ -5415,7 +5420,7 @@ export default function FormWizardPage() {
                           {form.protectAnimals ? "Yes" : "No"}
                         </p>
                         {form.protectAnimals ? (
-                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                          <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
                             {form.protectedAnimals.map((a, i) => (
                               <p key={`ra-${i}`}>
                                 <span className="text-slate-500">
@@ -5514,8 +5519,8 @@ export default function FormWizardPage() {
                         </p>
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Property, notice &amp; debts (Page 10)
                       </dt>
                       <dd className="mt-2 space-y-2 text-slate-800">
@@ -5546,7 +5551,7 @@ export default function FormWizardPage() {
                           {form.payDebtsForProperty ? "Yes" : "No"}
                         </p>
                         {form.payDebtsForProperty ? (
-                          <div className="space-y-1 border-l-2 border-sky-200/80 pl-3">
+                          <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
                             {form.payDebtsRows.map((d, i) => (
                               <p key={`pd-${i}`}>
                                 <span className="text-slate-500">
@@ -5610,8 +5615,8 @@ export default function FormWizardPage() {
                         ) : null}
                       </dd>
                     </div>
-                    <div className="rounded-xl border border-sky-100/90 bg-sky-50/40 px-4 py-4">
-                      <dt className="text-xs font-semibold uppercase tracking-wide text-sky-800/90">
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
                         Other court cases
                       </dt>
                       <dd className="mt-2 space-y-1 text-slate-800">
@@ -5718,7 +5723,7 @@ export default function FormWizardPage() {
                 type="button"
                 onClick={goBack}
                 disabled={!canGoBack}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-sky-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:border-sky-300 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-40"
+                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Back
               </button>
@@ -5727,7 +5732,7 @@ export default function FormWizardPage() {
                   type="button"
                   onClick={handleGenerateForms}
                   disabled={pdfGenerating}
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-sky-600 px-8 py-3 text-sm font-medium text-white shadow-md shadow-sky-600/25 transition hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
                 >
                   {pdfGenerating ? "Generating…" : "Generate Forms"}
                 </button>
@@ -5735,7 +5740,7 @@ export default function FormWizardPage() {
                 <button
                   type="button"
                   onClick={goNext}
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-sky-600 px-8 py-3 text-sm font-medium text-white shadow-md shadow-sky-600/25 transition hover:bg-sky-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 sm:ml-auto"
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz sm:ml-auto"
                 >
                   Next
                 </button>
