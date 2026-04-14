@@ -33,7 +33,6 @@ const STEP_TITLES = [
   "Person Causing Harm",
   "Describe Abuse",
   "Other Court Cases",
-  "Firearms",
   "Orders You Want the Judge to Make",
   "Move Out, Other Orders, Custody",
   "Property, Animals & Other Orders",
@@ -47,10 +46,9 @@ const STEP_TITLES = [
 const STEP_BLURBS = [
   "Are you an attorney preparing this on behalf of the petitioner, or are you a petitioner who is represented by an attorney?",
   "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
-  "Now, tell us about the person causing harm. We need their basic information and how you know them.",
+  "Now, tell us about the person causing harm. We need their basic information, how you know them, and whether they have access to firearms.",
   "Describe incidents of abuse (DV-100 Sections 5–7, Pages 3–5). You will start with the most recent incident; you can choose to add up to two more separate incidents when you feel ready.",
   "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
-  "Firearm information if known (DV-100 Section 9, Page 6).",
   "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
   "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
   "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
@@ -1513,6 +1511,149 @@ export default function FormWizardPage() {
                       </div>
                     </fieldset>
                   )}
+
+                  <hr className="my-8 border-0 border-t border-gray-200" />
+
+                  <div className="space-y-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Firearms
+                    </h2>
+
+                    <fieldset className="space-y-4">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Does this person own or possess any firearms or other
+                        guns?
+                      </legend>
+                      <div className="space-y-3">
+                        {(
+                          [
+                            { value: "idk" as const, label: "I don't know" },
+                            { value: "no" as const, label: "No" },
+                            { value: "yes" as const, label: "Yes" },
+                          ] as const
+                        ).map(({ value, label }) => (
+                          <label
+                            key={value}
+                            className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition"
+                          >
+                            <input
+                              type="radio"
+                              name="hasFirearms"
+                              checked={form.hasFirearms === value}
+                              onChange={() => update("hasFirearms", value)}
+                              className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              {label}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </fieldset>
+
+                    {form.hasFirearms === "yes" && (
+                      <div className="space-y-6">
+                        {form.firearms.map((row, index) => (
+                          <div
+                            key={index}
+                            className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
+                          >
+                            <p className="text-sm font-medium text-slate-800">
+                              Firearm {index + 1}
+                            </p>
+                            <div>
+                              <label
+                                htmlFor={`firearm-desc-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Description (type, make, model)
+                              </label>
+                              <input
+                                id={`firearm-desc-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={row.description}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    firearms: prev.firearms.map((f, i) =>
+                                      i === index
+                                        ? { ...f, description: e.target.value }
+                                        : f,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor={`firearm-amt-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Amount
+                              </label>
+                              <input
+                                id={`firearm-amt-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={row.amount}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    firearms: prev.firearms.map((f, i) =>
+                                      i === index
+                                        ? { ...f, amount: e.target.value }
+                                        : f,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor={`firearm-loc-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Location (if known)
+                              </label>
+                              <input
+                                id={`firearm-loc-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={row.location}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    firearms: prev.firearms.map((f, i) =>
+                                      i === index
+                                        ? { ...f, location: e.target.value }
+                                        : f,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          disabled={form.firearms.length >= 6}
+                          onClick={() =>
+                            setForm((prev) => ({
+                              ...prev,
+                              firearms: [...prev.firearms, defaultFirearmRow()],
+                            }))
+                          }
+                          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          Add Firearm
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -2946,154 +3087,6 @@ export default function FormWizardPage() {
               )}
 
               {step === 5 && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Section 9. Firearms
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Does the person in item 2 own or possess any firearms or
-                      other guns?
-                    </p>
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      9a–9c. Firearms
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "idk" as const, label: "I don't know" },
-                          { value: "no" as const, label: "No" },
-                          { value: "yes" as const, label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition"
-                        >
-                          <input
-                            type="radio"
-                            name="hasFirearms"
-                            checked={form.hasFirearms === value}
-                            onChange={() => update("hasFirearms", value)}
-                            className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.hasFirearms === "yes" && (
-                    <div className="space-y-6">
-                      {form.firearms.map((row, index) => (
-                        <div
-                          key={index}
-                          className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
-                        >
-                          <p className="text-sm font-medium text-slate-800">
-                            Firearm {index + 1}
-                          </p>
-                          <div>
-                            <label
-                              htmlFor={`firearm-desc-${index}`}
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Description (type, make, model)
-                            </label>
-                            <input
-                              id={`firearm-desc-${index}`}
-                              type="text"
-                              autoComplete="off"
-                              value={row.description}
-                              onChange={(e) =>
-                                setForm((prev) => ({
-                                  ...prev,
-                                  firearms: prev.firearms.map((f, i) =>
-                                    i === index
-                                      ? { ...f, description: e.target.value }
-                                      : f,
-                                  ),
-                                }))
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor={`firearm-amt-${index}`}
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Amount
-                            </label>
-                            <input
-                              id={`firearm-amt-${index}`}
-                              type="text"
-                              autoComplete="off"
-                              value={row.amount}
-                              onChange={(e) =>
-                                setForm((prev) => ({
-                                  ...prev,
-                                  firearms: prev.firearms.map((f, i) =>
-                                    i === index
-                                      ? { ...f, amount: e.target.value }
-                                      : f,
-                                  ),
-                                }))
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor={`firearm-loc-${index}`}
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Location (if known)
-                            </label>
-                            <input
-                              id={`firearm-loc-${index}`}
-                              type="text"
-                              autoComplete="off"
-                              value={row.location}
-                              onChange={(e) =>
-                                setForm((prev) => ({
-                                  ...prev,
-                                  firearms: prev.firearms.map((f, i) =>
-                                    i === index
-                                      ? { ...f, location: e.target.value }
-                                      : f,
-                                  ),
-                                }))
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        disabled={form.firearms.length >= 6}
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            firearms: [...prev.firearms, defaultFirearmRow()],
-                          }))
-                        }
-                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        Add Firearm
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {step === 6 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3650,7 +3643,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 7 && (
+              {step === 6 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3947,7 +3940,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 8 && (
+              {step === 7 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4411,7 +4404,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 9 && (
+              {step === 8 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4844,11 +4837,11 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 10 && (
+              {step === 9 && (
                 <Page11SupportFeesRestitutionStep form={form} setForm={setForm} />
               )}
 
-              {step === 11 && (
+              {step === 10 && (
                 <Page12InterventionWirelessStep
                   form={form}
                   setForm={setForm}
@@ -4856,7 +4849,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 12 && (
+              {step === 11 && (
                 <SignatureStep
                   formData={form}
                   updateFormData={(patch: Partial<FormData>) =>
@@ -4865,7 +4858,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 13 && (
+              {step === 12 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
