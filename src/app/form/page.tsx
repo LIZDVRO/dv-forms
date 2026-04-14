@@ -27,10 +27,9 @@ import { Page12InterventionWirelessStep } from "./Page12InterventionWirelessStep
 const STEP_TITLES = [
   "Legal Representation",
   "Who Needs Protection?",
-  "Person You Want Protection From",
-  "Relationship to Other Party",
-  "Other Court Cases",
+  "Person Causing Harm",
   "Describe Abuse",
+  "Other Court Cases",
   "Firearms",
   "Orders You Want the Judge to Make",
   "Move Out, Other Orders, Custody",
@@ -45,10 +44,9 @@ const STEP_TITLES = [
 const STEP_BLURBS = [
   "Are you an attorney preparing this on behalf of the petitioner, or are you a petitioner who is represented by an attorney?",
   "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
-  "Provide identifying information for the person you are asking the court for protection from.",
-  "Describe how you are connected to the other person (DV-100 Section 3).",
-  "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
+  "Now, tell us about the person causing harm. We need their basic information and how you know them.",
   "Describe incidents of abuse (DV-100 Sections 5–7, Pages 3–5). You will start with the most recent incident; you can choose to add up to two more separate incidents when you feel ready.",
+  "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
   "Firearm information if known (DV-100 Section 9, Page 6).",
   "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
   "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
@@ -1386,11 +1384,7 @@ export default function FormWizardPage() {
                       className={inputClass}
                     />
                   </div>
-                </div>
-              )}
-
-              {step === 3 && (
-                <div className="space-y-6">
+                  <hr className="my-8 border-0 border-t border-purple-200/70" />
                   <fieldset className="space-y-4">
                     <legend className="text-sm font-medium text-slate-800">
                       Check all that apply
@@ -1519,283 +1513,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 4 && (
-                <div className="space-y-8">
-                  <section className="space-y-6">
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Other restraining or protective orders
-                    </h2>
-                    <fieldset className="space-y-4">
-                      <legend className="text-sm font-medium text-slate-800">
-                        Do you have any other restraining/protective orders
-                        currently in effect?
-                      </legend>
-                      <div className="space-y-3">
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                          <input
-                            type="radio"
-                            name="hasRestrainingOrders"
-                            checked={form.hasRestrainingOrders === "yes"}
-                            onChange={() =>
-                              update("hasRestrainingOrders", "yes")
-                            }
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            Yes
-                          </span>
-                        </label>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                          <input
-                            type="radio"
-                            name="hasRestrainingOrders"
-                            checked={form.hasRestrainingOrders === "no"}
-                            onChange={() =>
-                              update("hasRestrainingOrders", "no")
-                            }
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            No
-                          </span>
-                        </label>
-                      </div>
-                    </fieldset>
-                    {form.hasRestrainingOrders === "yes" && (
-                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
-                        <p className="text-sm text-slate-600">
-                          For each order, enter the date of the order and when it
-                          expires.
-                        </p>
-                        <div className="grid gap-6 sm:grid-cols-2">
-                          <div>
-                            <label
-                              htmlFor="order1Date"
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Order 1 — date of order
-                            </label>
-                            <input
-                              id="order1Date"
-                              name="order1Date"
-                              type="text"
-                              autoComplete="off"
-                              value={form.order1Date}
-                              onChange={(e) =>
-                                update("order1Date", e.target.value)
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="order1Expires"
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Order 1 — date it expires
-                            </label>
-                            <input
-                              id="order1Expires"
-                              name="order1Expires"
-                              type="text"
-                              autoComplete="off"
-                              value={form.order1Expires}
-                              onChange={(e) =>
-                                update("order1Expires", e.target.value)
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                        </div>
-                        <div className="grid gap-6 sm:grid-cols-2">
-                          <div>
-                            <label
-                              htmlFor="order2Date"
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Order 2 — date of order
-                            </label>
-                            <input
-                              id="order2Date"
-                              name="order2Date"
-                              type="text"
-                              autoComplete="off"
-                              value={form.order2Date}
-                              onChange={(e) =>
-                                update("order2Date", e.target.value)
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                          <div>
-                            <label
-                              htmlFor="order2Expires"
-                              className="text-sm font-medium text-slate-800"
-                            >
-                              Order 2 — date it expires
-                            </label>
-                            <input
-                              id="order2Expires"
-                              name="order2Expires"
-                              type="text"
-                              autoComplete="off"
-                              value={form.order2Expires}
-                              onChange={(e) =>
-                                update("order2Expires", e.target.value)
-                              }
-                              className={inputClass}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </section>
-
-                  <section className="space-y-6 border-t border-purple-100/90 pt-8">
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Other court cases
-                    </h2>
-                    <fieldset className="space-y-4">
-                      <legend className="text-sm font-medium text-slate-800">
-                        Has any other court case involving you and this person
-                        been filed?
-                      </legend>
-                      <div className="space-y-3">
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                          <input
-                            type="radio"
-                            name="hasOtherCases"
-                            checked={form.hasOtherCases === "yes"}
-                            onChange={() => update("hasOtherCases", "yes")}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            Yes
-                          </span>
-                        </label>
-                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                          <input
-                            type="radio"
-                            name="hasOtherCases"
-                            checked={form.hasOtherCases === "no"}
-                            onChange={() => update("hasOtherCases", "no")}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            No
-                          </span>
-                        </label>
-                      </div>
-                    </fieldset>
-
-                    {form.hasOtherCases === "yes" && (
-                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
-                        <fieldset className="space-y-4">
-                          <legend className="text-sm font-medium text-slate-800">
-                            Type of case (check all that apply)
-                          </legend>
-                          <div className="space-y-3">
-                            {CASE_TYPE_OPTIONS.map(({ value, label }) => {
-                              const checked = form.caseTypes.includes(value);
-                              const detailKey = CASE_TYPE_DETAIL_KEY[value];
-                              return (
-                                <div
-                                  key={value}
-                                  className="rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm"
-                                >
-                                  <label className="flex cursor-pointer items-start gap-3 transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                                    <input
-                                      type="checkbox"
-                                      checked={checked}
-                                      onChange={() => {
-                                        setForm((prev) => {
-                                          const wasIncluded =
-                                            prev.caseTypes.includes(value);
-                                          const nextTypes = toggleInList(
-                                            prev.caseTypes,
-                                            value,
-                                          );
-                                          const next: FormData = {
-                                            ...prev,
-                                            caseTypes: nextTypes,
-                                          };
-                                          if (
-                                            wasIncluded &&
-                                            !nextTypes.includes(value)
-                                          ) {
-                                            const dk = CASE_TYPE_DETAIL_KEY[value];
-                                            if (dk) next[dk] = "";
-                                            if (value === "other") {
-                                              next.otherCaseType = "";
-                                            }
-                                          }
-                                          return next;
-                                        });
-                                      }}
-                                      className="mt-1 size-4 shrink-0 rounded border-purple-200 accent-liz focus:ring-liz"
-                                    />
-                                    <span className="text-sm leading-relaxed text-slate-800">
-                                      {label}
-                                    </span>
-                                  </label>
-                                  {checked && detailKey && (
-                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
-                                      <label
-                                        htmlFor={detailKey}
-                                        className="text-sm font-medium text-slate-800"
-                                      >
-                                        Case details (city, state, year, case
-                                        number)
-                                      </label>
-                                      <input
-                                        id={detailKey}
-                                        name={detailKey}
-                                        type="text"
-                                        autoComplete="off"
-                                        value={form[detailKey]}
-                                        onChange={(e) =>
-                                          update(detailKey, e.target.value)
-                                        }
-                                        className={`${inputClass} mt-1.5`}
-                                      />
-                                    </div>
-                                  )}
-                                  {checked && value === "other" && (
-                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
-                                      <label
-                                        htmlFor="otherCaseType"
-                                        className="text-sm font-medium text-slate-800"
-                                      >
-                                        What kind of case?
-                                      </label>
-                                      <input
-                                        id="otherCaseType"
-                                        name="otherCaseType"
-                                        type="text"
-                                        autoComplete="off"
-                                        value={form.otherCaseType}
-                                        onChange={(e) =>
-                                          update(
-                                            "otherCaseType",
-                                            e.target.value,
-                                          )
-                                        }
-                                        className={`${inputClass} mt-1.5`}
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </fieldset>
-                      </div>
-                    )}
-                  </section>
-                </div>
-              )}
-
-              {step === 5 && (
+              {step === 3 && (
                 <div className="space-y-8">
                   <div
                     className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
@@ -2948,7 +2666,283 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 6 && (
+              {step === 4 && (
+                <div className="space-y-8">
+                  <section className="space-y-6">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Other restraining or protective orders
+                    </h2>
+                    <fieldset className="space-y-4">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Do you have any other restraining/protective orders
+                        currently in effect?
+                      </legend>
+                      <div className="space-y-3">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                          <input
+                            type="radio"
+                            name="hasRestrainingOrders"
+                            checked={form.hasRestrainingOrders === "yes"}
+                            onChange={() =>
+                              update("hasRestrainingOrders", "yes")
+                            }
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            Yes
+                          </span>
+                        </label>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                          <input
+                            type="radio"
+                            name="hasRestrainingOrders"
+                            checked={form.hasRestrainingOrders === "no"}
+                            onChange={() =>
+                              update("hasRestrainingOrders", "no")
+                            }
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            No
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+                    {form.hasRestrainingOrders === "yes" && (
+                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
+                        <p className="text-sm text-slate-600">
+                          For each order, enter the date of the order and when it
+                          expires.
+                        </p>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div>
+                            <label
+                              htmlFor="order1Date"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 1 — date of order
+                            </label>
+                            <input
+                              id="order1Date"
+                              name="order1Date"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order1Date}
+                              onChange={(e) =>
+                                update("order1Date", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="order1Expires"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 1 — date it expires
+                            </label>
+                            <input
+                              id="order1Expires"
+                              name="order1Expires"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order1Expires}
+                              onChange={(e) =>
+                                update("order1Expires", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid gap-6 sm:grid-cols-2">
+                          <div>
+                            <label
+                              htmlFor="order2Date"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 2 — date of order
+                            </label>
+                            <input
+                              id="order2Date"
+                              name="order2Date"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order2Date}
+                              onChange={(e) =>
+                                update("order2Date", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                          <div>
+                            <label
+                              htmlFor="order2Expires"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              Order 2 — date it expires
+                            </label>
+                            <input
+                              id="order2Expires"
+                              name="order2Expires"
+                              type="text"
+                              autoComplete="off"
+                              value={form.order2Expires}
+                              onChange={(e) =>
+                                update("order2Expires", e.target.value)
+                              }
+                              className={inputClass}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+
+                  <section className="space-y-6 border-t border-purple-100/90 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Other court cases
+                    </h2>
+                    <fieldset className="space-y-4">
+                      <legend className="text-sm font-medium text-slate-800">
+                        Has any other court case involving you and this person
+                        been filed?
+                      </legend>
+                      <div className="space-y-3">
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                          <input
+                            type="radio"
+                            name="hasOtherCases"
+                            checked={form.hasOtherCases === "yes"}
+                            onChange={() => update("hasOtherCases", "yes")}
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            Yes
+                          </span>
+                        </label>
+                        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                          <input
+                            type="radio"
+                            name="hasOtherCases"
+                            checked={form.hasOtherCases === "no"}
+                            onChange={() => update("hasOtherCases", "no")}
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            No
+                          </span>
+                        </label>
+                      </div>
+                    </fieldset>
+
+                    {form.hasOtherCases === "yes" && (
+                      <div className="space-y-6 border-t border-purple-100/90 pt-6">
+                        <fieldset className="space-y-4">
+                          <legend className="text-sm font-medium text-slate-800">
+                            Type of case (check all that apply)
+                          </legend>
+                          <div className="space-y-3">
+                            {CASE_TYPE_OPTIONS.map(({ value, label }) => {
+                              const checked = form.caseTypes.includes(value);
+                              const detailKey = CASE_TYPE_DETAIL_KEY[value];
+                              return (
+                                <div
+                                  key={value}
+                                  className="rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm"
+                                >
+                                  <label className="flex cursor-pointer items-start gap-3 transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                                    <input
+                                      type="checkbox"
+                                      checked={checked}
+                                      onChange={() => {
+                                        setForm((prev) => {
+                                          const wasIncluded =
+                                            prev.caseTypes.includes(value);
+                                          const nextTypes = toggleInList(
+                                            prev.caseTypes,
+                                            value,
+                                          );
+                                          const next: FormData = {
+                                            ...prev,
+                                            caseTypes: nextTypes,
+                                          };
+                                          if (
+                                            wasIncluded &&
+                                            !nextTypes.includes(value)
+                                          ) {
+                                            const dk = CASE_TYPE_DETAIL_KEY[value];
+                                            if (dk) next[dk] = "";
+                                            if (value === "other") {
+                                              next.otherCaseType = "";
+                                            }
+                                          }
+                                          return next;
+                                        });
+                                      }}
+                                      className="mt-1 size-4 shrink-0 rounded border-purple-200 accent-liz focus:ring-liz"
+                                    />
+                                    <span className="text-sm leading-relaxed text-slate-800">
+                                      {label}
+                                    </span>
+                                  </label>
+                                  {checked && detailKey && (
+                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
+                                      <label
+                                        htmlFor={detailKey}
+                                        className="text-sm font-medium text-slate-800"
+                                      >
+                                        Case details (city, state, year, case
+                                        number)
+                                      </label>
+                                      <input
+                                        id={detailKey}
+                                        name={detailKey}
+                                        type="text"
+                                        autoComplete="off"
+                                        value={form[detailKey]}
+                                        onChange={(e) =>
+                                          update(detailKey, e.target.value)
+                                        }
+                                        className={`${inputClass} mt-1.5`}
+                                      />
+                                    </div>
+                                  )}
+                                  {checked && value === "other" && (
+                                    <div className="mt-3 border-t border-purple-100/90 pt-3 pl-7">
+                                      <label
+                                        htmlFor="otherCaseType"
+                                        className="text-sm font-medium text-slate-800"
+                                      >
+                                        What kind of case?
+                                      </label>
+                                      <input
+                                        id="otherCaseType"
+                                        name="otherCaseType"
+                                        type="text"
+                                        autoComplete="off"
+                                        value={form.otherCaseType}
+                                        onChange={(e) =>
+                                          update(
+                                            "otherCaseType",
+                                            e.target.value,
+                                          )
+                                        }
+                                        className={`${inputClass} mt-1.5`}
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </fieldset>
+                      </div>
+                    )}
+                  </section>
+                </div>
+              )}
+
+              {step === 5 && (
                 <div className="space-y-8">
                   <div>
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3096,7 +3090,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 7 && (
+              {step === 6 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3653,7 +3647,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 8 && (
+              {step === 7 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3950,7 +3944,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 9 && (
+              {step === 8 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4414,7 +4408,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 10 && (
+              {step === 9 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4847,7 +4841,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 11 && (
+              {step === 10 && (
                 <Page11SupportFeesRestitutionStep
                   form={form}
                   setForm={setForm}
@@ -4855,7 +4849,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 12 && (
+              {step === 11 && (
                 <Page12InterventionWirelessStep
                   form={form}
                   setForm={setForm}
@@ -4863,7 +4857,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 13 && (
+              {step === 12 && (
                 <SignatureStep
                   formData={form}
                   updateFormData={(patch: Partial<FormData>) =>
@@ -4872,7 +4866,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 14 && (
+              {step === 13 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
