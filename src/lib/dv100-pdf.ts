@@ -87,6 +87,27 @@ export type Dv100PayDebtRow = {
   dueDate: string;
 };
 
+/** Section 28 — one wireless account row on DV-100 Page 12 (PDF rows a–d). */
+export type Dv100WirelessAccountRow = {
+  isMyNumber: boolean;
+  isChildNumber: boolean;
+  phoneNumber: string;
+};
+
+export function emptyWirelessAccounts(): [
+  Dv100WirelessAccountRow,
+  Dv100WirelessAccountRow,
+  Dv100WirelessAccountRow,
+  Dv100WirelessAccountRow,
+] {
+  return [
+    { isMyNumber: false, isChildNumber: false, phoneNumber: "" },
+    { isMyNumber: false, isChildNumber: false, phoneNumber: "" },
+    { isMyNumber: false, isChildNumber: false, phoneNumber: "" },
+    { isMyNumber: false, isChildNumber: false, phoneNumber: "" },
+  ];
+}
+
 /**
  * Wizard answers written into the PDF by {@link generateDV100PDF}.
  */
@@ -284,6 +305,17 @@ export type Dv100PdfFormData = {
   requestSpousalSupport: boolean;
   /** Section 26 */
   requestLawyerFees: boolean;
+  /** Section 27 — batterer intervention (DV-100 Page 12) */
+  requestBattererIntervention: boolean;
+  /** Section 28 — wireless account transfer (DV-100 Page 12) */
+  requestWirelessTransfer: boolean;
+  /** Section 28 — four rows (a–d) for wireless numbers */
+  wirelessAccounts: [
+    Dv100WirelessAccountRow,
+    Dv100WirelessAccountRow,
+    Dv100WirelessAccountRow,
+    Dv100WirelessAccountRow,
+  ];
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -830,6 +862,40 @@ const PDF_24_CHILD_SUPPORT_SUB_B = "24b_checkbox";
 const PDF_24_CHILD_SUPPORT_SUB_C = "24c_checkbox";
 const PDF_25_SPOUSAL_SUPPORT = "Spousal Support";
 const PDF_26_LAWYER_FEES = "Lawyers Fees and Costs";
+
+/**
+ * DV-100 Page 12 — Sections 27–28 (batterer intervention, wireless transfer).
+ * Verify AcroForm names against `public/dv100.pdf` after re-flattening.
+ */
+const PDF_27_BATTERER_INTERVENTION = "Batterer Intervention Program";
+const PDF_28_WIRELESS_TRANSFER_MASTER = "Transfer of Wireless Phone Account";
+
+const PDF_PAGE12_WIRELESS_ROWS: readonly {
+  myNumber: string;
+  childNumber: string;
+  phone: string;
+}[] = [
+  {
+    myNumber: "My number_a",
+    childNumber: "Number of child in my care_a",
+    phone: "including area code_a",
+  },
+  {
+    myNumber: "My number_b",
+    childNumber: "Number of child in my care_b",
+    phone: "including area code_b",
+  },
+  {
+    myNumber: "My number_c",
+    childNumber: "Number of child in my care_c",
+    phone: "including area code_c",
+  },
+  {
+    myNumber: "My number_d",
+    childNumber: "Number of child in my care_d",
+    phone: "including area code_d",
+  },
+];
 
 const PDF_PAGE9_ANIMAL_NAMES = [
   PDF_16A_NAME_1,
@@ -4510,6 +4576,55 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
 
   mapPage11Check(data.requestSpousalSupport === true, PDF_25_SPOUSAL_SUPPORT, "25. Spousal support");
   mapPage11Check(data.requestLawyerFees === true, PDF_26_LAWYER_FEES, "26. Lawyer fees and costs");
+
+  mapPage11Check(
+    data.requestBattererIntervention === true,
+    PDF_27_BATTERER_INTERVENTION,
+    "27. Batterer intervention program",
+  );
+
+  const wirelessOn = data.requestWirelessTransfer === true;
+  mapPage11Check(wirelessOn, PDF_28_WIRELESS_TRANSFER_MASTER, "28. Transfer of wireless phone account");
+
+  const wirelessRows = data.wirelessAccounts ?? emptyWirelessAccounts();
+  const rowLetters = ["a", "b", "c", "d"] as const;
+  PDF_PAGE12_WIRELESS_ROWS.forEach((spec, idx) => {
+    const row = wirelessRows[idx] ?? {
+      isMyNumber: false,
+      isChildNumber: false,
+      phoneNumber: "",
+    };
+    const letter = rowLetters[idx];
+    mapPage11Check(
+      wirelessOn && row.isMyNumber === true,
+      spec.myNumber,
+      `28. Wireless — my number (row ${letter})`,
+    );
+    mapPage11Check(
+      wirelessOn && row.isChildNumber === true,
+      spec.childNumber,
+      `28. Wireless — child number (row ${letter})`,
+    );
+    const phoneVal = wirelessOn ? String(row.phoneNumber ?? "").trim().slice(0, 15) : "";
+    try {
+      const field = pdfForm.getTextField(spec.phone);
+      field.setText(phoneVal);
+      if (phoneVal) {
+        filled.push({
+          label: `28. Wireless — phone including area code (row ${letter})`,
+          pdfFieldName: spec.phone,
+        });
+      }
+    } catch (err) {
+      console.warn(`Failed to map ${spec.phone}`, err);
+      if (phoneVal) {
+        missing.push({
+          label: `28. Wireless — phone including area code (row ${letter})`,
+          pdfFieldName: spec.phone,
+        });
+      }
+    }
+  });
 
   pdfForm.updateFieldAppearances();
 

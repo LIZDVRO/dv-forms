@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import {
   DV100_GENDER_OPTIONS,
   emptyRestitutionExpenses,
+  emptyWirelessAccounts,
   generateDV100PDF,
   triggerPdfDownload,
   type Dv100FirearmRow,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/dv100-pdf";
 
 import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitutionStep";
+import { Page12InterventionWirelessStep } from "./Page12InterventionWirelessStep";
 
 const STEP_TITLES = [
   "Your Information",
@@ -32,6 +34,7 @@ const STEP_TITLES = [
   "Property, Animals & Other Orders",
   "Property, Notice & Debts",
   "Support, Fees & Restitution",
+  "Intervention & Wireless Accounts",
   "Review & Generate",
 ] as const;
 
@@ -50,6 +53,7 @@ const STEP_BLURBS = [
   "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
   "Property restraint, extended notice deadline, and pay-debts orders (DV-100 Sections 20-22, Page 10).",
   "Request restitution for document preparation, and indicate child support, spousal support, and lawyer-fee orders (DV-100 Sections 23-26, Page 11).",
+  "Batterer intervention and wireless phone account transfer requests (DV-100 Sections 27-28, Page 12). Sections 29-31 are automatic if the order is granted.",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
 
@@ -366,6 +370,9 @@ const initialForm: FormData = {
   childSupportTANF: false,
   requestSpousalSupport: false,
   requestLawyerFees: false,
+  requestBattererIntervention: false,
+  requestWirelessTransfer: false,
+  wirelessAccounts: emptyWirelessAccounts(),
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -4712,6 +4719,14 @@ export default function FormWizardPage() {
               )}
 
               {step === 14 && (
+                <Page12InterventionWirelessStep
+                  form={form}
+                  setForm={setForm}
+                  inputClass={inputClass}
+                />
+              )}
+
+              {step === 15 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
@@ -5700,6 +5715,40 @@ export default function FormWizardPage() {
                           </span>{" "}
                           {form.requestLawyerFees ? "Yes" : "No"}
                         </p>
+                      </dd>
+                    </div>
+                    <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
+                      <dt className="text-xs font-semibold uppercase tracking-wide text-purple-800/90">
+                        Intervention &amp; wireless (Page 12)
+                      </dt>
+                      <dd className="mt-2 space-y-1 text-slate-800">
+                        <p>
+                          <span className="text-slate-500">
+                            Batterer intervention program (Section 27):
+                          </span>{" "}
+                          {form.requestBattererIntervention ? "Yes" : "No"}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">
+                            Transfer of wireless phone account (Section 28):
+                          </span>{" "}
+                          {form.requestWirelessTransfer ? "Yes" : "No"}
+                        </p>
+                        {form.requestWirelessTransfer ? (
+                          <div className="mt-2 space-y-1">
+                            <p className="text-slate-500">Wireless number rows:</p>
+                            <ul className="list-inside list-disc text-slate-700">
+                              {form.wirelessAccounts.map((row, i) => (
+                                <li key={i}>
+                                  Row {String.fromCharCode(97 + i)}: My number{" "}
+                                  {row.isMyNumber ? "Yes" : "No"} · Child in my care{" "}
+                                  {row.isChildNumber ? "Yes" : "No"} · Phone:{" "}
+                                  {display(row.phoneNumber)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
                       </dd>
                     </div>
                     <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
