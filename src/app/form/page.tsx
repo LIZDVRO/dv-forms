@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   DV100_GENDER_OPTIONS,
@@ -458,6 +458,24 @@ export default function FormWizardPage() {
   const { petitioner, respondent, setPetitioner, setRespondent } =
     useFormStore();
 
+  const [petitionerFullName, setPetitionerFullName] = useState(() =>
+    personInfoToDisplayName(petitioner),
+  );
+  const [respondentFullName, setRespondentFullName] = useState(() =>
+    personInfoToDisplayName(respondent),
+  );
+
+  const prevStepRef = useRef(step);
+  useEffect(() => {
+    if (step === 0 && prevStepRef.current !== 0) {
+      setPetitionerFullName(personInfoToDisplayName(petitioner));
+    }
+    if (step === 2 && prevStepRef.current !== 2) {
+      setRespondentFullName(personInfoToDisplayName(respondent));
+    }
+    prevStepRef.current = step;
+  }, [step, petitioner, respondent]);
+
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -674,10 +692,12 @@ export default function FormWizardPage() {
                       name="petitionerName"
                       type="text"
                       autoComplete="name"
-                      value={personInfoToDisplayName(petitioner)}
-                      onChange={(e) =>
-                        setPetitioner(parseDisplayNameToPersonInfo(e.target.value))
-                      }
+                      value={petitionerFullName}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setPetitionerFullName(v);
+                        setPetitioner(parseDisplayNameToPersonInfo(v));
+                      }}
                       className={inputClass}
                     />
                   </div>
@@ -1272,10 +1292,12 @@ export default function FormWizardPage() {
                       name="respondentName"
                       type="text"
                       autoComplete="name"
-                      value={personInfoToDisplayName(respondent)}
-                      onChange={(e) =>
-                        setRespondent(parseDisplayNameToPersonInfo(e.target.value))
-                      }
+                      value={respondentFullName}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setRespondentFullName(v);
+                        setRespondent(parseDisplayNameToPersonInfo(v));
+                      }}
                       className={inputClass}
                     />
                   </div>
