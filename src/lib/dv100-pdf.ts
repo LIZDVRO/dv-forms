@@ -316,6 +316,10 @@ export type Dv100PdfFormData = {
     Dv100WirelessAccountRow,
     Dv100WirelessAccountRow,
   ];
+  /** Wizard final step — trimmed signature as PNG data URL, or null if cleared / not set. */
+  signatureDataUrl: string | null;
+  /** Section 34 attorney signature (PNG data URL); used when `hasLawyer` is true. */
+  attorneySignatureDataUrl: string | null;
 };
 
 /** One row in the fill / missing summary returned with the generated PDF. */
@@ -458,6 +462,12 @@ const PDF_PAGE1_RESPONDENT_AGE_FALLBACK =
   "b Age give estimate if you do not k now exact age";
 const PDF_PAGE1_RESPONDENT_DOB = "c Date of birth if known";
 const PDF_PAGE1_RESPONDENT_RACE = "e Race";
+
+/** Section 33–34 (DV-100 page 13): date and printed name before signatures. Verify names on `/inspect` if the PDF differs. */
+const PDF_PAGE13_SECTION33_DATE = "Date 1";
+const PDF_PAGE13_SECTION33_PRINT_NAME = "print name 1";
+const PDF_PAGE13_SECTION34_DATE = "Date 2";
+const PDF_PAGE13_SECTION34_PRINT_NAME = "print name 2";
 
 /** Flattened PDF may use two spaces after "2"; try {@link PDF_PAGE2_RELATED_USER_SPEC} first. */
 const PDF_PAGE2_RELATED_USER_SPEC =
@@ -4626,7 +4636,79 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   });
 
+  const today = new Date().toLocaleDateString("en-US");
+
+  try {
+    pdfForm.getTextField(PDF_PAGE13_SECTION33_DATE).setText(today);
+  } catch (err) {
+    console.warn(`Failed to map ${PDF_PAGE13_SECTION33_DATE}`, err);
+  }
+  try {
+    const petitionerPrintName = data.petitionerName.trim();
+    if (petitionerPrintName) {
+      pdfForm.getTextField(PDF_PAGE13_SECTION33_PRINT_NAME).setText(petitionerPrintName);
+    }
+  } catch (err) {
+    console.warn(`Failed to map ${PDF_PAGE13_SECTION33_PRINT_NAME}`, err);
+  }
+
+  if (data.hasLawyer) {
+    try {
+      pdfForm.getTextField(PDF_PAGE13_SECTION34_DATE).setText(today);
+    } catch (err) {
+      console.warn(`Failed to map ${PDF_PAGE13_SECTION34_DATE}`, err);
+    }
+    try {
+      const attorneyPrintName = data.lawyerName.trim();
+      if (attorneyPrintName) {
+        pdfForm.getTextField(PDF_PAGE13_SECTION34_PRINT_NAME).setText(attorneyPrintName);
+      }
+    } catch (err) {
+      console.warn(`Failed to map ${PDF_PAGE13_SECTION34_PRINT_NAME}`, err);
+    }
+  }
+
   pdfForm.updateFieldAppearances();
+
+  const signatureDataUrl = data.signatureDataUrl?.trim();
+  if (signatureDataUrl) {
+    try {
+      const petitionerSig = await doc.embedPng(signatureDataUrl);
+      const pDims = petitionerSig.scale(0.35);
+      const pages = doc.getPages();
+      if (pages.length > 12) {
+        const page13 = pages[12];
+        page13.drawImage(petitionerSig, {
+          x: 340,
+          y: 545,
+          width: pDims.width,
+          height: pDims.height,
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to embed petitioner signature on DV-100 page 13", err);
+    }
+  }
+
+  const attorneySignatureDataUrl = data.attorneySignatureDataUrl?.trim();
+  if (attorneySignatureDataUrl && data.hasLawyer) {
+    try {
+      const attorneySig = await doc.embedPng(attorneySignatureDataUrl);
+      const aDims = attorneySig.scale(0.35);
+      const pages = doc.getPages();
+      if (pages.length > 12) {
+        const page13 = pages[12];
+        page13.drawImage(attorneySig, {
+          x: 340,
+          y: 445,
+          width: aDims.width,
+          height: aDims.height,
+        });
+      }
+    } catch (err) {
+      console.warn("Failed to embed attorney signature on DV-100 page 13", err);
+    }
+  }
 
   if (data.requestAbuserPayLizFee === true) {
     const inv = await fillLizInvoiceFromTemplate({

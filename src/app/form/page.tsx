@@ -16,6 +16,8 @@ import {
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
 
+import SignatureStep from "@/components/SignatureStep";
+
 import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitutionStep";
 import { Page12InterventionWirelessStep } from "./Page12InterventionWirelessStep";
 
@@ -35,6 +37,7 @@ const STEP_TITLES = [
   "Property, Notice & Debts",
   "Support, Fees & Restitution",
   "Intervention & Wireless Accounts",
+  "Sign your document",
   "Review & Generate",
 ] as const;
 
@@ -54,6 +57,7 @@ const STEP_BLURBS = [
   "Property restraint, extended notice deadline, and pay-debts orders (DV-100 Sections 20-22, Page 10).",
   "Request restitution for document preparation, and indicate child support, spousal support, and lawyer-fee orders (DV-100 Sections 23-26, Page 11).",
   "Batterer intervention and wireless phone account transfer requests (DV-100 Sections 27-28, Page 12). Sections 29-31 are automatic if the order is granted.",
+  "Declare that your answers are true, then sign. Your signature is stored with your answers for PDF generation.",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
 
@@ -373,6 +377,8 @@ const initialForm: FormData = {
   requestBattererIntervention: false,
   requestWirelessTransfer: false,
   wirelessAccounts: emptyWirelessAccounts(),
+  signatureDataUrl: null,
+  attorneySignatureDataUrl: null,
 };
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -4727,6 +4733,15 @@ export default function FormWizardPage() {
               )}
 
               {step === 15 && (
+                <SignatureStep
+                  formData={form}
+                  updateFormData={(patch: Partial<FormData>) =>
+                    setForm((prev) => ({ ...prev, ...patch }))
+                  }
+                />
+              )}
+
+              {step === 16 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
