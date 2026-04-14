@@ -16,6 +16,8 @@ import {
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
 
+import { useFormStore, type PersonInfo } from "@/store/useFormStore";
+
 import SignatureStep from "@/components/SignatureStep";
 
 import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitutionStep";
@@ -217,6 +219,32 @@ function labelsForValues(
 
 const GENDER_OPTIONS = DV100_GENDER_OPTIONS;
 type FormData = Dv100PdfFormData;
+
+/** Single “full name” field ↔ Zustand `PersonInfo` (first / middle / last). */
+function personInfoToDisplayName(p: PersonInfo): string {
+  return [p.firstName, p.middleName, p.lastName]
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+function parseDisplayNameToPersonInfo(value: string): PersonInfo {
+  const parts = value.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return { firstName: "", middleName: "", lastName: "" };
+  }
+  if (parts.length === 1) {
+    return { firstName: parts[0], middleName: "", lastName: "" };
+  }
+  if (parts.length === 2) {
+    return { firstName: parts[0], middleName: "", lastName: parts[1] };
+  }
+  return {
+    firstName: parts[0],
+    middleName: parts.slice(1, -1).join(" "),
+    lastName: parts[parts.length - 1],
+  };
+}
 
 const initialForm: FormData = {
   petitionerName: "",
@@ -426,6 +454,9 @@ export default function FormWizardPage() {
     missing: Dv100PdfFillRow[];
   } | null>(null);
 
+  const { petitioner, respondent, setPetitioner, setRespondent } =
+    useFormStore();
+
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
@@ -532,7 +563,12 @@ export default function FormWizardPage() {
     setPdfError(null);
     setPdfInfo(null);
     try {
-      const { bytes, filled, missing } = await generateDV100PDF(form);
+      const pdfPayload: FormData = {
+        ...form,
+        petitionerName: personInfoToDisplayName(petitioner),
+        respondentName: personInfoToDisplayName(respondent),
+      };
+      const { bytes, filled, missing } = await generateDV100PDF(pdfPayload);
       triggerPdfDownload(bytes, "filled_dv100.pdf");
       setPdfInfo({ filled, missing });
     } catch (e) {
@@ -625,9 +661,9 @@ export default function FormWizardPage() {
                       name="petitionerName"
                       type="text"
                       autoComplete="name"
-                      value={form.petitionerName}
+                      value={personInfoToDisplayName(petitioner)}
                       onChange={(e) =>
-                        update("petitionerName", e.target.value)
+                        setPetitioner(parseDisplayNameToPersonInfo(e.target.value))
                       }
                       className={inputClass}
                     />
@@ -895,9 +931,9 @@ export default function FormWizardPage() {
                       name="respondentName"
                       type="text"
                       autoComplete="name"
-                      value={form.respondentName}
+                      value={personInfoToDisplayName(respondent)}
                       onChange={(e) =>
-                        update("respondentName", e.target.value)
+                        setRespondent(parseDisplayNameToPersonInfo(e.target.value))
                       }
                       className={inputClass}
                     />
@@ -4813,7 +4849,7 @@ export default function FormWizardPage() {
                       <dd className="mt-2 space-y-1 text-slate-800">
                         <p>
                           <span className="text-slate-500">Name:</span>{" "}
-                          {display(form.petitionerName)}
+                          {display(personInfoToDisplayName(petitioner))}
                         </p>
                         <p>
                           <span className="text-slate-500">Age:</span>{" "}
@@ -4879,7 +4915,7 @@ export default function FormWizardPage() {
                       <dd className="mt-2 space-y-1 text-slate-800">
                         <p>
                           <span className="text-slate-500">Name:</span>{" "}
-                          {display(form.respondentName)}
+                          {display(personInfoToDisplayName(respondent))}
                         </p>
                         <p>
                           <span className="text-slate-500">Age:</span>{" "}
