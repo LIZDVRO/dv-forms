@@ -12,6 +12,7 @@ import {
   type Dv100FirearmRow,
   type Dv100PdfFillRow,
   type Dv100PdfFormData,
+  type Dv100GenderOption,
   type Dv100ProtectedAnimal,
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
@@ -228,7 +229,9 @@ function personInfoToDisplayName(p: PersonInfo): string {
     .join(" ");
 }
 
-function parseDisplayNameToPersonInfo(value: string): PersonInfo {
+function parseDisplayNameToPersonInfo(
+  value: string,
+): Pick<PersonInfo, "firstName" | "middleName" | "lastName"> {
   const parts = value.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) {
     return { firstName: "", middleName: "", lastName: "" };
@@ -566,7 +569,18 @@ export default function FormWizardPage() {
       const pdfPayload: FormData = {
         ...form,
         petitionerName: personInfoToDisplayName(petitioner),
+        petitionerAge: petitioner.age,
+        petitionerAddress: petitioner.address.street,
+        petitionerCity: petitioner.address.city,
+        petitionerState: petitioner.address.state,
+        petitionerZip: petitioner.address.zip,
+        petitionerPhone: petitioner.telephone,
+        petitionerEmail: petitioner.email,
         respondentName: personInfoToDisplayName(respondent),
+        respondentAge: respondent.age,
+        respondentDob: respondent.dateOfBirth,
+        respondentGender: respondent.gender as Dv100GenderOption,
+        respondentRace: respondent.race,
       };
       const { bytes, filled, missing } = await generateDV100PDF(pdfPayload);
       triggerPdfDownload(bytes, "filled_dv100.pdf");
@@ -681,9 +695,75 @@ export default function FormWizardPage() {
                       type="text"
                       inputMode="numeric"
                       autoComplete="off"
-                      value={form.petitionerAge}
+                      value={petitioner.age}
                       onChange={(e) =>
-                        update("petitionerAge", e.target.value)
+                        setPetitioner({ age: e.target.value })
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="petitionerDob"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Date of birth
+                    </label>
+                    <input
+                      id="petitionerDob"
+                      name="petitionerDob"
+                      type="text"
+                      placeholder="MM / DD / YYYY"
+                      autoComplete="bday"
+                      value={petitioner.dateOfBirth}
+                      onChange={(e) =>
+                        setPetitioner({ dateOfBirth: e.target.value })
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Gender
+                    </legend>
+                    <div className="space-y-3">
+                      {GENDER_OPTIONS.map((option) => (
+                        <label
+                          key={option}
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                        >
+                          <input
+                            type="radio"
+                            name="petitionerGender"
+                            value={option}
+                            checked={petitioner.gender === option}
+                            onChange={() =>
+                              setPetitioner({ gender: option })
+                            }
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            {option}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <div>
+                    <label
+                      htmlFor="petitionerRace"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Race
+                    </label>
+                    <input
+                      id="petitionerRace"
+                      name="petitionerRace"
+                      type="text"
+                      autoComplete="off"
+                      value={petitioner.race}
+                      onChange={(e) =>
+                        setPetitioner({ race: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -700,9 +780,14 @@ export default function FormWizardPage() {
                       name="petitionerAddress"
                       type="text"
                       autoComplete="street-address"
-                      value={form.petitionerAddress}
+                      value={petitioner.address.street}
                       onChange={(e) =>
-                        update("petitionerAddress", e.target.value)
+                        setPetitioner({
+                          address: {
+                            ...petitioner.address,
+                            street: e.target.value,
+                          },
+                        })
                       }
                       className={inputClass}
                     />
@@ -720,9 +805,14 @@ export default function FormWizardPage() {
                         name="petitionerCity"
                         type="text"
                         autoComplete="address-level2"
-                        value={form.petitionerCity}
+                        value={petitioner.address.city}
                         onChange={(e) =>
-                          update("petitionerCity", e.target.value)
+                          setPetitioner({
+                            address: {
+                              ...petitioner.address,
+                              city: e.target.value,
+                            },
+                          })
                         }
                         className={inputClass}
                       />
@@ -740,9 +830,14 @@ export default function FormWizardPage() {
                           name="petitionerState"
                           type="text"
                           autoComplete="address-level1"
-                          value={form.petitionerState}
+                          value={petitioner.address.state}
                           onChange={(e) =>
-                            update("petitionerState", e.target.value)
+                            setPetitioner({
+                              address: {
+                                ...petitioner.address,
+                                state: e.target.value,
+                              },
+                            })
                           }
                           className={inputClass}
                         />
@@ -759,9 +854,14 @@ export default function FormWizardPage() {
                           name="petitionerZip"
                           type="text"
                           autoComplete="postal-code"
-                          value={form.petitionerZip}
+                          value={petitioner.address.zip}
                           onChange={(e) =>
-                            update("petitionerZip", e.target.value)
+                            setPetitioner({
+                              address: {
+                                ...petitioner.address,
+                                zip: e.target.value,
+                              },
+                            })
                           }
                           className={inputClass}
                         />
@@ -780,9 +880,9 @@ export default function FormWizardPage() {
                       name="petitionerPhone"
                       type="tel"
                       autoComplete="tel"
-                      value={form.petitionerPhone}
+                      value={petitioner.telephone}
                       onChange={(e) =>
-                        update("petitionerPhone", e.target.value)
+                        setPetitioner({ telephone: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -799,9 +899,9 @@ export default function FormWizardPage() {
                       name="petitionerEmail"
                       type="email"
                       autoComplete="email"
-                      value={form.petitionerEmail}
+                      value={petitioner.email}
                       onChange={(e) =>
-                        update("petitionerEmail", e.target.value)
+                        setPetitioner({ email: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -950,9 +1050,9 @@ export default function FormWizardPage() {
                       name="respondentAge"
                       type="text"
                       inputMode="numeric"
-                      value={form.respondentAge}
+                      value={respondent.age}
                       onChange={(e) =>
-                        update("respondentAge", e.target.value)
+                        setRespondent({ age: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -970,9 +1070,9 @@ export default function FormWizardPage() {
                       type="text"
                       placeholder="MM / DD / YYYY"
                       autoComplete="off"
-                      value={form.respondentDob}
+                      value={respondent.dateOfBirth}
                       onChange={(e) =>
-                        update("respondentDob", e.target.value)
+                        setRespondent({ dateOfBirth: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -991,9 +1091,9 @@ export default function FormWizardPage() {
                             type="radio"
                             name="respondentGender"
                             value={option}
-                            checked={form.respondentGender === option}
+                            checked={respondent.gender === option}
                             onChange={() =>
-                              update("respondentGender", option)
+                              setRespondent({ gender: option })
                             }
                             className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                           />
@@ -1016,9 +1116,9 @@ export default function FormWizardPage() {
                       name="respondentRace"
                       type="text"
                       autoComplete="off"
-                      value={form.respondentRace}
+                      value={respondent.race}
                       onChange={(e) =>
-                        update("respondentRace", e.target.value)
+                        setRespondent({ race: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -4853,31 +4953,43 @@ export default function FormWizardPage() {
                         </p>
                         <p>
                           <span className="text-slate-500">Age:</span>{" "}
-                          {display(form.petitionerAge)}
+                          {display(petitioner.age)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Date of birth:</span>{" "}
+                          {display(petitioner.dateOfBirth)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Gender:</span>{" "}
+                          {display(petitioner.gender)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Race:</span>{" "}
+                          {display(petitioner.race)}
                         </p>
                         <p>
                           <span className="text-slate-500">Address:</span>{" "}
-                          {display(form.petitionerAddress)}
+                          {display(petitioner.address.street)}
                         </p>
                         <p>
                           <span className="text-slate-500">City:</span>{" "}
-                          {display(form.petitionerCity)}
+                          {display(petitioner.address.city)}
                         </p>
                         <p>
                           <span className="text-slate-500">State:</span>{" "}
-                          {display(form.petitionerState)}
+                          {display(petitioner.address.state)}
                         </p>
                         <p>
                           <span className="text-slate-500">Zip:</span>{" "}
-                          {display(form.petitionerZip)}
+                          {display(petitioner.address.zip)}
                         </p>
                         <p>
                           <span className="text-slate-500">Phone:</span>{" "}
-                          {display(form.petitionerPhone)}
+                          {display(petitioner.telephone)}
                         </p>
                         <p>
                           <span className="text-slate-500">Email:</span>{" "}
-                          {display(form.petitionerEmail)}
+                          {display(petitioner.email)}
                         </p>
                       </dd>
                     </div>
@@ -4919,19 +5031,19 @@ export default function FormWizardPage() {
                         </p>
                         <p>
                           <span className="text-slate-500">Age:</span>{" "}
-                          {display(form.respondentAge)}
+                          {display(respondent.age)}
                         </p>
                         <p>
                           <span className="text-slate-500">Date of birth:</span>{" "}
-                          {display(form.respondentDob)}
+                          {display(respondent.dateOfBirth)}
                         </p>
                         <p>
                           <span className="text-slate-500">Gender:</span>{" "}
-                          {display(form.respondentGender)}
+                          {display(respondent.gender)}
                         </p>
                         <p>
                           <span className="text-slate-500">Race:</span>{" "}
-                          {display(form.respondentRace)}
+                          {display(respondent.race)}
                         </p>
                       </dd>
                     </div>

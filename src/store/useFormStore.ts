@@ -1,39 +1,78 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-// 1. This defines what a "Person" looks like in our app
+export interface PersonAddress {
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+}
+
 export interface PersonInfo {
   firstName: string;
   middleName: string;
   lastName: string;
+  age: string;
+  dateOfBirth: string;
+  gender: string;
+  race: string;
+  address: PersonAddress;
+  telephone: string;
+  email: string;
 }
 
-// 2. This defines the overall shape of our entire global state
 export interface FormState {
   petitioner: PersonInfo;
   respondent: PersonInfo;
-  
-  // These are the actions we'll use to update the data
+
   setPetitioner: (data: Partial<PersonInfo>) => void;
   setRespondent: (data: Partial<PersonInfo>) => void;
 }
 
-// 3. Blank default values so the form starts empty
-const initialPersonInfo: PersonInfo = {
-  firstName: '',
-  middleName: '',
-  lastName: '',
+const emptyAddress: PersonAddress = {
+  street: "",
+  city: "",
+  state: "",
+  zip: "",
 };
 
-// 4. This actually creates the global store!
-export const useFormStore = create<FormState>((set) => ({
-  // Set the starting state
-  petitioner: { ...initialPersonInfo },
-  respondent: { ...initialPersonInfo },
+function blankPerson(): PersonInfo {
+  return {
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    age: "",
+    dateOfBirth: "",
+    gender: "",
+    race: "",
+    address: { ...emptyAddress },
+    telephone: "",
+    email: "",
+  };
+}
 
-  // Create the update functions
+export const useFormStore = create<FormState>((set) => ({
+  petitioner: blankPerson(),
+  respondent: blankPerson(),
+
   setPetitioner: (data) =>
-    set((state) => ({ petitioner: { ...state.petitioner, ...data } })),
-  
+    set((state) => ({
+      petitioner: {
+        ...state.petitioner,
+        ...data,
+        address: data.address
+          ? { ...state.petitioner.address, ...data.address }
+          : state.petitioner.address,
+      },
+    })),
+
   setRespondent: (data) =>
-    set((state) => ({ respondent: { ...state.respondent, ...data } })),
+    set((state) => ({
+      respondent: {
+        ...state.respondent,
+        ...data,
+        address: data.address
+          ? { ...state.respondent.address, ...data.address }
+          : state.respondent.address,
+      },
+    })),
 }));
