@@ -25,8 +25,8 @@ import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitution
 import { Page12InterventionWirelessStep } from "./Page12InterventionWirelessStep";
 
 const STEP_TITLES = [
-  "Who Needs Protection?",
   "Legal Representation",
+  "Who Needs Protection?",
   "Person You Want Protection From",
   "Relationship to Other Party",
   "Other Court Cases",
@@ -43,8 +43,8 @@ const STEP_TITLES = [
 ] as const;
 
 const STEP_BLURBS = [
+  "Are you an attorney preparing this on behalf of the petitioner, or are you a petitioner who is represented by an attorney?",
   "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
-  "If an attorney represents you in this case, provide their information for the form.",
   "Provide identifying information for the person you are asking the court for protection from.",
   "Describe how you are connected to the other person (DV-100 Section 3).",
   "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
@@ -467,7 +467,7 @@ export default function FormWizardPage() {
 
   const prevStepRef = useRef(step);
   useEffect(() => {
-    if (step === 0 && prevStepRef.current !== 0) {
+    if (step === 1 && prevStepRef.current !== 1) {
       setPetitionerFullName(personInfoToDisplayName(petitioner));
     }
     if (step === 2 && prevStepRef.current !== 2) {
@@ -678,6 +678,104 @@ export default function FormWizardPage() {
 
             <div className="mt-8 flex flex-1 flex-col">
               {step === 0 && (
+                <div className="space-y-6">
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Is an attorney preparing or assisting with this form?
+                    </legend>
+                    <div className="space-y-3">
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                        <input
+                          type="radio"
+                          name="hasLawyer"
+                          checked={form.hasLawyer === true}
+                          onChange={() => update("hasLawyer", true)}
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                        />
+                        <span className="text-sm leading-relaxed text-slate-800">
+                          Yes
+                        </span>
+                      </label>
+                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                        <input
+                          type="radio"
+                          name="hasLawyer"
+                          checked={form.hasLawyer === false}
+                          onChange={() => update("hasLawyer", false)}
+                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                        />
+                        <span className="text-sm leading-relaxed text-slate-800">
+                          No
+                        </span>
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  {form.hasLawyer && (
+                    <div className="space-y-6 border-t border-purple-100/90 pt-6">
+                      <div>
+                        <label
+                          htmlFor="lawyerName"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Lawyer&apos;s name
+                        </label>
+                        <input
+                          id="lawyerName"
+                          name="lawyerName"
+                          type="text"
+                          autoComplete="name"
+                          value={form.lawyerName}
+                          onChange={(e) =>
+                            update("lawyerName", e.target.value)
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="lawyerBarNo"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          State Bar No.
+                        </label>
+                        <input
+                          id="lawyerBarNo"
+                          name="lawyerBarNo"
+                          type="text"
+                          autoComplete="off"
+                          value={form.lawyerBarNo}
+                          onChange={(e) =>
+                            update("lawyerBarNo", e.target.value)
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="lawyerFirm"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Firm name
+                        </label>
+                        <input
+                          id="lawyerFirm"
+                          name="lawyerFirm"
+                          type="text"
+                          autoComplete="organization"
+                          value={form.lawyerFirm}
+                          onChange={(e) =>
+                            update("lawyerFirm", e.target.value)
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {step === 1 && (
                 <>
                 <div className="space-y-6">
                   <div>
@@ -1178,104 +1276,6 @@ export default function FormWizardPage() {
 
                 </div>
                 </>
-              )}
-
-              {step === 1 && (
-                <div className="space-y-6">
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      Do you have a lawyer for this case?
-                    </legend>
-                    <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="hasLawyer"
-                          checked={form.hasLawyer === true}
-                          onChange={() => update("hasLawyer", true)}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          Yes
-                        </span>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="hasLawyer"
-                          checked={form.hasLawyer === false}
-                          onChange={() => update("hasLawyer", false)}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          No
-                        </span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  {form.hasLawyer && (
-                    <div className="space-y-6 border-t border-purple-100/90 pt-6">
-                      <div>
-                        <label
-                          htmlFor="lawyerName"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          Lawyer&apos;s name
-                        </label>
-                        <input
-                          id="lawyerName"
-                          name="lawyerName"
-                          type="text"
-                          autoComplete="name"
-                          value={form.lawyerName}
-                          onChange={(e) =>
-                            update("lawyerName", e.target.value)
-                          }
-                          className={inputClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="lawyerBarNo"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          State Bar No.
-                        </label>
-                        <input
-                          id="lawyerBarNo"
-                          name="lawyerBarNo"
-                          type="text"
-                          autoComplete="off"
-                          value={form.lawyerBarNo}
-                          onChange={(e) =>
-                            update("lawyerBarNo", e.target.value)
-                          }
-                          className={inputClass}
-                        />
-                      </div>
-                      <div>
-                        <label
-                          htmlFor="lawyerFirm"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          Firm name
-                        </label>
-                        <input
-                          id="lawyerFirm"
-                          name="lawyerFirm"
-                          type="text"
-                          autoComplete="organization"
-                          value={form.lawyerFirm}
-                          onChange={(e) =>
-                            update("lawyerFirm", e.target.value)
-                          }
-                          className={inputClass}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
               )}
 
               {step === 2 && (
