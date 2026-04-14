@@ -2,6 +2,7 @@
 
 import type { Dispatch, SetStateAction } from "react";
 
+import { formFieldInputControlClassName } from "@/components/ui/input";
 import type { Dv100PdfFormData, Dv100RestitutionExpenseRow } from "@/lib/dv100-pdf";
 import {
   DV100_LIZ_DOC_ASSIST_FOR,
@@ -14,7 +15,6 @@ import {
 type Props = {
   form: Dv100PdfFormData;
   setForm: Dispatch<SetStateAction<Dv100PdfFormData>>;
-  inputClass: string;
 };
 
 type RestitutionTuple = Dv100PdfFormData["restitutionExpenses"];
@@ -32,7 +32,7 @@ const checkboxClass =
 const labelCardClass =
   "flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30";
 
-export function Page11SupportFeesRestitutionStep({ form, setForm, inputClass }: Props) {
+export function Page11SupportFeesRestitutionStep({ form, setForm }: Props) {
   const updateRestitutionRow = (
     index: number,
     key: keyof Dv100RestitutionExpenseRow,
@@ -159,7 +159,7 @@ export function Page11SupportFeesRestitutionStep({ form, setForm, inputClass }: 
                               onChange={(e) =>
                                 updateRestitutionRow(idx, "payTo", e.target.value)
                               }
-                              className={`${inputClass} mt-0`}
+                              className={formFieldInputControlClassName}
                               aria-label={`Pay to, row ${idx + 1}`}
                             />
                           </td>
@@ -173,7 +173,7 @@ export function Page11SupportFeesRestitutionStep({ form, setForm, inputClass }: 
                               onChange={(e) =>
                                 updateRestitutionRow(idx, "forReason", e.target.value)
                               }
-                              className={`${inputClass} mt-0`}
+                              className={formFieldInputControlClassName}
                               aria-label={`For, row ${idx + 1}`}
                             />
                           </td>
@@ -187,7 +187,7 @@ export function Page11SupportFeesRestitutionStep({ form, setForm, inputClass }: 
                               onChange={(e) =>
                                 updateRestitutionRow(idx, "amount", e.target.value)
                               }
-                              className={`${inputClass} mt-0`}
+                              className={formFieldInputControlClassName}
                               aria-label={`Amount, row ${idx + 1}`}
                             />
                           </td>
