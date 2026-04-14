@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -643,17 +644,18 @@ export default function FormWizardPage() {
   const textareaClass = formFieldTextareaClassName;
 
   return (
-    <div className="relative flex min-h-full flex-1 flex-col overflow-hidden bg-gradient-to-b from-purple-50/80 via-white to-purple-100/40">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(102,45,145,0.14),transparent)]"
-        aria-hidden
-      />
-      <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12">
+    <div className="flex min-h-screen flex-1 flex-col overflow-hidden bg-white">
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 py-8 sm:px-6 sm:py-12">
         <header className="mb-8 flex flex-col gap-6 sm:mb-10">
-          <div className="border-b border-purple-200/60 pb-8 text-center">
-            <p className="font-sans text-5xl font-light tracking-widest text-liz">
-              LIZ
-            </p>
+          <div className="border-b border-gray-200 pb-8 text-center">
+            <Image
+              src="/liz-logo.png"
+              alt="LIZ"
+              width={200}
+              height={64}
+              className="mx-auto h-14 w-auto object-contain sm:h-16"
+              priority
+            />
           </div>
           <div className="flex items-center justify-between gap-4">
             <Link
@@ -667,7 +669,7 @@ export default function FormWizardPage() {
         </header>
 
         <main className="flex flex-1 flex-col">
-          <div className="flex flex-1 flex-col rounded-none border border-slate-200/80 bg-white p-6 shadow-sm sm:p-10">
+          <div className="flex flex-1 flex-col border-y border-gray-200 px-6 py-8 sm:px-10 sm:py-10">
             <h1 className="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
               {STEP_TITLES[step]}
             </h1>
