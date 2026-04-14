@@ -25,15 +25,13 @@ import { Page11SupportFeesRestitutionStep } from "./Page11SupportFeesRestitution
 import { Page12InterventionWirelessStep } from "./Page12InterventionWirelessStep";
 
 const STEP_TITLES = [
-  "Your Information",
+  "Who Needs Protection?",
   "Legal Representation",
   "Person You Want Protection From",
   "Relationship to Other Party",
   "Other Court Cases",
-  "Describe Abuse (Most Recent)",
-  "Describe Abuse (Second Incident)",
-  "Describe Abuse (Third Incident)",
-  "Other Protected People & Firearms",
+  "Describe Abuse",
+  "Firearms",
   "Orders You Want the Judge to Make",
   "Move Out, Other Orders, Custody",
   "Property, Animals & Other Orders",
@@ -45,15 +43,13 @@ const STEP_TITLES = [
 ] as const;
 
 const STEP_BLURBS = [
-  "Enter your details as they should appear on DV-100 (Page 1). Fields match the official form.",
+  "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
   "If an attorney represents you in this case, provide their information for the form.",
   "Provide identifying information for the person you are asking the court for protection from.",
   "Describe how you are connected to the other person (DV-100 Section 3).",
   "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
-  "Describe the most recent incident of abuse (DV-100 Section 5, Page 3). Estimate dates if you are unsure.",
-  "Describe a second incident of abuse (DV-100 Section 6, Page 4). Use a different incident from the one on the previous page.",
-  "Describe a third incident of abuse (DV-100 Section 7, Page 5), or leave blank if there was no other incident.",
-  "List anyone else who needs protection (Section 8) and firearm information if known (Section 9), DV-100 Page 6.",
+  "Describe incidents of abuse (DV-100 Sections 5–7, Pages 3–5). You will start with the most recent incident; you can choose to add up to two more separate incidents when you feel ready.",
+  "Firearm information if known (DV-100 Section 9, Page 6).",
   "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
   "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
   "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
@@ -449,6 +445,8 @@ function ProgressBar({ currentStep }: { currentStep: number }) {
 
 export default function FormWizardPage() {
   const [step, setStep] = useState(0);
+  const [showAbuseIncident2, setShowAbuseIncident2] = useState(false);
+  const [showAbuseIncident3, setShowAbuseIncident3] = useState(false);
   const [form, setForm] = useState<FormData>(initialForm);
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
@@ -662,6 +660,7 @@ export default function FormWizardPage() {
 
             <div className="mt-8 flex flex-1 flex-col">
               {step === 0 && (
+                <>
                 <div className="space-y-6">
                   <div>
                     <label
@@ -917,6 +916,248 @@ export default function FormWizardPage() {
                     blank, following court self-help guidance for your county.
                   </div>
                 </div>
+
+                <hr className="my-8 border-0 border-t border-purple-200/70" />
+
+                <div className="space-y-8">
+                  <div>
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Other Protected People
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-600">
+                      Besides yourself, does anyone else need protection from the
+                      person causing harm?
+                    </p>
+                  </div>
+
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Other people who need protection
+                    </legend>
+                    <div className="space-y-3">
+                      {(
+                        [
+                          { value: "no" as const, label: "No" },
+                          { value: "yes" as const, label: "Yes" },
+                        ] as const
+                      ).map(({ value, label }) => (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                        >
+                          <input
+                            type="radio"
+                            name="protectOtherPeople"
+                            checked={form.protectOtherPeople === value}
+                            onChange={() => {
+                              update("protectOtherPeople", value);
+                            }}
+                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            {label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  {form.protectOtherPeople === "yes" && (
+                    <>
+                      {form.protectedPeople.length > 4 && (
+                        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-950">
+                          Note: You have listed more than 4 people. An extra
+                          page titled &apos;DV-100, Other Protected People&apos;
+                          will automatically be created and attached to your
+                          final document.
+                        </p>
+                      )}
+
+                      <div className="space-y-6">
+                        {form.protectedPeople.map((person, index) => (
+                          <div
+                            key={index}
+                            className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
+                          >
+                            <p className="text-sm font-medium text-slate-800">
+                              Protected person {index + 1}
+                            </p>
+                            <div>
+                              <label
+                                htmlFor={`protected-name-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Full name
+                              </label>
+                              <input
+                                id={`protected-name-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={person.name}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    protectedPeople: prev.protectedPeople.map(
+                                      (p, i) =>
+                                        i === index
+                                          ? { ...p, name: e.target.value }
+                                          : p,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor={`protected-age-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Age
+                              </label>
+                              <input
+                                id={`protected-age-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={person.age}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    protectedPeople: prev.protectedPeople.map(
+                                      (p, i) =>
+                                        i === index
+                                          ? { ...p, age: e.target.value }
+                                          : p,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor={`protected-rel-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Relationship to you
+                              </label>
+                              <input
+                                id={`protected-rel-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={person.relationship}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    protectedPeople: prev.protectedPeople.map(
+                                      (p, i) =>
+                                        i === index
+                                          ? {
+                                              ...p,
+                                              relationship: e.target.value,
+                                            }
+                                          : p,
+                                    ),
+                                  }))
+                                }
+                                className={inputClass}
+                              />
+                            </div>
+                            <fieldset className="space-y-3">
+                              <legend className="text-sm font-medium text-slate-800">
+                                Lives with you
+                              </legend>
+                              <div className="space-y-2">
+                                {(
+                                  [
+                                    { v: "Yes" as const, lab: "Yes" },
+                                    { v: "No" as const, lab: "No" },
+                                  ] as const
+                                ).map(({ v, lab }) => (
+                                  <label
+                                    key={v}
+                                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={`protected-lives-${index}`}
+                                      checked={person.livesWithYou === v}
+                                      onChange={() =>
+                                        setForm((prev) => ({
+                                          ...prev,
+                                          protectedPeople:
+                                            prev.protectedPeople.map((p, i) =>
+                                              i === index
+                                                ? { ...p, livesWithYou: v }
+                                                : p,
+                                            ),
+                                        }))
+                                      }
+                                      className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                                    />
+                                    <span className="text-sm text-slate-800">
+                                      {lab}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            </fieldset>
+                          </div>
+                        ))}
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setForm((prev) => ({
+                            ...prev,
+                            protectedPeople: [
+                              ...prev.protectedPeople,
+                              defaultProtectedPerson(),
+                            ],
+                          }))
+                        }
+                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
+                      >
+                        Add Another Person
+                      </button>
+
+                      <div>
+                        <label
+                          htmlFor="protectedPeopleWhy"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Why do these people need protection?
+                        </label>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Keep it brief. Space is limited to the box on the form.
+                        </p>
+                        <textarea
+                          id="protectedPeopleWhy"
+                          name="protectedPeopleWhy"
+                          rows={5}
+                          maxLength={PROTECTED_PEOPLE_WHY_MAX_LENGTH}
+                          autoComplete="off"
+                          value={form.protectedPeopleWhy}
+                          onChange={(e) =>
+                            update("protectedPeopleWhy", e.target.value)
+                          }
+                          className={textareaClass}
+                          aria-describedby="protectedPeopleWhy-counter"
+                        />
+                        <p
+                          id="protectedPeopleWhy-counter"
+                          className="mt-1.5 text-xs tabular-nums text-slate-500"
+                        >
+                          {form.protectedPeopleWhy.length}/
+                          {PROTECTED_PEOPLE_WHY_MAX_LENGTH} characters
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                </div>
+                </>
               )}
 
               {step === 1 && (
@@ -1545,11 +1786,10 @@ export default function FormWizardPage() {
                       i
                     </span>
                     <p className="text-sm font-medium leading-relaxed text-purple-950">
-                      <span className="font-semibold">Tip:</span> You will have
-                      the opportunity to describe up to THREE separate
-                      incidents of abuse in this form. Start here with the MOST
-                      RECENT incident. You can add the other incidents on the
-                      next pages.
+                      <span className="font-semibold">Tip:</span> Start with the
+                      most recent incident. You can describe up to three separate
+                      incidents on the official form—only the first is shown
+                      here until you choose to add another.
                     </p>
                   </div>
                   <div>
@@ -1938,1024 +2178,757 @@ export default function FormWizardPage() {
                         />
                       </div>
                     )}
+                  <div className="border-t border-purple-100/90 pt-8">
+                    {!showAbuseIncident2 && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAbuseIncident2(true)}
+                        className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-dashed border-purple-300 bg-white px-5 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:bg-purple-50"
+                      >
+                        + Add another incident (optional)
+                      </button>
+                    )}
+                  </div>
+
+                  {showAbuseIncident2 && (
+                    <div className="space-y-8 border-t border-purple-100/90 pt-8">
+                      <p className="text-sm leading-relaxed text-slate-600">
+                        Optional: describe a <span className="font-medium">different</span> incident from Section 5 (DV-100 Section 6).
+                      </p>
+                      <div>
+                        <h2 className="text-sm font-semibold text-slate-900">
+                          Section 6. Second incident of abuse
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-600">
+                          Answer about a different incident from Section 5. You may
+                          estimate dates if you are unsure.
+                        </p>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="secondAbuseDate"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          6a. Date of abuse
+                        </label>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Give your best estimate if you do not know the exact date.
+                        </p>
+                        <input
+                          id="secondAbuseDate"
+                          name="secondAbuseDate"
+                          type="text"
+                          autoComplete="off"
+                          value={form.secondAbuseDate}
+                          onChange={(e) =>
+                            update("secondAbuseDate", e.target.value)
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          6b. Did anyone else hear or see what happened on this
+                          day?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "idk", label: "I don't know" },
+                              { value: "no", label: "No" },
+                              { value: "yes", label: "Yes" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="secondAbuseWitnesses"
+                                checked={form.secondAbuseWitnesses === value}
+                                onChange={() => {
+                                  update("secondAbuseWitnesses", value);
+                                  if (value !== "yes") {
+                                    update("secondAbuseWitnessDetail", "");
+                                  }
+                                }}
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                      {form.secondAbuseWitnesses === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="secondAbuseWitnessDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Give names or describe who heard or saw what happened
+                          </label>
+                          <input
+                            id="secondAbuseWitnessDetail"
+                            name="secondAbuseWitnessDetail"
+                            type="text"
+                            autoComplete="off"
+                            value={form.secondAbuseWitnessDetail}
+                            onChange={(e) =>
+                              update("secondAbuseWitnessDetail", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          6c. Did the person use or threaten to use a gun or other
+                          weapon?
+                        </legend>
+                        <div className="space-y-3">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="secondAbuseWeapon"
+                              checked={form.secondAbuseWeapon === "no"}
+                              onChange={() => {
+                                update("secondAbuseWeapon", "no");
+                                update("secondAbuseWeaponDetail", "");
+                              }}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              No
+                            </span>
+                          </label>
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="secondAbuseWeapon"
+                              checked={form.secondAbuseWeapon === "yes"}
+                              onChange={() => update("secondAbuseWeapon", "yes")}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              Yes
+                            </span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      {form.secondAbuseWeapon === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="secondAbuseWeaponDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe the gun or weapon
+                          </label>
+                          <input
+                            id="secondAbuseWeaponDetail"
+                            name="secondAbuseWeaponDetail"
+                            type="text"
+                            autoComplete="off"
+                            value={form.secondAbuseWeaponDetail}
+                            onChange={(e) =>
+                              update("secondAbuseWeaponDetail", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          6d. Did the person cause you emotional or physical harm?
+                        </legend>
+                        <div className="space-y-3">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="secondAbuseHarm"
+                              checked={form.secondAbuseHarm === "no"}
+                              onChange={() => {
+                                update("secondAbuseHarm", "no");
+                                update("secondAbuseHarmDetail", "");
+                              }}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              No
+                            </span>
+                          </label>
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="secondAbuseHarm"
+                              checked={form.secondAbuseHarm === "yes"}
+                              onChange={() => update("secondAbuseHarm", "yes")}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              Yes
+                            </span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      {form.secondAbuseHarm === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="secondAbuseHarmDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe the harm
+                          </label>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Keep it brief. Space is limited to one line on the
+                            official form.
+                          </p>
+                          <input
+                            id="secondAbuseHarmDetail"
+                            name="secondAbuseHarmDetail"
+                            type="text"
+                            autoComplete="off"
+                            maxLength={HARM_DETAIL_MAX_LENGTH}
+                            value={form.secondAbuseHarmDetail}
+                            onChange={(e) =>
+                              update("secondAbuseHarmDetail", e.target.value)
+                            }
+                            className={inputClass}
+                            aria-describedby="secondAbuseHarmDetail-counter"
+                          />
+                          <p
+                            id="secondAbuseHarmDetail-counter"
+                            className="mt-1.5 text-xs tabular-nums text-slate-500"
+                          >
+                            {form.secondAbuseHarmDetail.length}/
+                            {HARM_DETAIL_MAX_LENGTH} characters
+                          </p>
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          6e. Did the police come?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "idk", label: "I don't know" },
+                              { value: "no", label: "No" },
+                              { value: "yes", label: "Yes" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="secondAbusePolice"
+                                checked={form.secondAbusePolice === value}
+                                onChange={() =>
+                                  update("secondAbusePolice", value)
+                                }
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          If the police gave you a restraining order, list it in
+                          Section 4 of the form.
+                        </p>
+                      </fieldset>
+                      <div>
+                        <label
+                          htmlFor="secondAbuseDetails"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          6f. Details of abuse
+                        </label>
+                        <p className="mt-2 text-sm font-bold leading-snug text-slate-800">
+                          Note: You have plenty of space. Your response will be
+                          automatically printed on a full-page addendum (Attachment
+                          6f) at the end of the form.
+                        </p>
+                        <textarea
+                          id="secondAbuseDetails"
+                          name="secondAbuseDetails"
+                          rows={15}
+                          autoComplete="off"
+                          value={form.secondAbuseDetails}
+                          onChange={(e) =>
+                            update("secondAbuseDetails", e.target.value)
+                          }
+                          className={`${inputClass} mt-3 min-h-[20rem] resize-y`}
+                        />
+                      </div>
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          6g. How often has the person abused you like this?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "once", label: "Just this once" },
+                              { value: "2-5", label: "2–5 times" },
+                              { value: "weekly", label: "Weekly" },
+                              { value: "other", label: "Other" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="secondAbuseFrequency"
+                                checked={form.secondAbuseFrequency === value}
+                                onChange={() => {
+                                  update("secondAbuseFrequency", value);
+                                  if (value !== "other") {
+                                    update("secondAbuseFrequencyOther", "");
+                                  }
+                                  if (value === "once") {
+                                    update("secondAbuseDates", "");
+                                  }
+                                }}
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                      {form.secondAbuseFrequency === "other" && (
+                        <div>
+                          <label
+                            htmlFor="secondAbuseFrequencyOther"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe how often (other)
+                          </label>
+                          <input
+                            id="secondAbuseFrequencyOther"
+                            name="secondAbuseFrequencyOther"
+                            type="text"
+                            autoComplete="off"
+                            value={form.secondAbuseFrequencyOther}
+                            onChange={(e) =>
+                              update("secondAbuseFrequencyOther", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      {form.secondAbuseFrequency !== "" &&
+                        form.secondAbuseFrequency !== "once" && (
+                          <div>
+                            <label
+                              htmlFor="secondAbuseDates"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              6g. Dates or estimates of when it happened
+                            </label>
+                            <textarea
+                              id="secondAbuseDates"
+                              name="secondAbuseDates"
+                              rows={3}
+                              autoComplete="off"
+                              value={form.secondAbuseDates}
+                              onChange={(e) =>
+                                update("secondAbuseDates", e.target.value)
+                              }
+                              className={textareaClass}
+                            />
+                          </div>
+                        )}
+                      {showAbuseIncident2 && !showAbuseIncident3 && (
+                        <button
+                          type="button"
+                          onClick={() => setShowAbuseIncident3(true)}
+                          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-dashed border-purple-300 bg-white px-5 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:bg-purple-50"
+                        >
+                          + Add a third incident (optional)
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {showAbuseIncident3 && (
+                    <div className="space-y-8 border-t border-purple-100/90 pt-8">
+                      <p className="text-sm leading-relaxed text-slate-600">
+                        Optional: a third incident if it applies (DV-100 Section 7). Leave blank if not.
+                      </p>
+                      <div>
+                        <h2 className="text-sm font-semibold text-slate-900">
+                          Section 7. Third incident of abuse
+                        </h2>
+                        <p className="mt-1 text-sm text-slate-600">
+                          Answer about another incident, or skip this section if it
+                          does not apply. You may estimate dates if you are unsure.
+                        </p>
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="thirdAbuseDate"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          7a. Date of abuse
+                        </label>
+                        <p className="mt-1 text-xs text-slate-500">
+                          Give your best estimate if you do not know the exact date.
+                        </p>
+                        <input
+                          id="thirdAbuseDate"
+                          name="thirdAbuseDate"
+                          type="text"
+                          autoComplete="off"
+                          value={form.thirdAbuseDate}
+                          onChange={(e) =>
+                            update("thirdAbuseDate", e.target.value)
+                          }
+                          className={inputClass}
+                        />
+                      </div>
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          7b. Did anyone else hear or see what happened on this
+                          day?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "idk", label: "I don't know" },
+                              { value: "no", label: "No" },
+                              { value: "yes", label: "Yes" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="thirdAbuseWitnesses"
+                                checked={form.thirdAbuseWitnesses === value}
+                                onChange={() => {
+                                  update("thirdAbuseWitnesses", value);
+                                  if (value !== "yes") {
+                                    update("thirdAbuseWitnessDetail", "");
+                                  }
+                                }}
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                      {form.thirdAbuseWitnesses === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="thirdAbuseWitnessDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Give names or describe who heard or saw what happened
+                          </label>
+                          <input
+                            id="thirdAbuseWitnessDetail"
+                            name="thirdAbuseWitnessDetail"
+                            type="text"
+                            autoComplete="off"
+                            value={form.thirdAbuseWitnessDetail}
+                            onChange={(e) =>
+                              update("thirdAbuseWitnessDetail", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          7c. Did the person use or threaten to use a gun or other
+                          weapon?
+                        </legend>
+                        <div className="space-y-3">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="thirdAbuseWeapon"
+                              checked={form.thirdAbuseWeapon === "no"}
+                              onChange={() => {
+                                update("thirdAbuseWeapon", "no");
+                                update("thirdAbuseWeaponDetail", "");
+                              }}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              No
+                            </span>
+                          </label>
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="thirdAbuseWeapon"
+                              checked={form.thirdAbuseWeapon === "yes"}
+                              onChange={() => update("thirdAbuseWeapon", "yes")}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              Yes
+                            </span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      {form.thirdAbuseWeapon === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="thirdAbuseWeaponDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe the gun or weapon
+                          </label>
+                          <input
+                            id="thirdAbuseWeaponDetail"
+                            name="thirdAbuseWeaponDetail"
+                            type="text"
+                            autoComplete="off"
+                            value={form.thirdAbuseWeaponDetail}
+                            onChange={(e) =>
+                              update("thirdAbuseWeaponDetail", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          7d. Did the person cause you emotional or physical harm?
+                        </legend>
+                        <div className="space-y-3">
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="thirdAbuseHarm"
+                              checked={form.thirdAbuseHarm === "no"}
+                              onChange={() => {
+                                update("thirdAbuseHarm", "no");
+                                update("thirdAbuseHarmDetail", "");
+                              }}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              No
+                            </span>
+                          </label>
+                          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
+                            <input
+                              type="radio"
+                              name="thirdAbuseHarm"
+                              checked={form.thirdAbuseHarm === "yes"}
+                              onChange={() => update("thirdAbuseHarm", "yes")}
+                              className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                            />
+                            <span className="text-sm leading-relaxed text-slate-800">
+                              Yes
+                            </span>
+                          </label>
+                        </div>
+                      </fieldset>
+                      {form.thirdAbuseHarm === "yes" && (
+                        <div>
+                          <label
+                            htmlFor="thirdAbuseHarmDetail"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe the harm
+                          </label>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Keep it brief. Space is limited to one line on the
+                            official form.
+                          </p>
+                          <input
+                            id="thirdAbuseHarmDetail"
+                            name="thirdAbuseHarmDetail"
+                            type="text"
+                            autoComplete="off"
+                            maxLength={HARM_DETAIL_MAX_LENGTH}
+                            value={form.thirdAbuseHarmDetail}
+                            onChange={(e) =>
+                              update("thirdAbuseHarmDetail", e.target.value)
+                            }
+                            className={inputClass}
+                            aria-describedby="thirdAbuseHarmDetail-counter"
+                          />
+                          <p
+                            id="thirdAbuseHarmDetail-counter"
+                            className="mt-1.5 text-xs tabular-nums text-slate-500"
+                          >
+                            {form.thirdAbuseHarmDetail.length}/
+                            {HARM_DETAIL_MAX_LENGTH} characters
+                          </p>
+                        </div>
+                      )}
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          7e. Did the police come?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "idk", label: "I don't know" },
+                              { value: "no", label: "No" },
+                              { value: "yes", label: "Yes" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="thirdAbusePolice"
+                                checked={form.thirdAbusePolice === value}
+                                onChange={() =>
+                                  update("thirdAbusePolice", value)
+                                }
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                          If the police gave you a restraining order, list it in
+                          Section 4 of the form.
+                        </p>
+                      </fieldset>
+                      <div>
+                        <label
+                          htmlFor="thirdAbuseDetails"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          7f. Details of abuse
+                        </label>
+                        <p className="mt-2 text-sm font-bold leading-snug text-slate-800">
+                          Note: You have plenty of space. Your response will be
+                          automatically printed on a full-page addendum (Attachment
+                          7f) at the end of the form.
+                        </p>
+                        <textarea
+                          id="thirdAbuseDetails"
+                          name="thirdAbuseDetails"
+                          rows={15}
+                          autoComplete="off"
+                          value={form.thirdAbuseDetails}
+                          onChange={(e) =>
+                            update("thirdAbuseDetails", e.target.value)
+                          }
+                          className={`${inputClass} mt-3 min-h-[20rem] resize-y`}
+                        />
+                      </div>
+                      <fieldset className="space-y-4">
+                        <legend className="text-sm font-medium text-slate-800">
+                          7g. How often has the person abused you like this?
+                        </legend>
+                        <div className="space-y-3">
+                          {(
+                            [
+                              { value: "once", label: "Just this once" },
+                              { value: "2-5", label: "2–5 times" },
+                              { value: "weekly", label: "Weekly" },
+                              { value: "other", label: "Other" },
+                            ] as const
+                          ).map(({ value, label }) => (
+                            <label
+                              key={value}
+                              className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
+                            >
+                              <input
+                                type="radio"
+                                name="thirdAbuseFrequency"
+                                checked={form.thirdAbuseFrequency === value}
+                                onChange={() => {
+                                  update("thirdAbuseFrequency", value);
+                                  if (value !== "other") {
+                                    update("thirdAbuseFrequencyOther", "");
+                                  }
+                                  if (value === "once") {
+                                    update("thirdAbuseDates", "");
+                                  }
+                                }}
+                                className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
+                              />
+                              <span className="text-sm leading-relaxed text-slate-800">
+                                {label}
+                              </span>
+                            </label>
+                          ))}
+                        </div>
+                      </fieldset>
+                      {form.thirdAbuseFrequency === "other" && (
+                        <div>
+                          <label
+                            htmlFor="thirdAbuseFrequencyOther"
+                            className="text-sm font-medium text-slate-800"
+                          >
+                            Describe how often (other)
+                          </label>
+                          <input
+                            id="thirdAbuseFrequencyOther"
+                            name="thirdAbuseFrequencyOther"
+                            type="text"
+                            autoComplete="off"
+                            value={form.thirdAbuseFrequencyOther}
+                            onChange={(e) =>
+                              update("thirdAbuseFrequencyOther", e.target.value)
+                            }
+                            className={inputClass}
+                          />
+                        </div>
+                      )}
+                      {form.thirdAbuseFrequency !== "" &&
+                        form.thirdAbuseFrequency !== "once" && (
+                          <div>
+                            <label
+                              htmlFor="thirdAbuseDates"
+                              className="text-sm font-medium text-slate-800"
+                            >
+                              7g. Dates or estimates of when it happened
+                            </label>
+                            <textarea
+                              id="thirdAbuseDates"
+                              name="thirdAbuseDates"
+                              rows={3}
+                              autoComplete="off"
+                              value={form.thirdAbuseDates}
+                              onChange={(e) =>
+                                update("thirdAbuseDates", e.target.value)
+                              }
+                              className={textareaClass}
+                            />
+                          </div>
+                        )}
+                    </div>
+                  )}
+
                 </div>
               )}
 
               {step === 6 && (
                 <div className="space-y-8">
-                  <div
-                    className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
-                    role="status"
-                  >
-                    <span
-                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-liz text-sm font-bold text-white"
-                      aria-hidden
-                    >
-                      2
-                    </span>
-                    <p className="text-sm font-medium leading-relaxed text-purple-950">
-                      Incident 2 of 3: Use this page to describe a different
-                      incident of abuse from the one you described on the
-                      previous page.
-                    </p>
-                  </div>
-
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Section 6. Second incident of abuse
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Answer about a different incident from Section 5. You may
-                      estimate dates if you are unsure.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="secondAbuseDate"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      6a. Date of abuse
-                    </label>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Give your best estimate if you do not know the exact date.
-                    </p>
-                    <input
-                      id="secondAbuseDate"
-                      name="secondAbuseDate"
-                      type="text"
-                      autoComplete="off"
-                      value={form.secondAbuseDate}
-                      onChange={(e) =>
-                        update("secondAbuseDate", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      6b. Did anyone else hear or see what happened on this
-                      day?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "idk", label: "I don't know" },
-                          { value: "no", label: "No" },
-                          { value: "yes", label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="secondAbuseWitnesses"
-                            checked={form.secondAbuseWitnesses === value}
-                            onChange={() => {
-                              update("secondAbuseWitnesses", value);
-                              if (value !== "yes") {
-                                update("secondAbuseWitnessDetail", "");
-                              }
-                            }}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.secondAbuseWitnesses === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="secondAbuseWitnessDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Give names or describe who heard or saw what happened
-                      </label>
-                      <input
-                        id="secondAbuseWitnessDetail"
-                        name="secondAbuseWitnessDetail"
-                        type="text"
-                        autoComplete="off"
-                        value={form.secondAbuseWitnessDetail}
-                        onChange={(e) =>
-                          update("secondAbuseWitnessDetail", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      6c. Did the person use or threaten to use a gun or other
-                      weapon?
-                    </legend>
-                    <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="secondAbuseWeapon"
-                          checked={form.secondAbuseWeapon === "no"}
-                          onChange={() => {
-                            update("secondAbuseWeapon", "no");
-                            update("secondAbuseWeaponDetail", "");
-                          }}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          No
-                        </span>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="secondAbuseWeapon"
-                          checked={form.secondAbuseWeapon === "yes"}
-                          onChange={() => update("secondAbuseWeapon", "yes")}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          Yes
-                        </span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  {form.secondAbuseWeapon === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="secondAbuseWeaponDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe the gun or weapon
-                      </label>
-                      <input
-                        id="secondAbuseWeaponDetail"
-                        name="secondAbuseWeaponDetail"
-                        type="text"
-                        autoComplete="off"
-                        value={form.secondAbuseWeaponDetail}
-                        onChange={(e) =>
-                          update("secondAbuseWeaponDetail", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      6d. Did the person cause you emotional or physical harm?
-                    </legend>
-                    <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="secondAbuseHarm"
-                          checked={form.secondAbuseHarm === "no"}
-                          onChange={() => {
-                            update("secondAbuseHarm", "no");
-                            update("secondAbuseHarmDetail", "");
-                          }}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          No
-                        </span>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="secondAbuseHarm"
-                          checked={form.secondAbuseHarm === "yes"}
-                          onChange={() => update("secondAbuseHarm", "yes")}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          Yes
-                        </span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  {form.secondAbuseHarm === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="secondAbuseHarmDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe the harm
-                      </label>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Keep it brief. Space is limited to one line on the
-                        official form.
-                      </p>
-                      <input
-                        id="secondAbuseHarmDetail"
-                        name="secondAbuseHarmDetail"
-                        type="text"
-                        autoComplete="off"
-                        maxLength={HARM_DETAIL_MAX_LENGTH}
-                        value={form.secondAbuseHarmDetail}
-                        onChange={(e) =>
-                          update("secondAbuseHarmDetail", e.target.value)
-                        }
-                        className={inputClass}
-                        aria-describedby="secondAbuseHarmDetail-counter"
-                      />
-                      <p
-                        id="secondAbuseHarmDetail-counter"
-                        className="mt-1.5 text-xs tabular-nums text-slate-500"
-                      >
-                        {form.secondAbuseHarmDetail.length}/
-                        {HARM_DETAIL_MAX_LENGTH} characters
-                      </p>
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      6e. Did the police come?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "idk", label: "I don't know" },
-                          { value: "no", label: "No" },
-                          { value: "yes", label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="secondAbusePolice"
-                            checked={form.secondAbusePolice === value}
-                            onChange={() =>
-                              update("secondAbusePolice", value)
-                            }
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      If the police gave you a restraining order, list it in
-                      Section 4 of the form.
-                    </p>
-                  </fieldset>
-
-                  <div>
-                    <label
-                      htmlFor="secondAbuseDetails"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      6f. Details of abuse
-                    </label>
-                    <p className="mt-2 text-sm font-bold leading-snug text-slate-800">
-                      Note: You have plenty of space. Your response will be
-                      automatically printed on a full-page addendum (Attachment
-                      6f) at the end of the form.
-                    </p>
-                    <textarea
-                      id="secondAbuseDetails"
-                      name="secondAbuseDetails"
-                      rows={15}
-                      autoComplete="off"
-                      value={form.secondAbuseDetails}
-                      onChange={(e) =>
-                        update("secondAbuseDetails", e.target.value)
-                      }
-                      className={`${inputClass} mt-3 min-h-[20rem] resize-y`}
-                    />
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      6g. How often has the person abused you like this?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "once", label: "Just this once" },
-                          { value: "2-5", label: "2–5 times" },
-                          { value: "weekly", label: "Weekly" },
-                          { value: "other", label: "Other" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="secondAbuseFrequency"
-                            checked={form.secondAbuseFrequency === value}
-                            onChange={() => {
-                              update("secondAbuseFrequency", value);
-                              if (value !== "other") {
-                                update("secondAbuseFrequencyOther", "");
-                              }
-                              if (value === "once") {
-                                update("secondAbuseDates", "");
-                              }
-                            }}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.secondAbuseFrequency === "other" && (
-                    <div>
-                      <label
-                        htmlFor="secondAbuseFrequencyOther"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe how often (other)
-                      </label>
-                      <input
-                        id="secondAbuseFrequencyOther"
-                        name="secondAbuseFrequencyOther"
-                        type="text"
-                        autoComplete="off"
-                        value={form.secondAbuseFrequencyOther}
-                        onChange={(e) =>
-                          update("secondAbuseFrequencyOther", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  {form.secondAbuseFrequency !== "" &&
-                    form.secondAbuseFrequency !== "once" && (
-                      <div>
-                        <label
-                          htmlFor="secondAbuseDates"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          6g. Dates or estimates of when it happened
-                        </label>
-                        <textarea
-                          id="secondAbuseDates"
-                          name="secondAbuseDates"
-                          rows={3}
-                          autoComplete="off"
-                          value={form.secondAbuseDates}
-                          onChange={(e) =>
-                            update("secondAbuseDates", e.target.value)
-                          }
-                          className={textareaClass}
-                        />
-                      </div>
-                    )}
-                </div>
-              )}
-
-              {step === 7 && (
-                <div className="space-y-8">
-                  <div
-                    className="flex gap-3 rounded-xl border-2 border-liz bg-liz/10 px-4 py-4 shadow-sm sm:px-5"
-                    role="status"
-                  >
-                    <span
-                      className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-liz text-sm font-bold text-white"
-                      aria-hidden
-                    >
-                      3
-                    </span>
-                    <p className="text-sm font-medium leading-relaxed text-purple-950">
-                      Incident 3 of 3: Use this page to describe a third incident
-                      of abuse. If there are no other incidents, you can leave
-                      this page blank and continue.
-                    </p>
-                  </div>
-
-                  <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Section 7. Third incident of abuse
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Answer about another incident, or skip this section if it
-                      does not apply. You may estimate dates if you are unsure.
-                    </p>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="thirdAbuseDate"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      7a. Date of abuse
-                    </label>
-                    <p className="mt-1 text-xs text-slate-500">
-                      Give your best estimate if you do not know the exact date.
-                    </p>
-                    <input
-                      id="thirdAbuseDate"
-                      name="thirdAbuseDate"
-                      type="text"
-                      autoComplete="off"
-                      value={form.thirdAbuseDate}
-                      onChange={(e) =>
-                        update("thirdAbuseDate", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      7b. Did anyone else hear or see what happened on this
-                      day?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "idk", label: "I don't know" },
-                          { value: "no", label: "No" },
-                          { value: "yes", label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="thirdAbuseWitnesses"
-                            checked={form.thirdAbuseWitnesses === value}
-                            onChange={() => {
-                              update("thirdAbuseWitnesses", value);
-                              if (value !== "yes") {
-                                update("thirdAbuseWitnessDetail", "");
-                              }
-                            }}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.thirdAbuseWitnesses === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="thirdAbuseWitnessDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Give names or describe who heard or saw what happened
-                      </label>
-                      <input
-                        id="thirdAbuseWitnessDetail"
-                        name="thirdAbuseWitnessDetail"
-                        type="text"
-                        autoComplete="off"
-                        value={form.thirdAbuseWitnessDetail}
-                        onChange={(e) =>
-                          update("thirdAbuseWitnessDetail", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      7c. Did the person use or threaten to use a gun or other
-                      weapon?
-                    </legend>
-                    <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="thirdAbuseWeapon"
-                          checked={form.thirdAbuseWeapon === "no"}
-                          onChange={() => {
-                            update("thirdAbuseWeapon", "no");
-                            update("thirdAbuseWeaponDetail", "");
-                          }}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          No
-                        </span>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="thirdAbuseWeapon"
-                          checked={form.thirdAbuseWeapon === "yes"}
-                          onChange={() => update("thirdAbuseWeapon", "yes")}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          Yes
-                        </span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  {form.thirdAbuseWeapon === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="thirdAbuseWeaponDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe the gun or weapon
-                      </label>
-                      <input
-                        id="thirdAbuseWeaponDetail"
-                        name="thirdAbuseWeaponDetail"
-                        type="text"
-                        autoComplete="off"
-                        value={form.thirdAbuseWeaponDetail}
-                        onChange={(e) =>
-                          update("thirdAbuseWeaponDetail", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      7d. Did the person cause you emotional or physical harm?
-                    </legend>
-                    <div className="space-y-3">
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="thirdAbuseHarm"
-                          checked={form.thirdAbuseHarm === "no"}
-                          onChange={() => {
-                            update("thirdAbuseHarm", "no");
-                            update("thirdAbuseHarmDetail", "");
-                          }}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          No
-                        </span>
-                      </label>
-                      <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30">
-                        <input
-                          type="radio"
-                          name="thirdAbuseHarm"
-                          checked={form.thirdAbuseHarm === "yes"}
-                          onChange={() => update("thirdAbuseHarm", "yes")}
-                          className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                        />
-                        <span className="text-sm leading-relaxed text-slate-800">
-                          Yes
-                        </span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  {form.thirdAbuseHarm === "yes" && (
-                    <div>
-                      <label
-                        htmlFor="thirdAbuseHarmDetail"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe the harm
-                      </label>
-                      <p className="mt-1 text-xs text-slate-500">
-                        Keep it brief. Space is limited to one line on the
-                        official form.
-                      </p>
-                      <input
-                        id="thirdAbuseHarmDetail"
-                        name="thirdAbuseHarmDetail"
-                        type="text"
-                        autoComplete="off"
-                        maxLength={HARM_DETAIL_MAX_LENGTH}
-                        value={form.thirdAbuseHarmDetail}
-                        onChange={(e) =>
-                          update("thirdAbuseHarmDetail", e.target.value)
-                        }
-                        className={inputClass}
-                        aria-describedby="thirdAbuseHarmDetail-counter"
-                      />
-                      <p
-                        id="thirdAbuseHarmDetail-counter"
-                        className="mt-1.5 text-xs tabular-nums text-slate-500"
-                      >
-                        {form.thirdAbuseHarmDetail.length}/
-                        {HARM_DETAIL_MAX_LENGTH} characters
-                      </p>
-                    </div>
-                  )}
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      7e. Did the police come?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "idk", label: "I don't know" },
-                          { value: "no", label: "No" },
-                          { value: "yes", label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="thirdAbusePolice"
-                            checked={form.thirdAbusePolice === value}
-                            onChange={() =>
-                              update("thirdAbusePolice", value)
-                            }
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                    <p className="text-xs text-slate-500">
-                      If the police gave you a restraining order, list it in
-                      Section 4 of the form.
-                    </p>
-                  </fieldset>
-
-                  <div>
-                    <label
-                      htmlFor="thirdAbuseDetails"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      7f. Details of abuse
-                    </label>
-                    <p className="mt-2 text-sm font-bold leading-snug text-slate-800">
-                      Note: You have plenty of space. Your response will be
-                      automatically printed on a full-page addendum (Attachment
-                      7f) at the end of the form.
-                    </p>
-                    <textarea
-                      id="thirdAbuseDetails"
-                      name="thirdAbuseDetails"
-                      rows={15}
-                      autoComplete="off"
-                      value={form.thirdAbuseDetails}
-                      onChange={(e) =>
-                        update("thirdAbuseDetails", e.target.value)
-                      }
-                      className={`${inputClass} mt-3 min-h-[20rem] resize-y`}
-                    />
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      7g. How often has the person abused you like this?
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "once", label: "Just this once" },
-                          { value: "2-5", label: "2–5 times" },
-                          { value: "weekly", label: "Weekly" },
-                          { value: "other", label: "Other" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="thirdAbuseFrequency"
-                            checked={form.thirdAbuseFrequency === value}
-                            onChange={() => {
-                              update("thirdAbuseFrequency", value);
-                              if (value !== "other") {
-                                update("thirdAbuseFrequencyOther", "");
-                              }
-                              if (value === "once") {
-                                update("thirdAbuseDates", "");
-                              }
-                            }}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.thirdAbuseFrequency === "other" && (
-                    <div>
-                      <label
-                        htmlFor="thirdAbuseFrequencyOther"
-                        className="text-sm font-medium text-slate-800"
-                      >
-                        Describe how often (other)
-                      </label>
-                      <input
-                        id="thirdAbuseFrequencyOther"
-                        name="thirdAbuseFrequencyOther"
-                        type="text"
-                        autoComplete="off"
-                        value={form.thirdAbuseFrequencyOther}
-                        onChange={(e) =>
-                          update("thirdAbuseFrequencyOther", e.target.value)
-                        }
-                        className={inputClass}
-                      />
-                    </div>
-                  )}
-
-                  {form.thirdAbuseFrequency !== "" &&
-                    form.thirdAbuseFrequency !== "once" && (
-                      <div>
-                        <label
-                          htmlFor="thirdAbuseDates"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          7g. Dates or estimates of when it happened
-                        </label>
-                        <textarea
-                          id="thirdAbuseDates"
-                          name="thirdAbuseDates"
-                          rows={3}
-                          autoComplete="off"
-                          value={form.thirdAbuseDates}
-                          onChange={(e) =>
-                            update("thirdAbuseDates", e.target.value)
-                          }
-                          className={textareaClass}
-                        />
-                      </div>
-                    )}
-                </div>
-              )}
-
-              {step === 8 && (
-                <div className="space-y-8">
-                  <div>
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Section 8. Other people needing protection
-                    </h2>
-                    <p className="mt-1 text-sm text-slate-600">
-                      Besides yourself, is there anyone else who needs protection
-                      from the person in item 2?
-                    </p>
-                  </div>
-
-                  <fieldset className="space-y-4">
-                    <legend className="text-sm font-medium text-slate-800">
-                      8a. Other people needing protection
-                    </legend>
-                    <div className="space-y-3">
-                      {(
-                        [
-                          { value: "no" as const, label: "No" },
-                          { value: "yes" as const, label: "Yes" },
-                        ] as const
-                      ).map(({ value, label }) => (
-                        <label
-                          key={value}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30"
-                        >
-                          <input
-                            type="radio"
-                            name="protectOtherPeople"
-                            checked={form.protectOtherPeople === value}
-                            onChange={() => {
-                              update("protectOtherPeople", value);
-                            }}
-                            className="mt-1 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                          />
-                          <span className="text-sm leading-relaxed text-slate-800">
-                            {label}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  {form.protectOtherPeople === "yes" && (
-                    <>
-                      {form.protectedPeople.length > 4 && (
-                        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-950">
-                          Note: You have listed more than 4 people. An extra
-                          page titled &apos;DV-100, Other Protected People&apos;
-                          will automatically be created and attached to your
-                          final document.
-                        </p>
-                      )}
-
-                      <div className="space-y-6">
-                        {form.protectedPeople.map((person, index) => (
-                          <div
-                            key={index}
-                            className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
-                          >
-                            <p className="text-sm font-medium text-slate-800">
-                              Protected person {index + 1}
-                            </p>
-                            <div>
-                              <label
-                                htmlFor={`protected-name-${index}`}
-                                className="text-sm font-medium text-slate-800"
-                              >
-                                Full name
-                              </label>
-                              <input
-                                id={`protected-name-${index}`}
-                                type="text"
-                                autoComplete="off"
-                                value={person.name}
-                                onChange={(e) =>
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    protectedPeople: prev.protectedPeople.map(
-                                      (p, i) =>
-                                        i === index
-                                          ? { ...p, name: e.target.value }
-                                          : p,
-                                    ),
-                                  }))
-                                }
-                                className={inputClass}
-                              />
-                            </div>
-                            <div>
-                              <label
-                                htmlFor={`protected-age-${index}`}
-                                className="text-sm font-medium text-slate-800"
-                              >
-                                Age
-                              </label>
-                              <input
-                                id={`protected-age-${index}`}
-                                type="text"
-                                autoComplete="off"
-                                value={person.age}
-                                onChange={(e) =>
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    protectedPeople: prev.protectedPeople.map(
-                                      (p, i) =>
-                                        i === index
-                                          ? { ...p, age: e.target.value }
-                                          : p,
-                                    ),
-                                  }))
-                                }
-                                className={inputClass}
-                              />
-                            </div>
-                            <div>
-                              <label
-                                htmlFor={`protected-rel-${index}`}
-                                className="text-sm font-medium text-slate-800"
-                              >
-                                Relationship to you
-                              </label>
-                              <input
-                                id={`protected-rel-${index}`}
-                                type="text"
-                                autoComplete="off"
-                                value={person.relationship}
-                                onChange={(e) =>
-                                  setForm((prev) => ({
-                                    ...prev,
-                                    protectedPeople: prev.protectedPeople.map(
-                                      (p, i) =>
-                                        i === index
-                                          ? {
-                                              ...p,
-                                              relationship: e.target.value,
-                                            }
-                                          : p,
-                                    ),
-                                  }))
-                                }
-                                className={inputClass}
-                              />
-                            </div>
-                            <fieldset className="space-y-3">
-                              <legend className="text-sm font-medium text-slate-800">
-                                Lives with you
-                              </legend>
-                              <div className="space-y-2">
-                                {(
-                                  [
-                                    { v: "Yes" as const, lab: "Yes" },
-                                    { v: "No" as const, lab: "No" },
-                                  ] as const
-                                ).map(({ v, lab }) => (
-                                  <label
-                                    key={v}
-                                    className="flex cursor-pointer items-start gap-3 rounded-lg border border-purple-100/80 bg-white px-3 py-2.5"
-                                  >
-                                    <input
-                                      type="radio"
-                                      name={`protected-lives-${index}`}
-                                      checked={person.livesWithYou === v}
-                                      onChange={() =>
-                                        setForm((prev) => ({
-                                          ...prev,
-                                          protectedPeople:
-                                            prev.protectedPeople.map((p, i) =>
-                                              i === index
-                                                ? { ...p, livesWithYou: v }
-                                                : p,
-                                            ),
-                                        }))
-                                      }
-                                      className="mt-0.5 size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
-                                    />
-                                    <span className="text-sm text-slate-800">
-                                      {lab}
-                                    </span>
-                                  </label>
-                                ))}
-                              </div>
-                            </fieldset>
-                          </div>
-                        ))}
-                      </div>
-
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            protectedPeople: [
-                              ...prev.protectedPeople,
-                              defaultProtectedPerson(),
-                            ],
-                          }))
-                        }
-                        className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
-                      >
-                        Add Another Person
-                      </button>
-
-                      <div>
-                        <label
-                          htmlFor="protectedPeopleWhy"
-                          className="text-sm font-medium text-slate-800"
-                        >
-                          8b(2). Why do these people need protection?
-                        </label>
-                        <p className="mt-1 text-xs text-slate-500">
-                          Keep it brief. Space is limited to the box on the form.
-                        </p>
-                        <textarea
-                          id="protectedPeopleWhy"
-                          name="protectedPeopleWhy"
-                          rows={5}
-                          maxLength={PROTECTED_PEOPLE_WHY_MAX_LENGTH}
-                          autoComplete="off"
-                          value={form.protectedPeopleWhy}
-                          onChange={(e) =>
-                            update("protectedPeopleWhy", e.target.value)
-                          }
-                          className={textareaClass}
-                          aria-describedby="protectedPeopleWhy-counter"
-                        />
-                        <p
-                          id="protectedPeopleWhy-counter"
-                          className="mt-1.5 text-xs tabular-nums text-slate-500"
-                        >
-                          {form.protectedPeopleWhy.length}/
-                          {PROTECTED_PEOPLE_WHY_MAX_LENGTH} characters
-                        </p>
-                      </div>
-                    </>
-                  )}
-
-                  <div className="border-t border-purple-100/90 pt-8">
                     <h2 className="text-sm font-semibold text-slate-900">
                       Section 9. Firearms
                     </h2>
@@ -3101,7 +3074,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 9 && (
+              {step === 7 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3658,7 +3631,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 10 && (
+              {step === 8 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -3955,7 +3928,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 11 && (
+              {step === 9 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4419,7 +4392,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 12 && (
+              {step === 10 && (
                 <div className="space-y-10">
                   <section className="space-y-4">
                     <h2 className="text-sm font-semibold text-slate-900">
@@ -4852,7 +4825,7 @@ export default function FormWizardPage() {
                 </div>
               )}
 
-              {step === 13 && (
+              {step === 11 && (
                 <Page11SupportFeesRestitutionStep
                   form={form}
                   setForm={setForm}
@@ -4860,7 +4833,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 14 && (
+              {step === 12 && (
                 <Page12InterventionWirelessStep
                   form={form}
                   setForm={setForm}
@@ -4868,7 +4841,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 15 && (
+              {step === 13 && (
                 <SignatureStep
                   formData={form}
                   updateFormData={(patch: Partial<FormData>) =>
@@ -4877,7 +4850,7 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 16 && (
+              {step === 14 && (
                 <div className="space-y-8">
                   {pdfError && (
                     <p
