@@ -17,6 +17,7 @@ import {
   type Dv100ProtectedAnimal,
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
+import { generateCLETS001PDF, type Clets001PdfData } from "@/lib/clets001-pdf";
 
 import { useFormStore, type PersonInfo } from "@/store/useFormStore";
 
@@ -165,7 +166,15 @@ const PAGE10_DEBT_AMOUNT_MAX = 10;
 const PAGE10_DEBT_DUE_MAX = 15;
 
 function defaultProtectedPerson(): Dv100ProtectedPerson {
-  return { name: "", age: "", relationship: "", livesWithYou: null };
+  return {
+    name: "",
+    age: "",
+    relationship: "",
+    livesWithYou: null,
+    race: "",
+    gender: "",
+    dateOfBirth: "",
+  };
 }
 
 function defaultFirearmRow(): Dv100FirearmRow {
@@ -452,6 +461,7 @@ export default function FormWizardPage() {
   const [showAbuseIncident3, setShowAbuseIncident3] = useState(false);
   const [form, setForm] = useState<FormData>(initialForm);
   const [pdfGenerating, setPdfGenerating] = useState(false);
+  const [cletsPdfGenerating, setCletsPdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfInfo, setPdfInfo] = useState<{
     filled: Dv100PdfFillRow[];
@@ -614,6 +624,28 @@ export default function FormWizardPage() {
       setPdfError(e instanceof Error ? e.message : String(e));
     } finally {
       setPdfGenerating(false);
+    }
+  };
+
+  const handleDownloadClets001 = async () => {
+    setCletsPdfGenerating(true);
+    setPdfError(null);
+    try {
+      const cletsPayload: Clets001PdfData = {
+        petitioner,
+        respondent,
+        respondentCLETS,
+        protectOtherPeople: form.protectOtherPeople,
+        protectedPeople: form.protectedPeople,
+        hasFirearms: form.hasFirearms,
+        firearms: form.firearms,
+      };
+      const bytes = await generateCLETS001PDF(cletsPayload);
+      triggerPdfDownload(bytes, "filled_clets001.pdf");
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setCletsPdfGenerating(false);
     }
   };
 
@@ -825,7 +857,7 @@ export default function FormWizardPage() {
                       onChange={(e) =>
                         setPetitioner({ age: e.target.value })
                       }
-                      className={inputClass}
+                      className={invoiceFieldInputClassName}
                     />
                   </div>
                   <div>
@@ -891,7 +923,7 @@ export default function FormWizardPage() {
                       onChange={(e) =>
                         setPetitioner({ race: e.target.value })
                       }
-                      className={inputClass}
+                      className={invoiceFieldInputClassName}
                     />
                   </div>
                   <div>
@@ -1189,7 +1221,7 @@ export default function FormWizardPage() {
                                     ),
                                   }))
                                 }
-                                className={inputClass}
+                                className={invoiceFieldInputClassName}
                               />
                             </div>
                             <div>
@@ -1215,7 +1247,98 @@ export default function FormWizardPage() {
                                     ),
                                   }))
                                 }
-                                className={inputClass}
+                                className={invoiceFieldInputClassName}
+                              />
+                            </div>
+                            <div>
+                              <label
+                                htmlFor={`protected-dob-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Date of birth
+                              </label>
+                              <input
+                                id={`protected-dob-${index}`}
+                                type="text"
+                                placeholder="MM / DD / YYYY"
+                                autoComplete="off"
+                                value={person.dateOfBirth}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    protectedPeople: prev.protectedPeople.map(
+                                      (p, i) =>
+                                        i === index
+                                          ? {
+                                              ...p,
+                                              dateOfBirth: e.target.value,
+                                            }
+                                          : p,
+                                    ),
+                                  }))
+                                }
+                                className={invoiceFieldInputClassName}
+                              />
+                            </div>
+                            <fieldset className="space-y-4">
+                              <legend className="text-sm font-medium text-slate-800">
+                                Gender
+                              </legend>
+                              <div className="space-y-3">
+                                {GENDER_OPTIONS.map((option) => (
+                                  <label
+                                    key={option}
+                                    className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition"
+                                  >
+                                    <input
+                                      type="radio"
+                                      name={`protected-gender-${index}`}
+                                      value={option}
+                                      checked={person.gender === option}
+                                      onChange={() =>
+                                        setForm((prev) => ({
+                                          ...prev,
+                                          protectedPeople:
+                                            prev.protectedPeople.map((p, i) =>
+                                              i === index
+                                                ? { ...p, gender: option }
+                                                : p,
+                                            ),
+                                        }))
+                                      }
+                                      className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
+                                    />
+                                    <span className="text-sm leading-relaxed text-slate-800">
+                                      {option}
+                                    </span>
+                                  </label>
+                                ))}
+                              </div>
+                            </fieldset>
+                            <div>
+                              <label
+                                htmlFor={`protected-race-${index}`}
+                                className="text-sm font-medium text-slate-800"
+                              >
+                                Race
+                              </label>
+                              <input
+                                id={`protected-race-${index}`}
+                                type="text"
+                                autoComplete="off"
+                                value={person.race}
+                                onChange={(e) =>
+                                  setForm((prev) => ({
+                                    ...prev,
+                                    protectedPeople: prev.protectedPeople.map(
+                                      (p, i) =>
+                                        i === index
+                                          ? { ...p, race: e.target.value }
+                                          : p,
+                                    ),
+                                  }))
+                                }
+                                className={invoiceFieldInputClassName}
                               />
                             </div>
                             <div>
@@ -1244,7 +1367,7 @@ export default function FormWizardPage() {
                                     ),
                                   }))
                                 }
-                                className={inputClass}
+                                className={invoiceFieldInputClassName}
                               />
                             </div>
                             <fieldset className="space-y-3">
@@ -1450,6 +1573,25 @@ export default function FormWizardPage() {
                         setRespondent({ race: e.target.value })
                       }
                       className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="respondentTelephone"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Telephone
+                    </label>
+                    <input
+                      id="respondentTelephone"
+                      name="respondentTelephone"
+                      type="tel"
+                      autoComplete="tel"
+                      value={respondent.telephone}
+                      onChange={(e) =>
+                        setRespondent({ telephone: e.target.value })
+                      }
+                      className={invoiceFieldInputClassName}
                     />
                   </div>
                   <fieldset className="space-y-4">
@@ -5382,6 +5524,10 @@ export default function FormWizardPage() {
                           <span className="text-slate-500">Race:</span>{" "}
                           {display(respondent.race)}
                         </p>
+                        <p>
+                          <span className="text-slate-500">Telephone:</span>{" "}
+                          {display(respondent.telephone)}
+                        </p>
                       </dd>
                     </div>
                     <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
@@ -5697,7 +5843,9 @@ export default function FormWizardPage() {
                                 <span className="text-slate-500">
                                   Person {i + 1}:
                                 </span>{" "}
-                                {display(p.name)}; age {display(p.age)};
+                                {display(p.name)}; age {display(p.age)}; DOB{" "}
+                                {display(p.dateOfBirth)}; gender{" "}
+                                {display(p.gender)}; race {display(p.race)};
                                 relationship {display(p.relationship)}; lives
                                 with you{" "}
                                 {p.livesWithYou === "Yes" ||
@@ -6364,14 +6512,24 @@ export default function FormWizardPage() {
                 Back
               </button>
               {isLastStep ? (
-                <button
-                  type="button"
-                  onClick={handleGenerateForms}
-                  disabled={pdfGenerating}
-                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:ml-auto"
-                >
-                  {pdfGenerating ? "Generating…" : "Generate Forms"}
-                </button>
+                <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+                  <button
+                    type="button"
+                    onClick={handleDownloadClets001}
+                    disabled={cletsPdfGenerating}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {cletsPdfGenerating ? "Preparing…" : "Download CLETS-001"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleGenerateForms}
+                    disabled={pdfGenerating}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {pdfGenerating ? "Generating…" : "Generate Forms"}
+                  </button>
+                </div>
               ) : (
                 <button
                   type="button"

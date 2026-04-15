@@ -63,6 +63,12 @@ export type Dv100ProtectedPerson = {
   age: string;
   relationship: string;
   livesWithYou: null | "Yes" | "No";
+  /** CLETS-001 Page 2 and related exports */
+  race: string;
+  /** Optional; CLETS-001 `Gender_{i}` text when collected */
+  gender: string;
+  /** Optional; CLETS-001 `Date of Birth_{i}` when collected */
+  dateOfBirth: string;
 };
 
 export type Dv100FirearmRow = {
