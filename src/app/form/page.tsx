@@ -1515,10 +1515,6 @@ export default function FormWizardPage() {
                   <hr className="my-8 border-0 border-t border-gray-200" />
 
                   <div className="space-y-8">
-                    <h2 className="text-sm font-semibold text-slate-900">
-                      Firearms
-                    </h2>
-
                     <fieldset className="space-y-4">
                       <legend className="text-sm font-medium text-slate-800">
                         Does this person own or possess any firearms or other
