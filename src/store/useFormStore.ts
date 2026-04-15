@@ -15,6 +15,10 @@ export interface PersonInfo {
   dateOfBirth: string;
   gender: string;
   race: string;
+  height: string;
+  weight: string;
+  hairColor: string;
+  eyeColor: string;
   address: PersonAddress;
   telephone: string;
   email: string;
@@ -62,6 +66,10 @@ const initialPersonInfo: PersonInfo = {
   dateOfBirth: "",
   gender: "",
   race: "",
+  height: "",
+  weight: "",
+  hairColor: "",
+  eyeColor: "",
   address: { ...emptyAddress },
   telephone: "",
   email: "",

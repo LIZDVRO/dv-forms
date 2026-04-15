@@ -18,6 +18,8 @@ import {
   type Dv100ProtectedPerson,
 } from "@/lib/dv100-pdf";
 import { generateCLETS001PDF, type Clets001PdfData } from "@/lib/clets001-pdf";
+import { generateDV109PDF, type Dv109PdfData } from "@/lib/dv109-pdf";
+import { generateDV110PDF, type Dv110PdfData } from "@/lib/dv110-pdf";
 
 import { useFormStore, type PersonInfo } from "@/store/useFormStore";
 
@@ -87,6 +89,27 @@ const RELATIONSHIP_OPTIONS: { value: string; label: string }[] = [
     label: "We live together or used to live together",
   },
 ];
+
+const DV110_RELATIONSHIP_LABEL_BY_CHECK: Record<string, string> = {
+  married: "Spouse/Domestic Partner",
+  usedToBeMarried: "Former Spouse/Domestic Partner",
+  children: "Parent of shared children",
+  dating: "Dating/Former Dating Partner",
+  engaged: "Engaged/Former Fiance(e)",
+  related: "Related",
+  liveTogether: "Cohabitant",
+};
+
+function relationshipChecksToDv110Relationship(checks: readonly string[]): string {
+  const labels: string[] = [];
+  for (const { value } of RELATIONSHIP_OPTIONS) {
+    const mapped = DV110_RELATIONSHIP_LABEL_BY_CHECK[value];
+    if (mapped && checks.includes(value)) {
+      labels.push(mapped);
+    }
+  }
+  return labels.join(", ");
+}
 
 /** LIZ invoice underline fields (CLETS-001 additions) — bottom border only, white bg. */
 const invoiceFieldInputClassName =
@@ -462,6 +485,8 @@ export default function FormWizardPage() {
   const [form, setForm] = useState<FormData>(initialForm);
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [cletsPdfGenerating, setCletsPdfGenerating] = useState(false);
+  const [dv109PdfGenerating, setDv109PdfGenerating] = useState(false);
+  const [dv110PdfGenerating, setDv110PdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
   const [pdfInfo, setPdfInfo] = useState<{
     filled: Dv100PdfFillRow[];
@@ -646,6 +671,58 @@ export default function FormWizardPage() {
       setPdfError(e instanceof Error ? e.message : String(e));
     } finally {
       setCletsPdfGenerating(false);
+    }
+  };
+
+  const handleDownloadDv109 = async () => {
+    setDv109PdfGenerating(true);
+    setPdfError(null);
+    try {
+      const payload: Dv109PdfData = {
+        protectedPersonName: personInfoToDisplayName(petitioner),
+        restrainedPersonName: personInfoToDisplayName(respondent),
+      };
+      const bytes = await generateDV109PDF(payload);
+      triggerPdfDownload(bytes, "filled_dv109.pdf");
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDv109PdfGenerating(false);
+    }
+  };
+
+  const handleDownloadDv110 = async () => {
+    setDv110PdfGenerating(true);
+    setPdfError(null);
+    try {
+      const payload: Dv110PdfData = {
+        protectedPersonName: personInfoToDisplayName(petitioner),
+        fullName: personInfoToDisplayName(respondent),
+        gender: respondent.gender,
+        race: respondent.race,
+        age: respondent.age,
+        dateOfBirth: respondent.dateOfBirth,
+        height: respondent.height,
+        weight: respondent.weight,
+        hairColor: respondent.hairColor,
+        eyeColor: respondent.eyeColor,
+        relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
+        address: respondent.address.street,
+        city: respondent.address.city,
+        state: respondent.address.state,
+        zip: respondent.address.zip,
+        protectedPeople: form.protectedPeople.map((p) => ({
+          name: p.name,
+          relationship: p.relationship,
+          age: p.age,
+        })),
+      };
+      const bytes = await generateDV110PDF(payload);
+      triggerPdfDownload(bytes, "filled_dv110.pdf");
+    } catch (e) {
+      setPdfError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setDv110PdfGenerating(false);
     }
   };
 
@@ -1573,6 +1650,82 @@ export default function FormWizardPage() {
                         setRespondent({ race: e.target.value })
                       }
                       className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="respondentHeight"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Height
+                    </label>
+                    <input
+                      id="respondentHeight"
+                      name="respondentHeight"
+                      type="text"
+                      autoComplete="off"
+                      value={respondent.height}
+                      onChange={(e) =>
+                        setRespondent({ height: e.target.value })
+                      }
+                      className={invoiceFieldInputClassName}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="respondentWeight"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Weight
+                    </label>
+                    <input
+                      id="respondentWeight"
+                      name="respondentWeight"
+                      type="text"
+                      autoComplete="off"
+                      value={respondent.weight}
+                      onChange={(e) =>
+                        setRespondent({ weight: e.target.value })
+                      }
+                      className={invoiceFieldInputClassName}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="respondentHairColor"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Hair color
+                    </label>
+                    <input
+                      id="respondentHairColor"
+                      name="respondentHairColor"
+                      type="text"
+                      autoComplete="off"
+                      value={respondent.hairColor}
+                      onChange={(e) =>
+                        setRespondent({ hairColor: e.target.value })
+                      }
+                      className={invoiceFieldInputClassName}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="respondentEyeColor"
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Eye color
+                    </label>
+                    <input
+                      id="respondentEyeColor"
+                      name="respondentEyeColor"
+                      type="text"
+                      autoComplete="off"
+                      value={respondent.eyeColor}
+                      onChange={(e) =>
+                        setRespondent({ eyeColor: e.target.value })
+                      }
+                      className={invoiceFieldInputClassName}
                     />
                   </div>
                   <div>
@@ -5525,6 +5678,22 @@ export default function FormWizardPage() {
                           {display(respondent.race)}
                         </p>
                         <p>
+                          <span className="text-slate-500">Height:</span>{" "}
+                          {display(respondent.height)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Weight:</span>{" "}
+                          {display(respondent.weight)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Hair color:</span>{" "}
+                          {display(respondent.hairColor)}
+                        </p>
+                        <p>
+                          <span className="text-slate-500">Eye color:</span>{" "}
+                          {display(respondent.eyeColor)}
+                        </p>
+                        <p>
                           <span className="text-slate-500">Telephone:</span>{" "}
                           {display(respondent.telephone)}
                         </p>
@@ -6512,19 +6681,46 @@ export default function FormWizardPage() {
                 Back
               </button>
               {isLastStep ? (
-                <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+                <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
                   <button
                     type="button"
                     onClick={handleDownloadClets001}
-                    disabled={cletsPdfGenerating}
+                    disabled={
+                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                    }
                     className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {cletsPdfGenerating ? "Preparing…" : "Download CLETS-001"}
                   </button>
                   <button
                     type="button"
+                    onClick={handleDownloadDv109}
+                    disabled={
+                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                    }
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {dv109PdfGenerating ? "Preparing…" : "Download DV-109"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDownloadDv110}
+                    disabled={
+                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                    }
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {dv110PdfGenerating ? "Preparing…" : "Download DV-110"}
+                  </button>
+                  <button
+                    type="button"
                     onClick={handleGenerateForms}
-                    disabled={pdfGenerating}
+                    disabled={
+                      pdfGenerating ||
+                      cletsPdfGenerating ||
+                      dv109PdfGenerating ||
+                      dv110PdfGenerating
+                    }
                     className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {pdfGenerating ? "Generating…" : "Generate Forms"}
