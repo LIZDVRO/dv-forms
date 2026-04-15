@@ -4,6 +4,7 @@ import {
   PDFDocument,
   PDFDropdown,
   type PDFField,
+  PDFFont,
   PDFForm,
   PDFOptionList,
   PDFRadioGroup,
@@ -474,6 +475,8 @@ const PDF_PAGE13_SECTION33_DATE = "Date 1";
 const PDF_PAGE13_SECTION33_PRINT_NAME = "print name 1";
 const PDF_PAGE13_SECTION34_DATE = "Date 2";
 const PDF_PAGE13_SECTION34_PRINT_NAME = "print name 2";
+/** Section 32 — DV-100 page 13: count of extra pages attached (overflow addenda, invoice, etc.). */
+const PDF_PAGE13_NUMBER_OF_PAGES_ATTACHED = "number of pages attached";
 
 /** Flattened PDF may use two spaces after "2"; try {@link PDF_PAGE2_RELATED_USER_SPEC} first. */
 const PDF_PAGE2_RELATED_USER_SPEC =
@@ -596,7 +599,7 @@ const PDF_PAGE3_WEAPON_DETAIL = "c use or threaten to use a gun or other weapon"
 const PDF_PAGE3_HARM_NO = "No_6";
 const PDF_PAGE3_HARM_YES = "Yes If yes describe harm";
 const PDF_PAGE3_HARM_DETAIL = "d cause you any emotional or physical harm";
-const PDF_PAGE3_ABUSE_DETAILS = "5f details of abuse";
+const PDF_PAGE3_ABUSE_DETAILS = "5f_abuse_details";
 const PDF_PAGE3_FREQ_OTHER_TEXT = "undefined_6";
 const PDF_PAGE3_FREQ_DATES = "5g dates when it happened";
 const PDF_PAGE3_POLICE_IDK = "I dont know_2";
@@ -624,7 +627,7 @@ const PDF_PAGE4_POLICE_IDK = "I dont know_4";
 const PDF_PAGE4_POLICE_NO = "No_11";
 const PDF_PAGE4_POLICE_YES =
   "Yes If the police gave you a restraining order list it in  4_2";
-const PDF_PAGE4_ABUSE_DETAILS = "6f details of abuse";
+const PDF_PAGE4_ABUSE_DETAILS = "6f_abuse_details";
 const PDF_PAGE4_FREQ_ONCE = "Just this once_2";
 const PDF_PAGE4_FREQ_25 = "25 times_2";
 const PDF_PAGE4_FREQ_WEEKLY = "Weekly_2";
@@ -651,7 +654,7 @@ const PDF_PAGE5_POLICE_IDK = "I dont know_6";
 const PDF_PAGE5_POLICE_NO = "No_15";
 const PDF_PAGE5_POLICE_YES =
   "Yes If the police gave you a restraining order list it in  4_3";
-const PDF_PAGE5_ABUSE_DETAILS = "7f details of abuse";
+const PDF_PAGE5_ABUSE_DETAILS = "7f_abuse_details";
 const PDF_PAGE5_NEED_MORE_SPACE =
   "Check this box if you need more space to describe the abuse You can use form DV101 Description of";
 const PDF_PAGE5_FREQ_ONCE = "Just this once_3";
@@ -938,6 +941,71 @@ const PDF_PAGE9_ANIMAL_COLORS = [
   PDF_16A_COLOR_4,
 ] as const;
 
+const ABUSE_NARRATIVE_MAX_CHARS = 500;
+
+/**
+ * Writes a Section 5(f)/6(f)/7(f) abuse narrative into the PDF field, or routes overflow
+ * to a dynamically appended addendum page. Returns `true` if an addendum was added,
+ * `false` if not (empty or filled inline), `null` if the field could not be written.
+ */
+async function handleAbuseOverflow(
+  pdfDoc: PDFDocument,
+  form: PDFForm,
+  fieldName: string,
+  narrative: string,
+  attachmentLabel: string,
+  font: PDFFont,
+): Promise<boolean | null> {
+  const trimmed = narrative.trim();
+  if (!trimmed) return false;
+
+  const MAX_CHARS = ABUSE_NARRATIVE_MAX_CHARS;
+
+  try {
+    const field = form.getTextField(fieldName);
+    if (trimmed.length <= MAX_CHARS) {
+      field.setText(trimmed);
+      return false;
+    }
+    field.setText("SEE ATTACHED ADDENDUM: " + attachmentLabel);
+  } catch (err) {
+    console.warn(`Could not access field ${fieldName}`, err);
+    return null;
+  }
+
+  try {
+    const page = pdfDoc.addPage([612, 792]);
+    const { width, height } = page.getSize();
+    const margin = 50;
+    const titleSize = 14;
+    const bodySize = 11;
+    const lineHeight = bodySize * 1.4;
+
+    page.drawText(attachmentLabel, {
+      x: margin,
+      y: height - margin,
+      size: titleSize,
+      font,
+      color: rgb(0, 0, 0),
+    });
+
+    page.drawText(trimmed, {
+      x: margin,
+      y: height - margin - 30,
+      size: bodySize,
+      font,
+      color: rgb(0, 0, 0),
+      maxWidth: width - margin * 2,
+      lineHeight,
+    });
+  } catch (err) {
+    console.warn(`Failed to build abuse addendum for ${fieldName}`, err);
+    return null;
+  }
+
+  return true;
+}
+
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
  * `form.updateFieldAppearances()` so Acrobat renders filled values, and saves without flattening.
@@ -945,8 +1013,12 @@ const PDF_PAGE9_ANIMAL_COLORS = [
 export async function generateDV100PDF(data: Dv100PdfFormData): Promise<GenerateDv100PdfResult> {
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
+  const narrativeFont = await doc.embedFont(StandardFonts.Helvetica);
   const filled: Dv100PdfFillRow[] = [];
   const missing: Dv100PdfFillRow[] = [];
+  let abuseAddendumPageCount = 0;
+  let protectedPeopleAddendumPageCount = 0;
+  let lizAttachedPageCount = 0;
 
   try {
     const field = pdfForm.getTextField(PDF_PAGE1_PETITIONER_NAME);
@@ -1805,23 +1877,29 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   }
 
-  try {
-    const field = pdfForm.getTextField(PDF_PAGE3_ABUSE_DETAILS);
+  {
     const v = data.recentAbuseDetails.trim();
-    if (field && v) {
-      field.setText(v);
-      filled.push({
-        label: "Details of abuse",
-        pdfFieldName: PDF_PAGE3_ABUSE_DETAILS,
-      });
-    }
-  } catch (err) {
-    console.warn("Failed to map recentAbuseDetails", err);
-    if (data.recentAbuseDetails.trim()) {
-      missing.push({
-        label: "Details of abuse",
-        pdfFieldName: PDF_PAGE3_ABUSE_DETAILS,
-      });
+    if (v) {
+      const overflowResult = await handleAbuseOverflow(
+        doc,
+        pdfForm,
+        PDF_PAGE3_ABUSE_DETAILS,
+        data.recentAbuseDetails,
+        "ATTACHMENT 5(f)",
+        narrativeFont,
+      );
+      if (overflowResult === null) {
+        missing.push({
+          label: "Details of abuse",
+          pdfFieldName: PDF_PAGE3_ABUSE_DETAILS,
+        });
+      } else {
+        if (overflowResult) abuseAddendumPageCount++;
+        filled.push({
+          label: overflowResult ? "Details of abuse (addendum)" : "Details of abuse",
+          pdfFieldName: PDF_PAGE3_ABUSE_DETAILS,
+        });
+      }
     }
   }
 
@@ -2284,23 +2362,29 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   }
 
-  try {
-    const field = pdfForm.getTextField(PDF_PAGE4_ABUSE_DETAILS);
+  {
     const v = (data.secondAbuseDetails ?? "").trim();
-    if (field && v) {
-      field.setText(v);
-      filled.push({
-        label: "6f. Details of abuse",
-        pdfFieldName: PDF_PAGE4_ABUSE_DETAILS,
-      });
-    }
-  } catch (err) {
-    console.warn("Failed to map secondAbuseDetails", err);
-    if ((data.secondAbuseDetails ?? "").trim()) {
-      missing.push({
-        label: "6f. Details of abuse",
-        pdfFieldName: PDF_PAGE4_ABUSE_DETAILS,
-      });
+    if (v) {
+      const overflowResult = await handleAbuseOverflow(
+        doc,
+        pdfForm,
+        PDF_PAGE4_ABUSE_DETAILS,
+        data.secondAbuseDetails ?? "",
+        "ATTACHMENT 6(f)",
+        narrativeFont,
+      );
+      if (overflowResult === null) {
+        missing.push({
+          label: "6f. Details of abuse",
+          pdfFieldName: PDF_PAGE4_ABUSE_DETAILS,
+        });
+      } else {
+        if (overflowResult) abuseAddendumPageCount++;
+        filled.push({
+          label: overflowResult ? "6f. Details of abuse (addendum)" : "6f. Details of abuse",
+          pdfFieldName: PDF_PAGE4_ABUSE_DETAILS,
+        });
+      }
     }
   }
 
@@ -2774,29 +2858,35 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   }
 
-  try {
-    const field = pdfForm.getTextField(PDF_PAGE5_ABUSE_DETAILS);
+  {
     const v = (data.thirdAbuseDetails ?? "").trim();
-    if (field && v) {
-      field.setText(v);
-      filled.push({
-        label: "7f. Details of abuse",
-        pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
-      });
-    }
-  } catch (err) {
-    console.warn("Failed to map thirdAbuseDetails", err);
-    if ((data.thirdAbuseDetails ?? "").trim()) {
-      missing.push({
-        label: "7f. Details of abuse",
-        pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
-      });
+    if (v) {
+      const overflowResult = await handleAbuseOverflow(
+        doc,
+        pdfForm,
+        PDF_PAGE5_ABUSE_DETAILS,
+        data.thirdAbuseDetails ?? "",
+        "ATTACHMENT 7(f)",
+        narrativeFont,
+      );
+      if (overflowResult === null) {
+        missing.push({
+          label: "7f. Details of abuse",
+          pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
+        });
+      } else {
+        if (overflowResult) abuseAddendumPageCount++;
+        filled.push({
+          label: overflowResult ? "7f. Details of abuse (addendum)" : "7f. Details of abuse",
+          pdfFieldName: PDF_PAGE5_ABUSE_DETAILS,
+        });
+      }
     }
   }
 
   const sec7DetailsTrimmed = (data.thirdAbuseDetails ?? "").trim();
   try {
-    if (sec7DetailsTrimmed.length > 0) {
+    if (sec7DetailsTrimmed.length > ABUSE_NARRATIVE_MAX_CHARS) {
       pdfForm.getCheckBox(PDF_PAGE5_NEED_MORE_SPACE).check();
       filled.push({
         label: "7f. Need more space (addendum)",
@@ -2807,7 +2897,7 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   } catch (err) {
     console.warn("Failed to map 7f need-more-space checkbox", err);
-    if (sec7DetailsTrimmed.length > 0) {
+    if (sec7DetailsTrimmed.length > ABUSE_NARRATIVE_MAX_CHARS) {
       missing.push({
         label: "7f. Need more space (addendum)",
         pdfFieldName: PDF_PAGE5_NEED_MORE_SPACE,
@@ -3187,6 +3277,7 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
   if (overflowPeople) {
     try {
       let page = doc.addPage([612, 792]);
+      protectedPeopleAddendumPageCount = 1;
       const titleFont = await doc.embedFont(StandardFonts.HelveticaBold);
       const bodyFont = await doc.embedFont(StandardFonts.Helvetica);
       const black = rgb(0, 0, 0);
@@ -3218,6 +3309,7 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
         const blockHeight = lines.length * 16 + 8;
         if (y - blockHeight < 50) {
           page = doc.addPage([612, 792]);
+          protectedPeopleAddendumPageCount++;
           page.drawText("(continued)", {
             x: 50,
             y: 740,
@@ -4561,6 +4653,7 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
   });
 
   const mapPage11Check = (on: boolean, pdfName: string, label: string) => {
+    console.log("Attempting to map checkbox:", pdfName);
     try {
       if (on) {
         pdfForm.getCheckBox(pdfName).check();
@@ -4568,8 +4661,8 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
       } else {
         pdfForm.getCheckBox(pdfName).uncheck();
       }
-    } catch (err) {
-      console.warn(`Failed to map ${pdfName}`, err);
+    } catch {
+      console.warn(`⚠️ Skipping checkbox mapping for: ${pdfName} (Field missing or wrong type)`);
       if (on) {
         missing.push({ label, pdfFieldName: pdfName });
       }
@@ -4721,10 +4814,23 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
       petitionerName: data.petitionerName,
     });
     const invPages = await doc.copyPages(inv, inv.getPageIndices());
+    lizAttachedPageCount = invPages.length;
     for (const p of invPages) {
       doc.addPage(p);
     }
   }
+
+  try {
+    const totalAttachedPages =
+      abuseAddendumPageCount + protectedPeopleAddendumPageCount + lizAttachedPageCount;
+    pdfForm
+      .getTextField(PDF_PAGE13_NUMBER_OF_PAGES_ATTACHED)
+      .setText(totalAttachedPages > 0 ? String(totalAttachedPages) : "");
+  } catch (err) {
+    console.warn(`Failed to map ${PDF_PAGE13_NUMBER_OF_PAGES_ATTACHED}`, err);
+  }
+
+  pdfForm.updateFieldAppearances();
 
   const bytes = await doc.save();
   return { bytes, filled, missing };
