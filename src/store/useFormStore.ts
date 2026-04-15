@@ -18,14 +18,33 @@ export interface PersonInfo {
   address: PersonAddress;
   telephone: string;
   email: string;
+  speaksEnglish: "" | "yes" | "no" | "unknown";
+  language: string;
+}
+
+export interface RespondentCLETSInfo {
+  otherNamesUsed: string;
+  marksScarsTattoos: string;
+  /** Driver license number */
+  driversLicense: string;
+  /** Licensing state */
+  driversLicenseState: string;
+  ssn: string;
+  employerNameAddress: string;
+  vehicleType: string;
+  vehicleModel: string;
+  vehicleYear: string;
+  vehiclePlate: string;
 }
 
 export interface FormState {
   petitioner: PersonInfo;
   respondent: PersonInfo;
+  respondentCLETS: RespondentCLETSInfo;
 
   setPetitioner: (data: Partial<PersonInfo>) => void;
   setRespondent: (data: Partial<PersonInfo>) => void;
+  setRespondentCLETS: (data: Partial<RespondentCLETSInfo>) => void;
 }
 
 const emptyAddress: PersonAddress = {
@@ -35,24 +54,45 @@ const emptyAddress: PersonAddress = {
   zip: "",
 };
 
+const initialPersonInfo: PersonInfo = {
+  firstName: "",
+  middleName: "",
+  lastName: "",
+  age: "",
+  dateOfBirth: "",
+  gender: "",
+  race: "",
+  address: { ...emptyAddress },
+  telephone: "",
+  email: "",
+  speaksEnglish: "",
+  language: "",
+};
+
+const initialRespondentCLETS: RespondentCLETSInfo = {
+  otherNamesUsed: "",
+  marksScarsTattoos: "",
+  driversLicense: "",
+  driversLicenseState: "",
+  ssn: "",
+  employerNameAddress: "",
+  vehicleType: "",
+  vehicleModel: "",
+  vehicleYear: "",
+  vehiclePlate: "",
+};
+
 function blankPerson(): PersonInfo {
   return {
-    firstName: "",
-    middleName: "",
-    lastName: "",
-    age: "",
-    dateOfBirth: "",
-    gender: "",
-    race: "",
-    address: { ...emptyAddress },
-    telephone: "",
-    email: "",
+    ...initialPersonInfo,
+    address: { ...initialPersonInfo.address },
   };
 }
 
 export const useFormStore = create<FormState>((set) => ({
   petitioner: blankPerson(),
   respondent: blankPerson(),
+  respondentCLETS: { ...initialRespondentCLETS },
 
   setPetitioner: (data) =>
     set((state) => ({
@@ -73,6 +113,14 @@ export const useFormStore = create<FormState>((set) => ({
         address: data.address
           ? { ...state.respondent.address, ...data.address }
           : state.respondent.address,
+      },
+    })),
+
+  setRespondentCLETS: (data) =>
+    set((state) => ({
+      respondentCLETS: {
+        ...state.respondentCLETS,
+        ...data,
       },
     })),
 }));

@@ -87,6 +87,10 @@ const RELATIONSHIP_OPTIONS: { value: string; label: string }[] = [
   },
 ];
 
+/** LIZ invoice underline fields (CLETS-001 additions) — bottom border only, white bg. */
+const invoiceFieldInputClassName =
+  "mt-2 w-full rounded-none border-0 border-b border-gray-300 bg-white px-0 py-3 text-base text-slate-900 shadow-none outline-none ring-0 transition placeholder:text-slate-400 focus:border-[#662D91] focus:outline-none focus:ring-0 focus-visible:border-[#662D91] focus-visible:outline-none focus-visible:ring-0";
+
 const RELATED_TYPE_OPTIONS: { value: string; label: string }[] = [
   {
     value: "parent",
@@ -454,8 +458,14 @@ export default function FormWizardPage() {
     missing: Dv100PdfFillRow[];
   } | null>(null);
 
-  const { petitioner, respondent, setPetitioner, setRespondent } =
-    useFormStore();
+  const {
+    petitioner,
+    respondent,
+    respondentCLETS,
+    setPetitioner,
+    setRespondent,
+    setRespondentCLETS,
+  } = useFormStore();
 
   const [petitionerFullName, setPetitionerFullName] = useState(() =>
     personInfoToDisplayName(petitioner),
@@ -1022,6 +1032,63 @@ export default function FormWizardPage() {
                       className={inputClass}
                     />
                   </div>
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Does this person speak English?
+                    </legend>
+                    <div className="space-y-3">
+                      {(
+                        [
+                          { value: "yes" as const, label: "Yes" },
+                          { value: "no" as const, label: "No" },
+                          { value: "unknown" as const, label: "I don't know" },
+                        ] as const
+                      ).map(({ value, label }) => (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition"
+                        >
+                          <input
+                            type="radio"
+                            name="petitionerSpeaksEnglish"
+                            checked={petitioner.speaksEnglish === value}
+                            onChange={() =>
+                              setPetitioner({
+                                speaksEnglish: value,
+                                language:
+                                  value === "no" ? petitioner.language : "",
+                              })
+                            }
+                            className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            {label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  {petitioner.speaksEnglish === "no" && (
+                    <div>
+                      <label
+                        htmlFor="petitionerLanguage"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        What language?
+                      </label>
+                      <input
+                        id="petitionerLanguage"
+                        name="petitionerLanguage"
+                        type="text"
+                        autoComplete="language"
+                        value={petitioner.language}
+                        onChange={(e) =>
+                          setPetitioner({ language: e.target.value })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                  )}
                   <div
                     className="rounded-xl border border-amber-200/90 bg-amber-50/80 px-4 py-3 text-sm leading-relaxed text-amber-950"
                     role="note"
@@ -1385,6 +1452,299 @@ export default function FormWizardPage() {
                       className={inputClass}
                     />
                   </div>
+                  <fieldset className="space-y-4">
+                    <legend className="text-sm font-medium text-slate-800">
+                      Does this person speak English?
+                    </legend>
+                    <div className="space-y-3">
+                      {(
+                        [
+                          { value: "yes" as const, label: "Yes" },
+                          { value: "no" as const, label: "No" },
+                          { value: "unknown" as const, label: "I don't know" },
+                        ] as const
+                      ).map(({ value, label }) => (
+                        <label
+                          key={value}
+                          className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition"
+                        >
+                          <input
+                            type="radio"
+                            name="respondentSpeaksEnglish"
+                            checked={respondent.speaksEnglish === value}
+                            onChange={() =>
+                              setRespondent({
+                                speaksEnglish: value,
+                                language:
+                                  value === "no" ? respondent.language : "",
+                              })
+                            }
+                            className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
+                          />
+                          <span className="text-sm leading-relaxed text-slate-800">
+                            {label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  {respondent.speaksEnglish === "no" && (
+                    <div>
+                      <label
+                        htmlFor="respondentLanguage"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        What language?
+                      </label>
+                      <input
+                        id="respondentLanguage"
+                        name="respondentLanguage"
+                        type="text"
+                        autoComplete="language"
+                        value={respondent.language}
+                        onChange={(e) =>
+                          setRespondent({ language: e.target.value })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-6 border-t border-gray-200 pt-8">
+                    <div>
+                      <h2 className="text-sm font-semibold text-slate-900">
+                        Law enforcement identifying information
+                      </h2>
+                      <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                        Optional details that can help law enforcement identify
+                        the person causing harm. Skip anything you do not know
+                        or prefer not to share here.
+                      </p>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="cletsOtherNamesUsed"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        Other names used
+                      </label>
+                      <input
+                        id="cletsOtherNamesUsed"
+                        name="cletsOtherNamesUsed"
+                        type="text"
+                        autoComplete="off"
+                        value={respondentCLETS.otherNamesUsed}
+                        onChange={(e) =>
+                          setRespondentCLETS({
+                            otherNamesUsed: e.target.value,
+                          })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="cletsMarksScars"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        Marks, scars, or tattoos
+                      </label>
+                      <input
+                        id="cletsMarksScars"
+                        name="cletsMarksScars"
+                        type="text"
+                        autoComplete="off"
+                        value={respondentCLETS.marksScarsTattoos}
+                        onChange={(e) =>
+                          setRespondentCLETS({
+                            marksScarsTattoos: e.target.value,
+                          })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor="cletsDriversLicense"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Driver&apos;s license number
+                        </label>
+                        <input
+                          id="cletsDriversLicense"
+                          name="cletsDriversLicense"
+                          type="text"
+                          autoComplete="off"
+                          value={respondentCLETS.driversLicense}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              driversLicense: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="cletsDriversLicenseState"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          License state
+                        </label>
+                        <input
+                          id="cletsDriversLicenseState"
+                          name="cletsDriversLicenseState"
+                          type="text"
+                          autoComplete="off"
+                          value={respondentCLETS.driversLicenseState}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              driversLicenseState: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="cletsSsn"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        Social Security Number
+                      </label>
+                      <input
+                        id="cletsSsn"
+                        name="cletsSsn"
+                        type="text"
+                        autoComplete="off"
+                        inputMode="numeric"
+                        value={respondentCLETS.ssn}
+                        onChange={(e) =>
+                          setRespondentCLETS({ ssn: e.target.value })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="cletsEmployer"
+                        className="text-sm font-medium text-slate-800"
+                      >
+                        Name of employer and address
+                      </label>
+                      <input
+                        id="cletsEmployer"
+                        name="cletsEmployer"
+                        type="text"
+                        autoComplete="organization"
+                        value={respondentCLETS.employerNameAddress}
+                        onChange={(e) =>
+                          setRespondentCLETS({
+                            employerNameAddress: e.target.value,
+                          })
+                        }
+                        className={invoiceFieldInputClassName}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6 border-t border-gray-200 pt-8">
+                    <h2 className="text-sm font-semibold text-slate-900">
+                      Respondent vehicle
+                    </h2>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor="cletsVehicleType"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Vehicle type
+                        </label>
+                        <input
+                          id="cletsVehicleType"
+                          name="cletsVehicleType"
+                          type="text"
+                          autoComplete="off"
+                          value={respondentCLETS.vehicleType}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              vehicleType: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="cletsVehicleModel"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Model
+                        </label>
+                        <input
+                          id="cletsVehicleModel"
+                          name="cletsVehicleModel"
+                          type="text"
+                          autoComplete="off"
+                          value={respondentCLETS.vehicleModel}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              vehicleModel: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid gap-6 sm:grid-cols-2">
+                      <div>
+                        <label
+                          htmlFor="cletsVehicleYear"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Year
+                        </label>
+                        <input
+                          id="cletsVehicleYear"
+                          name="cletsVehicleYear"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="off"
+                          value={respondentCLETS.vehicleYear}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              vehicleYear: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                      <div>
+                        <label
+                          htmlFor="cletsVehiclePlate"
+                          className="text-sm font-medium text-slate-800"
+                        >
+                          Plate number
+                        </label>
+                        <input
+                          id="cletsVehiclePlate"
+                          name="cletsVehiclePlate"
+                          type="text"
+                          autoComplete="off"
+                          value={respondentCLETS.vehiclePlate}
+                          onChange={(e) =>
+                            setRespondentCLETS({
+                              vehiclePlate: e.target.value,
+                            })
+                          }
+                          className={invoiceFieldInputClassName}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <hr className="my-8 border-0 border-t border-purple-200/70" />
                   <fieldset className="space-y-4">
                     <legend className="text-sm font-medium text-slate-800">
