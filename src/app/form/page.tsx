@@ -20,6 +20,7 @@ import {
 import { generateCLETS001PDF, type Clets001PdfData } from "@/lib/clets001-pdf";
 import { generateDV109PDF, type Dv109PdfData } from "@/lib/dv109-pdf";
 import { generateDV110PDF, type Dv110PdfData } from "@/lib/dv110-pdf";
+import { submitEfile } from "@/lib/efile";
 
 import { useFormStore, type PersonInfo } from "@/store/useFormStore";
 
@@ -492,6 +493,10 @@ export default function FormWizardPage() {
     filled: Dv100PdfFillRow[];
     missing: Dv100PdfFillRow[];
   } | null>(null);
+  const [efileStatus, setEfileStatus] = useState<
+    "idle" | "confirming" | "sending" | "success" | "error"
+  >("idle");
+  const [efileError, setEfileError] = useState("");
 
   const {
     petitioner,
@@ -723,6 +728,95 @@ export default function FormWizardPage() {
       setPdfError(e instanceof Error ? e.message : String(e));
     } finally {
       setDv110PdfGenerating(false);
+    }
+  };
+
+  const handleEfile = async () => {
+    setEfileStatus("sending");
+    setEfileError("");
+    try {
+      const pdfPayload: FormData = {
+        ...form,
+        petitionerName: personInfoToDisplayName(petitioner),
+        petitionerAge: petitioner.age,
+        petitionerAddress: petitioner.address.street,
+        petitionerCity: petitioner.address.city,
+        petitionerState: petitioner.address.state,
+        petitionerZip: petitioner.address.zip,
+        petitionerPhone: petitioner.telephone,
+        petitionerEmail: petitioner.email,
+        respondentName: personInfoToDisplayName(respondent),
+        respondentAge: respondent.age,
+        respondentDob: respondent.dateOfBirth,
+        respondentGender: respondent.gender as Dv100GenderOption,
+        respondentRace: respondent.race,
+      };
+      const { bytes: dv100Bytes } = await generateDV100PDF(pdfPayload);
+
+      const cletsPayload: Clets001PdfData = {
+        petitioner,
+        respondent,
+        respondentCLETS,
+        protectOtherPeople: form.protectOtherPeople,
+        protectedPeople: form.protectedPeople,
+        hasFirearms: form.hasFirearms,
+        firearms: form.firearms,
+      };
+      const clets001Bytes = await generateCLETS001PDF(cletsPayload);
+
+      const dv109Payload: Dv109PdfData = {
+        protectedPersonName: personInfoToDisplayName(petitioner),
+        restrainedPersonName: personInfoToDisplayName(respondent),
+      };
+      const dv109Bytes = await generateDV109PDF(dv109Payload);
+
+      const dv110Payload: Dv110PdfData = {
+        protectedPersonName: personInfoToDisplayName(petitioner),
+        fullName: personInfoToDisplayName(respondent),
+        gender: respondent.gender,
+        race: respondent.race,
+        age: respondent.age,
+        dateOfBirth: respondent.dateOfBirth,
+        height: respondent.height,
+        weight: respondent.weight,
+        hairColor: respondent.hairColor,
+        eyeColor: respondent.eyeColor,
+        relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
+        address: respondent.address.street,
+        city: respondent.address.city,
+        state: respondent.address.state,
+        zip: respondent.address.zip,
+        protectedPeople: form.protectedPeople.map((p) => ({
+          name: p.name,
+          relationship: p.relationship,
+          age: p.age,
+        })),
+      };
+      const dv110Bytes = await generateDV110PDF(dv110Payload);
+
+      const petName = [petitioner.firstName, petitioner.middleName, petitioner.lastName]
+        .filter(Boolean)
+        .join(" ");
+
+      const result = await submitEfile({
+        petitionerName: petName,
+        dv100Bytes,
+        clets001Bytes,
+        dv109Bytes,
+        dv110Bytes,
+      });
+
+      if (result.success) {
+        setEfileStatus("success");
+      } else {
+        setEfileError(result.error ?? result.message ?? "Something went wrong");
+        setEfileStatus("error");
+      }
+    } catch {
+      setEfileError(
+        "Network error. Please check your connection and try again.",
+      );
+      setEfileStatus("error");
     }
   };
 
@@ -6671,24 +6765,19 @@ export default function FormWizardPage() {
               )}
             </div>
 
-            <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between sm:gap-4">
-              <button
-                type="button"
-                onClick={goBack}
-                disabled={!canGoBack}
-                className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Back
-              </button>
-              {isLastStep ? (
-                <div className="flex w-full flex-col gap-3 sm:ml-auto sm:w-auto sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+            {isLastStep ? (
+              <div className="mt-10 flex w-full flex-col gap-8">
+                <div className="flex w-full flex-col gap-3">
                   <button
                     type="button"
                     onClick={handleDownloadClets001}
                     disabled={
-                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                      cletsPdfGenerating ||
+                      dv109PdfGenerating ||
+                      dv110PdfGenerating ||
+                      efileStatus === "sending"
                     }
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
                   >
                     {cletsPdfGenerating ? "Preparing…" : "Download CLETS-001"}
                   </button>
@@ -6696,9 +6785,12 @@ export default function FormWizardPage() {
                     type="button"
                     onClick={handleDownloadDv109}
                     disabled={
-                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                      cletsPdfGenerating ||
+                      dv109PdfGenerating ||
+                      dv110PdfGenerating ||
+                      efileStatus === "sending"
                     }
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
                   >
                     {dv109PdfGenerating ? "Preparing…" : "Download DV-109"}
                   </button>
@@ -6706,9 +6798,12 @@ export default function FormWizardPage() {
                     type="button"
                     onClick={handleDownloadDv110}
                     disabled={
-                      cletsPdfGenerating || dv109PdfGenerating || dv110PdfGenerating
+                      cletsPdfGenerating ||
+                      dv109PdfGenerating ||
+                      dv110PdfGenerating ||
+                      efileStatus === "sending"
                     }
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-purple-900 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
                   >
                     {dv110PdfGenerating ? "Preparing…" : "Download DV-110"}
                   </button>
@@ -6719,14 +6814,180 @@ export default function FormWizardPage() {
                       pdfGenerating ||
                       cletsPdfGenerating ||
                       dv109PdfGenerating ||
-                      dv110PdfGenerating
+                      dv110PdfGenerating ||
+                      efileStatus === "sending"
                     }
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                    className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto sm:self-start"
                   >
                     {pdfGenerating ? "Generating…" : "Generate Forms"}
                   </button>
                 </div>
-              ) : (
+
+                <div className="w-full border-t border-gray-200 pt-8 sm:max-w-2xl">
+                    <h3 className="text-lg font-semibold text-[#662D91]">
+                      e-File with Court
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                      This sends your completed packet to{" "}
+                      <span className="font-medium text-slate-800">
+                        efile.lizbreakfree.org
+                      </span>{" "}
+                      for review and submission.{" "}
+                      <a
+                        href="https://efile.lizbreakfree.org/ca/"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-liz underline-offset-4 hover:text-purple-900 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                      >
+                        Open the e-filing portal
+                      </a>
+                      . No court filing fee for domestic violence restraining orders.
+                    </p>
+
+                    {efileStatus === "idle" && (
+                      <button
+                        type="button"
+                        onClick={() => setEfileStatus("confirming")}
+                        disabled={
+                          pdfGenerating ||
+                          cletsPdfGenerating ||
+                          dv109PdfGenerating ||
+                          dv110PdfGenerating
+                        }
+                        className="mt-4 inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        e-File with Court
+                      </button>
+                    )}
+
+                    {efileStatus === "confirming" && (
+                      <div className="mt-4 rounded-md border border-[#662D91]/20 bg-purple-50 p-4">
+                        <p className="text-sm leading-relaxed text-purple-950">
+                          We will send all four completed forms (DV-100, CLETS-001,
+                          DV-109, and DV-110) to the court e-filing service. You will
+                          receive an email with a link to review your filing before it
+                          is submitted.
+                        </p>
+                        <div className="mt-4 flex flex-wrap gap-3">
+                          <button
+                            type="button"
+                            onClick={handleEfile}
+                            className="inline-flex min-h-12 items-center justify-center rounded-xl bg-liz px-8 py-3 text-sm font-medium text-white shadow-md shadow-liz/25 transition hover:bg-purple-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                          >
+                            Confirm &amp; Send
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEfileStatus("idle");
+                              setEfileError("");
+                            }}
+                            className="inline-flex min-h-12 items-center justify-center rounded-xl border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {efileStatus === "sending" && (
+                      <div className="mt-4 flex items-center gap-3 text-sm font-medium text-[#662D91]">
+                        <svg
+                          className="size-8 shrink-0 animate-spin text-liz"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        <span>Sending filing packet to the court...</span>
+                      </div>
+                    )}
+
+                    {efileStatus === "success" && (
+                      <div className="mt-4 rounded-xl border border-green-200 bg-green-50 p-4">
+                        <p className="text-sm font-medium text-green-900">
+                          Filing packet sent successfully!
+                        </p>
+                        <p className="mt-2 text-sm leading-relaxed text-green-900/90">
+                          Check your email for the review link. You can also visit{" "}
+                          <a
+                            href="https://efile.lizbreakfree.org/ca/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-liz underline-offset-4 hover:text-purple-900 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                          >
+                            efile.lizbreakfree.org/ca/
+                          </a>{" "}
+                          anytime.
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEfileStatus("idle");
+                            setEfileError("");
+                          }}
+                          className="mt-3 text-sm font-medium text-liz underline-offset-4 hover:text-purple-900 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                        >
+                          Send again
+                        </button>
+                      </div>
+                    )}
+
+                    {efileStatus === "error" && (
+                      <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                        <p className="text-sm font-medium text-red-900">
+                          {efileError ||
+                            "Something went wrong. Please try again."}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEfileStatus("idle");
+                            setEfileError("");
+                          }}
+                          className="mt-3 text-sm font-medium text-liz underline-offset-4 hover:text-purple-900 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-liz"
+                        >
+                          Try again
+                        </button>
+                      </div>
+                    )}
+                </div>
+
+                <div className="border-t border-slate-200 pt-6">
+                  <button
+                    type="button"
+                    onClick={goBack}
+                    disabled={!canGoBack}
+                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Back
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-10 flex flex-col-reverse gap-3 sm:flex-row sm:justify-between sm:gap-4">
+                <button
+                  type="button"
+                  onClick={goBack}
+                  disabled={!canGoBack}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-purple-200 bg-white px-6 py-3 text-sm font-medium text-slate-800 shadow-sm transition hover:border-purple-300 hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Back
+                </button>
                 <button
                   type="button"
                   onClick={goNext}
@@ -6734,8 +6995,8 @@ export default function FormWizardPage() {
                 >
                   Next
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
