@@ -303,47 +303,6 @@ export default function FormWizardPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const resetMoveOutOrders = () =>
-    setForm((prev) => ({
-      ...prev,
-      orderToMoveOut: false,
-      moveOutOrderPersonAsk: "",
-      moveOutOwnHome: false,
-      moveOutNameOnLease: false,
-      moveOutWithChildren: false,
-      moveOutLivedFor: false,
-      moveOutLivedYears: "",
-      moveOutLivedMonths: "",
-      moveOutPaysRent: false,
-      moveOutOther: false,
-      moveOutOtherExplain: "",
-    }));
-
-  const resetProtectAnimals = () =>
-    setForm((prev) => ({
-      ...prev,
-      protectAnimals: false,
-      protectedAnimals: initialProtectedAnimals(),
-      protectAnimalsStayAway: false,
-      protectAnimalsStayAwayDistance: "",
-      protectAnimalsStayAwayOtherYards: "",
-      protectAnimalsNotTake: false,
-      protectAnimalsSolePossession: false,
-      protectAnimalsSoleReasonAbuse: false,
-      protectAnimalsSoleReasonCare: false,
-      protectAnimalsSoleReasonPurchased: false,
-      protectAnimalsSoleReasonOther: false,
-      protectAnimalsSoleReasonOtherExplain: "",
-    }));
-
-  const resetControlProperty = () =>
-    setForm((prev) => ({
-      ...prev,
-      controlProperty: false,
-      controlPropertyDescribe: "",
-      controlPropertyWhy: "",
-    }));
-
   const resetPayDebtsForProperty = () =>
     setForm((prev) => ({
       ...prev,
@@ -639,24 +598,15 @@ export default function FormWizardPage() {
 
               {step === 6 && (
                 <Step6_MoveOutCustody
-                  form={form}
-                  setForm={setForm}
-                  update={update}
                   inputClass={inputClass}
                   textareaClass={textareaClass}
-                  resetMoveOutOrders={resetMoveOutOrders}
                 />
               )}
 
               {step === 7 && (
                 <Step7_PropertyAnimals
-                  form={form}
-                  setForm={setForm}
-                  update={update}
                   inputClass={inputClass}
                   textareaClass={textareaClass}
-                  resetProtectAnimals={resetProtectAnimals}
-                  resetControlProperty={resetControlProperty}
                 />
               )}
 

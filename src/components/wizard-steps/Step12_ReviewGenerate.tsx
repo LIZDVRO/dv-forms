@@ -5,7 +5,10 @@ import Link from "next/link";
 import {
   getAbuseIncidentsPdfFieldsFromFormStore,
   getCourtHistoryPdfFieldsFromFormStore,
+  getCustodyOrdersPdfFieldsFromFormStore,
   getFirearmsPdfFieldsFromFormStore,
+  getMoveOutPdfFieldsFromFormStore,
+  getPropertyAnimalsPdfFieldsFromFormStore,
   getProtectionOrdersPdfFieldsFromFormStore,
   getRelationshipPdfFieldsFromFormStore,
 } from "@/lib/dv100-pdf";
@@ -77,6 +80,9 @@ export default function Step12_ReviewGenerate({
   const gunsR = getFirearmsPdfFieldsFromFormStore();
   const chPdf = getCourtHistoryPdfFieldsFromFormStore();
   const poPdf = getProtectionOrdersPdfFieldsFromFormStore();
+  const moveOutPdf = getMoveOutPdfFieldsFromFormStore();
+  const custodyPdf = getCustodyOrdersPdfFieldsFromFormStore();
+  const propertyAnimalsPdf = getPropertyAnimalsPdfFieldsFromFormStore();
 
   return (
     <div className="space-y-8">
@@ -698,43 +704,43 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-2 text-slate-800">
             <p>
               <span className="text-slate-500">Order to move out:</span>{" "}
-              {form.orderToMoveOut ? "Yes" : "No"}
+              {moveOutPdf.orderToMoveOut ? "Yes" : "No"}
             </p>
-            {form.orderToMoveOut ? (
+            {moveOutPdf.orderToMoveOut ? (
               <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
                 <p>
                   <span className="text-slate-500">13a:</span>{" "}
-                  {display(form.moveOutOrderPersonAsk)}
+                  {display(moveOutPdf.moveOutOrderPersonAsk)}
                 </p>
                 <p>
                   <span className="text-slate-500">13b:</span>{" "}
                   {(() => {
                     const parts: string[] = [];
-                    if (form.moveOutOwnHome) parts.push("I own the home");
-                    if (form.moveOutNameOnLease) {
+                    if (moveOutPdf.moveOutOwnHome) parts.push("I own the home");
+                    if (moveOutPdf.moveOutNameOnLease) {
                       parts.push("My name is on the lease");
                     }
-                    if (form.moveOutWithChildren) {
+                    if (moveOutPdf.moveOutWithChildren) {
                       parts.push("I live at this address with my children");
                     }
-                    if (form.moveOutLivedFor) {
-                      const y = form.moveOutLivedYears.trim();
-                      const m = form.moveOutLivedMonths.trim();
+                    if (moveOutPdf.moveOutLivedFor) {
+                      const y = moveOutPdf.moveOutLivedYears.trim();
+                      const m = moveOutPdf.moveOutLivedMonths.trim();
                       const dur =
                         y || m
                           ? `I have lived at this address for (${y || "—"} yr, ${m || "—"} mo)`
                           : "I have lived at this address for";
                       parts.push(dur);
                     }
-                    if (form.moveOutPaysRent) {
+                    if (moveOutPdf.moveOutPaysRent) {
                       parts.push(
                         "I pay for some or all of the rent or mortgage",
                       );
                     }
-                    if (form.moveOutOther) {
+                    if (moveOutPdf.moveOutOther) {
                       parts.push(
-                        form.moveOutOtherExplain.trim()
-                          ? `Other (${form.moveOutOtherExplain.trim()})`
+                        moveOutPdf.moveOutOtherExplain.trim()
+                          ? `Other (${moveOutPdf.moveOutOtherExplain.trim()})`
                           : "Other (please explain)",
                       );
                     }
@@ -745,19 +751,21 @@ export default function Step12_ReviewGenerate({
             ) : null}
             <p>
               <span className="text-slate-500">Other orders:</span>{" "}
-              {form.otherOrders ? "Yes" : "No"}
+              {moveOutPdf.otherOrders ? "Yes" : "No"}
             </p>
-            {form.otherOrders && (
+            {moveOutPdf.otherOrders && (
               <p>
                 <span className="text-slate-500">14. Describe:</span>{" "}
-                {display(form.otherOrdersDescribe)}
+                {display(moveOutPdf.otherOrdersDescribe)}
               </p>
             )}
             <p>
               <span className="text-slate-500">
                 Child custody and visitation:
               </span>{" "}
-              {form.childCustodyVisitation ? "Yes (complete DV-105)" : "No"}
+              {custodyPdf.childCustodyVisitation
+                ? "Yes (complete DV-105)"
+                : "No"}
             </p>
           </dd>
         </div>
@@ -768,11 +776,11 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-2 text-slate-800">
             <p>
               <span className="text-slate-500">Protect animals:</span>{" "}
-              {form.protectAnimals ? "Yes" : "No"}
+              {propertyAnimalsPdf.protectAnimals ? "Yes" : "No"}
             </p>
-            {form.protectAnimals ? (
+            {propertyAnimalsPdf.protectAnimals ? (
               <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
-                {form.protectedAnimals.map((a, i) => (
+                {propertyAnimalsPdf.protectedAnimals.map((a, i) => (
                   <p key={`ra-${i}`}>
                     <span className="text-slate-500">Animal {i + 1}:</span>{" "}
                     {display(a.name)} / {display(a.type)} / {display(a.breed)} /{" "}
@@ -783,12 +791,14 @@ export default function Step12_ReviewGenerate({
                   <span className="text-slate-500">
                     Stay away from animals:
                   </span>{" "}
-                  {form.protectAnimalsStayAway
-                    ? form.protectAnimalsStayAwayDistance === "hundred"
+                  {propertyAnimalsPdf.protectAnimalsStayAway
+                    ? propertyAnimalsPdf.protectAnimalsStayAwayDistance ===
+                        "hundred"
                       ? "100 yards (300 feet)"
-                      : form.protectAnimalsStayAwayDistance === "other"
-                        ? form.protectAnimalsStayAwayOtherYards.trim()
-                          ? `${form.protectAnimalsStayAwayOtherYards.trim()} yards`
+                      : propertyAnimalsPdf.protectAnimalsStayAwayDistance ===
+                          "other"
+                        ? propertyAnimalsPdf.protectAnimalsStayAwayOtherYards.trim()
+                          ? `${propertyAnimalsPdf.protectAnimalsStayAwayOtherYards.trim()} yards`
                           : "Other (yards not specified)"
                         : "—"
                     : "No"}
@@ -797,32 +807,34 @@ export default function Step12_ReviewGenerate({
                   <span className="text-slate-500">
                     Not take / harm animals:
                   </span>{" "}
-                  {form.protectAnimalsNotTake ? "Yes" : "No"}
+                  {propertyAnimalsPdf.protectAnimalsNotTake ? "Yes" : "No"}
                 </p>
                 <p>
                   <span className="text-slate-500">
                     Sole possession of animals:
                   </span>{" "}
-                  {form.protectAnimalsSolePossession ? "Yes" : "No"}
+                  {propertyAnimalsPdf.protectAnimalsSolePossession
+                    ? "Yes"
+                    : "No"}
                 </p>
-                {form.protectAnimalsSolePossession ? (
+                {propertyAnimalsPdf.protectAnimalsSolePossession ? (
                   <p>
                     <span className="text-slate-500">Reasons:</span>{" "}
                     {(() => {
                       const parts: string[] = [];
-                      if (form.protectAnimalsSoleReasonAbuse) {
+                      if (propertyAnimalsPdf.protectAnimalsSoleReasonAbuse) {
                         parts.push("Person in 2 abuses the animals");
                       }
-                      if (form.protectAnimalsSoleReasonCare) {
+                      if (propertyAnimalsPdf.protectAnimalsSoleReasonCare) {
                         parts.push("I take care of these animals");
                       }
-                      if (form.protectAnimalsSoleReasonPurchased) {
+                      if (propertyAnimalsPdf.protectAnimalsSoleReasonPurchased) {
                         parts.push("I purchased these animals");
                       }
-                      if (form.protectAnimalsSoleReasonOther) {
+                      if (propertyAnimalsPdf.protectAnimalsSoleReasonOther) {
                         parts.push(
-                          form.protectAnimalsSoleReasonOtherExplain.trim()
-                            ? `Other (${form.protectAnimalsSoleReasonOtherExplain.trim()})`
+                          propertyAnimalsPdf.protectAnimalsSoleReasonOtherExplain.trim()
+                            ? `Other (${propertyAnimalsPdf.protectAnimalsSoleReasonOtherExplain.trim()})`
                             : "Other",
                         );
                       }
@@ -834,17 +846,17 @@ export default function Step12_ReviewGenerate({
             ) : null}
             <p>
               <span className="text-slate-500">Control of property:</span>{" "}
-              {form.controlProperty ? "Yes" : "No"}
+              {propertyAnimalsPdf.controlProperty ? "Yes" : "No"}
             </p>
-            {form.controlProperty ? (
+            {propertyAnimalsPdf.controlProperty ? (
               <>
                 <p>
                   <span className="text-slate-500">17a:</span>{" "}
-                  {display(form.controlPropertyDescribe)}
+                  {display(propertyAnimalsPdf.controlPropertyDescribe)}
                 </p>
                 <p>
                   <span className="text-slate-500">17b:</span>{" "}
-                  {display(form.controlPropertyWhy)}
+                  {display(propertyAnimalsPdf.controlPropertyWhy)}
                 </p>
               </>
             ) : null}
@@ -852,11 +864,11 @@ export default function Step12_ReviewGenerate({
               <span className="text-slate-500">
                 Health and other insurance:
               </span>{" "}
-              {form.healthOtherInsurance ? "Yes" : "No"}
+              {propertyAnimalsPdf.healthOtherInsurance ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">Record communications:</span>{" "}
-              {form.recordCommunications ? "Yes" : "No"}
+              {propertyAnimalsPdf.recordCommunications ? "Yes" : "No"}
             </p>
           </dd>
         </div>

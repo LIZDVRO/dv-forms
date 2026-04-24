@@ -1,30 +1,58 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
-
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
-
-type FormData = Dv100PdfFormData;
+import { useFormStore } from "@/store/useFormStore";
 
 type Step7Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   inputClass: string;
   textareaClass: string;
-  resetProtectAnimals: () => void;
-  resetControlProperty: () => void;
 };
 
+const emptyAnimals = () => [
+  { name: "", type: "", breed: "", color: "" },
+  { name: "", type: "", breed: "", color: "" },
+  { name: "", type: "", breed: "", color: "" },
+  { name: "", type: "", breed: "", color: "" },
+];
+
+const emptySoleReasons = () => ({
+  respondentAbuses: false,
+  iCareForThem: false,
+  iPurchasedThem: false,
+  other: false,
+  otherDescription: "",
+});
+
 export default function Step7_PropertyAnimals({
-  form,
-  setForm,
-  update,
   inputClass,
   textareaClass,
-  resetProtectAnimals,
-  resetControlProperty,
 }: Step7Props) {
+  const pa = useFormStore((s) => s.propertyAnimals);
+  const setPropertyAnimals = useFormStore((s) => s.setPropertyAnimals);
+  const reasons = pa.animalSolePossessionReasons;
+
+  const resetAnimalProtection = () => {
+    setPropertyAnimals({
+      wantsAnimalProtection: false,
+      animals: emptyAnimals(),
+      animalStayAwayDistance: "",
+      animalStayAwayDistanceOther: "",
+      animalNoHarm: false,
+      animalSolePossession: false,
+      animalSolePossessionReasons: emptySoleReasons(),
+    });
+  };
+
+  const resetPropertyControl = () => {
+    setPropertyAnimals({
+      wantsPropertyControl: false,
+      propertyDescription: "",
+      propertyWhyControl: "",
+    });
+  };
+
+  const stayAwayActive =
+    pa.animalStayAwayDistance === "100" || pa.animalStayAwayDistance === "other";
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -34,12 +62,12 @@ export default function Step7_PropertyAnimals({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.protectAnimals}
+            checked={pa.wantsAnimalProtection}
             onChange={(e) => {
               if (e.target.checked) {
-                update("protectAnimals", true);
+                setPropertyAnimals({ wantsAnimalProtection: true });
               } else {
-                resetProtectAnimals();
+                resetAnimalProtection();
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -47,12 +75,12 @@ export default function Step7_PropertyAnimals({
           <span className="text-sm font-medium text-slate-800">Protect Animals</span>
         </label>
 
-        {form.protectAnimals && (
+        {pa.wantsAnimalProtection && (
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-medium text-slate-800">Animals (up to four)</h3>
               <div className="mt-3 space-y-4">
-                {form.protectedAnimals.map((animal, idx) => (
+                {pa.animals.map((animal, idx) => (
                   <div
                     key={`animal-${idx}`}
                     className="rounded-xl border border-purple-100/80 bg-white p-4 shadow-sm"
@@ -73,13 +101,11 @@ export default function Step7_PropertyAnimals({
                           type="text"
                           autoComplete="off"
                           value={animal.name}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              const next = [...prev.protectedAnimals];
-                              next[idx] = { ...next[idx], name: e.target.value };
-                              return { ...prev, protectedAnimals: next };
-                            })
-                          }
+                          onChange={(e) => {
+                            const next = [...pa.animals];
+                            next[idx] = { ...next[idx], name: e.target.value };
+                            setPropertyAnimals({ animals: next });
+                          }}
                           className={inputClass}
                         />
                       </div>
@@ -95,13 +121,11 @@ export default function Step7_PropertyAnimals({
                           type="text"
                           autoComplete="off"
                           value={animal.type}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              const next = [...prev.protectedAnimals];
-                              next[idx] = { ...next[idx], type: e.target.value };
-                              return { ...prev, protectedAnimals: next };
-                            })
-                          }
+                          onChange={(e) => {
+                            const next = [...pa.animals];
+                            next[idx] = { ...next[idx], type: e.target.value };
+                            setPropertyAnimals({ animals: next });
+                          }}
                           className={inputClass}
                         />
                       </div>
@@ -117,13 +141,11 @@ export default function Step7_PropertyAnimals({
                           type="text"
                           autoComplete="off"
                           value={animal.breed}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              const next = [...prev.protectedAnimals];
-                              next[idx] = { ...next[idx], breed: e.target.value };
-                              return { ...prev, protectedAnimals: next };
-                            })
-                          }
+                          onChange={(e) => {
+                            const next = [...pa.animals];
+                            next[idx] = { ...next[idx], breed: e.target.value };
+                            setPropertyAnimals({ animals: next });
+                          }}
                           className={inputClass}
                         />
                       </div>
@@ -139,13 +161,11 @@ export default function Step7_PropertyAnimals({
                           type="text"
                           autoComplete="off"
                           value={animal.color}
-                          onChange={(e) =>
-                            setForm((prev) => {
-                              const next = [...prev.protectedAnimals];
-                              next[idx] = { ...next[idx], color: e.target.value };
-                              return { ...prev, protectedAnimals: next };
-                            })
-                          }
+                          onChange={(e) => {
+                            const next = [...pa.animals];
+                            next[idx] = { ...next[idx], color: e.target.value };
+                            setPropertyAnimals({ animals: next });
+                          }}
                           className={inputClass}
                         />
                       </div>
@@ -162,19 +182,17 @@ export default function Step7_PropertyAnimals({
               <label className="flex cursor-pointer items-start gap-3 py-2.5 pr-2 pl-0.5 transition">
                 <input
                   type="checkbox"
-                  checked={form.protectAnimalsStayAway}
+                  checked={stayAwayActive}
                   onChange={(e) => {
                     const on = e.target.checked;
-                    setForm((prev) => ({
-                      ...prev,
-                      protectAnimalsStayAway: on,
-                      ...(!on
-                        ? {
-                            protectAnimalsStayAwayDistance: "",
-                            protectAnimalsStayAwayOtherYards: "",
-                          }
-                        : {}),
-                    }));
+                    if (!on) {
+                      setPropertyAnimals({
+                        animalStayAwayDistance: "",
+                        animalStayAwayDistanceOther: "",
+                      });
+                    } else {
+                      setPropertyAnimals({ animalStayAwayDistance: "100" });
+                    }
                   }}
                   className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
@@ -182,22 +200,19 @@ export default function Step7_PropertyAnimals({
                   Stay away from animals by at least
                 </span>
               </label>
-              {form.protectAnimalsStayAway && (
+              {stayAwayActive && (
                 <div className="ml-7 space-y-3 border-l-2 border-purple-200/80 pl-4">
                   <div className="flex flex-col gap-2">
                     <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                       <input
                         type="radio"
-                        name="protectAnimalsStayAwayDistance"
-                        checked={
-                          form.protectAnimalsStayAwayDistance === "hundred"
-                        }
+                        name="animalStayAwayDistance"
+                        checked={pa.animalStayAwayDistance === "100"}
                         onChange={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            protectAnimalsStayAwayDistance: "hundred",
-                            protectAnimalsStayAwayOtherYards: "",
-                          }))
+                          setPropertyAnimals({
+                            animalStayAwayDistance: "100",
+                            animalStayAwayDistanceOther: "",
+                          })
                         }
                         className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                       />
@@ -206,38 +221,36 @@ export default function Step7_PropertyAnimals({
                     <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                       <input
                         type="radio"
-                        name="protectAnimalsStayAwayDistance"
-                        checked={form.protectAnimalsStayAwayDistance === "other"}
+                        name="animalStayAwayDistance"
+                        checked={pa.animalStayAwayDistance === "other"}
                         onChange={() =>
-                          setForm((prev) => ({
-                            ...prev,
-                            protectAnimalsStayAwayDistance: "other",
-                          }))
+                          setPropertyAnimals({
+                            animalStayAwayDistance: "other",
+                          })
                         }
                         className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                       />
                       Other (yards)
                     </label>
                   </div>
-                  {form.protectAnimalsStayAwayDistance === "other" && (
+                  {pa.animalStayAwayDistance === "other" && (
                     <div>
                       <label
-                        htmlFor="protectAnimalsStayAwayOtherYards"
+                        htmlFor="animalStayAwayDistanceOther"
                         className="text-sm font-medium text-slate-800"
                       >
                         Number of yards
                       </label>
                       <input
-                        id="protectAnimalsStayAwayOtherYards"
+                        id="animalStayAwayDistanceOther"
                         type="text"
                         inputMode="numeric"
                         autoComplete="off"
-                        value={form.protectAnimalsStayAwayOtherYards}
+                        value={pa.animalStayAwayDistanceOther}
                         onChange={(e) =>
-                          update(
-                            "protectAnimalsStayAwayOtherYards",
-                            e.target.value,
-                          )
+                          setPropertyAnimals({
+                            animalStayAwayDistanceOther: e.target.value,
+                          })
                         }
                         className={inputClass}
                       />
@@ -249,9 +262,9 @@ export default function Step7_PropertyAnimals({
               <label className="flex cursor-pointer items-start gap-3 py-2.5 pr-2 pl-0.5 transition">
                 <input
                   type="checkbox"
-                  checked={form.protectAnimalsNotTake}
+                  checked={pa.animalNoHarm}
                   onChange={(e) =>
-                    update("protectAnimalsNotTake", e.target.checked)
+                    setPropertyAnimals({ animalNoHarm: e.target.checked })
                   }
                   className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
@@ -265,22 +278,17 @@ export default function Step7_PropertyAnimals({
               <label className="flex cursor-pointer items-start gap-3 py-2.5 pr-2 pl-0.5 transition">
                 <input
                   type="checkbox"
-                  checked={form.protectAnimalsSolePossession}
+                  checked={pa.animalSolePossession}
                   onChange={(e) => {
                     const on = e.target.checked;
-                    setForm((prev) => ({
-                      ...prev,
-                      protectAnimalsSolePossession: on,
-                      ...(!on
-                        ? {
-                            protectAnimalsSoleReasonAbuse: false,
-                            protectAnimalsSoleReasonCare: false,
-                            protectAnimalsSoleReasonPurchased: false,
-                            protectAnimalsSoleReasonOther: false,
-                            protectAnimalsSoleReasonOtherExplain: "",
-                          }
-                        : {}),
-                    }));
+                    if (!on) {
+                      setPropertyAnimals({
+                        animalSolePossession: false,
+                        animalSolePossessionReasons: emptySoleReasons(),
+                      });
+                    } else {
+                      setPropertyAnimals({ animalSolePossession: true });
+                    }
                   }}
                   className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
@@ -288,20 +296,20 @@ export default function Step7_PropertyAnimals({
                   Give me sole possession, care, and control of the animals
                 </span>
               </label>
-              {form.protectAnimalsSolePossession && (
+              {pa.animalSolePossession && (
                 <div className="ml-7 space-y-2 border-l-2 border-purple-200/80 pl-4">
                   {(
                     [
                       {
-                        key: "protectAnimalsSoleReasonAbuse" as const,
+                        key: "respondentAbuses" as const,
                         label: "Person in item 2 abuses the animals",
                       },
                       {
-                        key: "protectAnimalsSoleReasonCare" as const,
+                        key: "iCareForThem" as const,
                         label: "I take care of these animals",
                       },
                       {
-                        key: "protectAnimalsSoleReasonPurchased" as const,
+                        key: "iPurchasedThem" as const,
                         label: "I purchased these animals",
                       },
                     ] as const
@@ -312,8 +320,15 @@ export default function Step7_PropertyAnimals({
                     >
                       <input
                         type="checkbox"
-                        checked={Boolean(form[key])}
-                        onChange={(e) => update(key, e.target.checked)}
+                        checked={Boolean(reasons[key])}
+                        onChange={(e) =>
+                          setPropertyAnimals({
+                            animalSolePossessionReasons: {
+                              ...reasons,
+                              [key]: e.target.checked,
+                            },
+                          })
+                        }
                         className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                       />
                       <span className="text-sm text-slate-800">{label}</span>
@@ -322,30 +337,32 @@ export default function Step7_PropertyAnimals({
                   <label className="flex cursor-pointer items-start gap-3 py-1.5 pr-1">
                     <input
                       type="checkbox"
-                      checked={form.protectAnimalsSoleReasonOther}
+                      checked={reasons.other}
                       onChange={(e) => {
                         const on = e.target.checked;
-                        setForm((prev) => ({
-                          ...prev,
-                          protectAnimalsSoleReasonOther: on,
-                          ...(!on
-                            ? { protectAnimalsSoleReasonOtherExplain: "" }
-                            : {}),
-                        }));
+                        setPropertyAnimals({
+                          animalSolePossessionReasons: {
+                            ...reasons,
+                            other: on,
+                            ...(!on ? { otherDescription: "" } : {}),
+                          },
+                        });
                       }}
                       className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                     />
                     <span className="text-sm text-slate-800">Other</span>
                   </label>
-                  {form.protectAnimalsSoleReasonOther && (
+                  {reasons.other && (
                     <textarea
                       autoComplete="off"
-                      value={form.protectAnimalsSoleReasonOtherExplain}
+                      value={reasons.otherDescription}
                       onChange={(e) =>
-                        update(
-                          "protectAnimalsSoleReasonOtherExplain",
-                          e.target.value,
-                        )
+                        setPropertyAnimals({
+                          animalSolePossessionReasons: {
+                            ...reasons,
+                            otherDescription: e.target.value,
+                          },
+                        })
                       }
                       className={textareaClass}
                     />
@@ -364,49 +381,51 @@ export default function Step7_PropertyAnimals({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.controlProperty}
+            checked={pa.wantsPropertyControl}
             onChange={(e) => {
               if (e.target.checked) {
-                update("controlProperty", true);
+                setPropertyAnimals({ wantsPropertyControl: true });
               } else {
-                resetControlProperty();
+                resetPropertyControl();
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
           <span className="text-sm font-medium text-slate-800">Control of Property</span>
         </label>
-        {form.controlProperty && (
+        {pa.wantsPropertyControl && (
           <div className="space-y-4">
             <div>
               <label
-                htmlFor="controlPropertyDescribe"
+                htmlFor="propertyDescription"
                 className="text-sm font-medium text-slate-800"
               >
                 17a. Describe the property
               </label>
               <textarea
-                id="controlPropertyDescribe"
+                id="propertyDescription"
                 autoComplete="off"
-                value={form.controlPropertyDescribe}
+                value={pa.propertyDescription}
                 onChange={(e) =>
-                  update("controlPropertyDescribe", e.target.value)
+                  setPropertyAnimals({ propertyDescription: e.target.value })
                 }
                 className={textareaClass}
               />
             </div>
             <div>
               <label
-                htmlFor="controlPropertyWhy"
+                htmlFor="propertyWhyControl"
                 className="text-sm font-medium text-slate-800"
               >
                 17b. Explain why you want control
               </label>
               <textarea
-                id="controlPropertyWhy"
+                id="propertyWhyControl"
                 autoComplete="off"
-                value={form.controlPropertyWhy}
-                onChange={(e) => update("controlPropertyWhy", e.target.value)}
+                value={pa.propertyWhyControl}
+                onChange={(e) =>
+                  setPropertyAnimals({ propertyWhyControl: e.target.value })
+                }
                 className={textareaClass}
               />
             </div>
@@ -421,9 +440,9 @@ export default function Step7_PropertyAnimals({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.healthOtherInsurance}
+            checked={pa.wantsInsuranceOrder}
             onChange={(e) =>
-              update("healthOtherInsurance", e.target.checked)
+              setPropertyAnimals({ wantsInsuranceOrder: e.target.checked })
             }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
@@ -440,9 +459,11 @@ export default function Step7_PropertyAnimals({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.recordCommunications}
+            checked={pa.wantsRecordCommunications}
             onChange={(e) =>
-              update("recordCommunications", e.target.checked)
+              setPropertyAnimals({
+                wantsRecordCommunications: e.target.checked,
+              })
             }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />

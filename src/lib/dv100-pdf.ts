@@ -260,6 +260,8 @@ export type Dv100PdfFormData = {
   otherOrdersDescribe: string;
   /** Section 15 — checkbox only; DV-105 is separate */
   childCustodyVisitation: boolean;
+  /** Section 15 — reserved for DV-105 / future PDF fields */
+  childCustodyVisitationReason?: string;
   /** Section 16 — Protect Animals (DV-100 Page 9) */
   protectAnimals: boolean;
   protectedAnimals: Dv100ProtectedAnimal[];
@@ -1376,6 +1378,119 @@ export function getAbuseIncidentsPdfFieldsFromFormStore(): Pick<
  * Human-readable “relationship to restrained person” for DV-110, same ordering as
  * the former `form.relationshipChecks` mapping.
  */
+/**
+ * Sections 13–14 — move-out and other orders, from Zustand `moveOut`.
+ */
+export function getMoveOutPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "orderToMoveOut"
+  | "moveOutOrderPersonAsk"
+  | "moveOutOwnHome"
+  | "moveOutNameOnLease"
+  | "moveOutWithChildren"
+  | "moveOutLivedFor"
+  | "moveOutLivedYears"
+  | "moveOutLivedMonths"
+  | "moveOutPaysRent"
+  | "moveOutOther"
+  | "moveOutOtherExplain"
+  | "otherOrders"
+  | "otherOrdersDescribe"
+> {
+  const m = useFormStore.getState().moveOut;
+  const rl = m.rightToLive;
+  const lived =
+    rl.yearsAtAddress.trim().length > 0 || rl.monthsAtAddress.trim().length > 0;
+  const oo = m.otherOrders.trim();
+  return {
+    orderToMoveOut: m.wantsMoveOut,
+    moveOutOrderPersonAsk: m.moveOutAddress,
+    moveOutOwnHome: rl.ownHome,
+    moveOutNameOnLease: rl.nameOnLease,
+    moveOutWithChildren: rl.liveWithChildren,
+    moveOutLivedFor: lived,
+    moveOutLivedYears: rl.yearsAtAddress,
+    moveOutLivedMonths: rl.monthsAtAddress,
+    moveOutPaysRent: rl.payRentOrMortgage,
+    moveOutOther: rl.other,
+    moveOutOtherExplain: rl.otherDescription,
+    otherOrders: oo.length > 0,
+    otherOrdersDescribe: m.otherOrders,
+  };
+}
+
+/**
+ * Section 15 — custody / visitation request flag from Zustand `custodyOrders`
+ * (full DV-105 mapping comes later).
+ */
+export function getCustodyOrdersPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  "childCustodyVisitation" | "childCustodyVisitationReason"
+> {
+  const c = useFormStore.getState().custodyOrders;
+  const yes = c.wantsCustodyOrders === "yes";
+  return {
+    childCustodyVisitation: yes,
+    childCustodyVisitationReason: yes ? "" : "",
+  };
+}
+
+/**
+ * Sections 16–19 — animals, property, insurance, recordings from Zustand `propertyAnimals`.
+ */
+export function getPropertyAnimalsPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "protectAnimals"
+  | "protectedAnimals"
+  | "protectAnimalsStayAway"
+  | "protectAnimalsStayAwayDistance"
+  | "protectAnimalsStayAwayOtherYards"
+  | "protectAnimalsNotTake"
+  | "protectAnimalsSolePossession"
+  | "protectAnimalsSoleReasonAbuse"
+  | "protectAnimalsSoleReasonCare"
+  | "protectAnimalsSoleReasonPurchased"
+  | "protectAnimalsSoleReasonOther"
+  | "protectAnimalsSoleReasonOtherExplain"
+  | "controlProperty"
+  | "controlPropertyDescribe"
+  | "controlPropertyWhy"
+  | "healthOtherInsurance"
+  | "recordCommunications"
+> {
+  const p = useFormStore.getState().propertyAnimals;
+  const reasons = p.animalSolePossessionReasons;
+  const dist = p.animalStayAwayDistance;
+  const stayAway =
+    p.wantsAnimalProtection && (dist === "100" || dist === "other");
+  const pdfDist: Dv100PdfFormData["protectAnimalsStayAwayDistance"] =
+    dist === "100" ? "hundred" : dist === "other" ? "other" : "";
+  return {
+    protectAnimals: p.wantsAnimalProtection,
+    protectedAnimals: p.animals.map((a) => ({
+      name: a.name,
+      type: a.type,
+      breed: a.breed,
+      color: a.color,
+    })),
+    protectAnimalsStayAway: stayAway,
+    protectAnimalsStayAwayDistance: pdfDist,
+    protectAnimalsStayAwayOtherYards: p.animalStayAwayDistanceOther,
+    protectAnimalsNotTake: p.animalNoHarm,
+    protectAnimalsSolePossession: p.animalSolePossession,
+    protectAnimalsSoleReasonAbuse: reasons.respondentAbuses,
+    protectAnimalsSoleReasonCare: reasons.iCareForThem,
+    protectAnimalsSoleReasonPurchased: reasons.iPurchasedThem,
+    protectAnimalsSoleReasonOther: reasons.other,
+    protectAnimalsSoleReasonOtherExplain: reasons.otherDescription,
+    controlProperty: p.wantsPropertyControl,
+    controlPropertyDescribe: p.propertyDescription,
+    controlPropertyWhy: p.propertyWhyControl,
+    healthOtherInsurance: p.wantsInsuranceOrder,
+    recordCommunications: p.wantsRecordCommunications,
+  };
+}
+
 export function getDv110RelationshipLabelFromFormStore(): string {
   const r = useFormStore.getState().relationship;
   const out: string[] = [];
@@ -1402,6 +1517,9 @@ export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<Gene
     ...getAbuseIncidentsPdfFieldsFromFormStore(),
     ...getCourtHistoryPdfFieldsFromFormStore(),
     ...getProtectionOrdersPdfFieldsFromFormStore(),
+    ...getMoveOutPdfFieldsFromFormStore(),
+    ...getCustodyOrdersPdfFieldsFromFormStore(),
+    ...getPropertyAnimalsPdfFieldsFromFormStore(),
   };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();

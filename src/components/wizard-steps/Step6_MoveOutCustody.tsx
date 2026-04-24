@@ -1,8 +1,6 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
-
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
+import { useFormStore } from "@/store/useFormStore";
 
 import {
   MOVE_OUT_13A_MAX_LENGTH,
@@ -11,25 +9,39 @@ import {
   OTHER_ORDERS_14_MAX_LENGTH,
 } from "./wizardShared";
 
-type FormData = Dv100PdfFormData;
-
 type Step6Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   inputClass: string;
   textareaClass: string;
-  resetMoveOutOrders: () => void;
 };
 
 export default function Step6_MoveOutCustody({
-  form,
-  setForm,
-  update,
   inputClass,
   textareaClass,
-  resetMoveOutOrders,
 }: Step6Props) {
+  const moveOut = useFormStore((s) => s.moveOut);
+  const setMoveOut = useFormStore((s) => s.setMoveOut);
+  const wantsCustodyOrders = useFormStore((s) => s.custodyOrders.wantsCustodyOrders);
+  const setCustodyOrders = useFormStore((s) => s.setCustodyOrders);
+
+  const rl = moveOut.rightToLive;
+
+  const resetMoveOutFields = () => {
+    setMoveOut({
+      wantsMoveOut: false,
+      moveOutAddress: "",
+      rightToLive: {
+        ownHome: false,
+        nameOnLease: false,
+        payRentOrMortgage: false,
+        liveWithChildren: false,
+        yearsAtAddress: "",
+        monthsAtAddress: "",
+        other: false,
+        otherDescription: "",
+      },
+    });
+  };
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -39,12 +51,12 @@ export default function Step6_MoveOutCustody({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.orderToMoveOut}
+            checked={moveOut.wantsMoveOut}
             onChange={(e) => {
               if (e.target.checked) {
-                update("orderToMoveOut", true);
+                setMoveOut({ wantsMoveOut: true });
               } else {
-                resetMoveOutOrders();
+                resetMoveOutFields();
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -52,7 +64,7 @@ export default function Step6_MoveOutCustody({
           <span className="text-sm font-medium text-slate-800">Order to Move Out</span>
         </label>
 
-        {form.orderToMoveOut && (
+        {moveOut.wantsMoveOut && (
           <div className="space-y-6">
             <div>
               <label
@@ -67,14 +79,12 @@ export default function Step6_MoveOutCustody({
                 type="text"
                 autoComplete="off"
                 maxLength={MOVE_OUT_13A_MAX_LENGTH}
-                value={form.moveOutOrderPersonAsk}
-                onChange={(e) =>
-                  update("moveOutOrderPersonAsk", e.target.value)
-                }
+                value={moveOut.moveOutAddress}
+                onChange={(e) => setMoveOut({ moveOutAddress: e.target.value })}
                 className={inputClass}
               />
               <p className="mt-1 text-xs text-slate-500">
-                {form.moveOutOrderPersonAsk.length} / {MOVE_OUT_13A_MAX_LENGTH}{" "}
+                {moveOut.moveOutAddress.length} / {MOVE_OUT_13A_MAX_LENGTH}{" "}
                 characters
               </p>
             </div>
@@ -86,26 +96,22 @@ export default function Step6_MoveOutCustody({
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {(
                   [
-                    { key: "moveOutOwnHome" as const, label: "I own the home" },
+                    { key: "ownHome" as const, label: "I own the home" },
                     {
-                      key: "moveOutNameOnLease" as const,
+                      key: "nameOnLease" as const,
                       label: "My name is on the lease",
                     },
                     {
-                      key: "moveOutWithChildren" as const,
+                      key: "liveWithChildren" as const,
                       label: "I live at this address with my children",
                     },
                     {
-                      key: "moveOutLivedFor" as const,
-                      label: "I have lived at this address for",
-                    },
-                    {
-                      key: "moveOutPaysRent" as const,
+                      key: "payRentOrMortgage" as const,
                       label:
                         "I pay for some or all of the rent or mortgage",
                     },
                     {
-                      key: "moveOutOther" as const,
+                      key: "other" as const,
                       label: "Other (please explain)",
                     },
                   ] as const
@@ -116,24 +122,21 @@ export default function Step6_MoveOutCustody({
                   >
                     <input
                       type="checkbox"
-                      checked={Boolean(form[key])}
+                      checked={Boolean(rl[key])}
                       onChange={(e) => {
                         const on = e.target.checked;
-                        if (key === "moveOutLivedFor" && !on) {
-                          setForm((prev) => ({
-                            ...prev,
-                            moveOutLivedFor: false,
-                            moveOutLivedYears: "",
-                            moveOutLivedMonths: "",
-                          }));
-                        } else if (key === "moveOutOther" && !on) {
-                          setForm((prev) => ({
-                            ...prev,
-                            moveOutOther: false,
-                            moveOutOtherExplain: "",
-                          }));
+                        if (key === "other" && !on) {
+                          setMoveOut({
+                            rightToLive: {
+                              ...rl,
+                              other: false,
+                              otherDescription: "",
+                            },
+                          });
                         } else {
-                          update(key, on);
+                          setMoveOut({
+                            rightToLive: { ...rl, [key]: on },
+                          });
                         }
                       }}
                       className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -143,52 +146,63 @@ export default function Step6_MoveOutCustody({
                 ))}
               </div>
 
-              {form.moveOutLivedFor && (
-                <div className="mt-4 flex flex-wrap gap-4">
-                  <div className="min-w-[7rem] flex-1">
-                    <label
-                      htmlFor="moveOutLivedYears"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      Years
-                    </label>
-                    <input
-                      id="moveOutLivedYears"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="off"
-                      maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
-                      value={form.moveOutLivedYears}
-                      onChange={(e) =>
-                        update("moveOutLivedYears", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </div>
-                  <div className="min-w-[7rem] flex-1">
-                    <label
-                      htmlFor="moveOutLivedMonths"
-                      className="text-sm font-medium text-slate-800"
-                    >
-                      Months
-                    </label>
-                    <input
-                      id="moveOutLivedMonths"
-                      type="text"
-                      inputMode="numeric"
-                      autoComplete="off"
-                      maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
-                      value={form.moveOutLivedMonths}
-                      onChange={(e) =>
-                        update("moveOutLivedMonths", e.target.value)
-                      }
-                      className={inputClass}
-                    />
-                  </div>
+              <div className="mt-4 flex flex-wrap gap-4">
+                <p className="w-full text-sm font-medium text-slate-800">
+                  I have lived at this address for (years / months)
+                </p>
+                <div className="min-w-[7rem] flex-1">
+                  <label
+                    htmlFor="moveOutLivedYears"
+                    className="text-sm font-medium text-slate-800"
+                  >
+                    Years
+                  </label>
+                  <input
+                    id="moveOutLivedYears"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
+                    value={rl.yearsAtAddress}
+                    onChange={(e) =>
+                      setMoveOut({
+                        rightToLive: {
+                          ...rl,
+                          yearsAtAddress: e.target.value,
+                        },
+                      })
+                    }
+                    className={inputClass}
+                  />
                 </div>
-              )}
+                <div className="min-w-[7rem] flex-1">
+                  <label
+                    htmlFor="moveOutLivedMonths"
+                    className="text-sm font-medium text-slate-800"
+                  >
+                    Months
+                  </label>
+                  <input
+                    id="moveOutLivedMonths"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
+                    maxLength={MOVE_OUT_DURATION_MAX_LENGTH}
+                    value={rl.monthsAtAddress}
+                    onChange={(e) =>
+                      setMoveOut({
+                        rightToLive: {
+                          ...rl,
+                          monthsAtAddress: e.target.value,
+                        },
+                      })
+                    }
+                    className={inputClass}
+                  />
+                </div>
+              </div>
 
-              {form.moveOutOther && (
+              {rl.other && (
                 <div className="mt-4">
                   <label
                     htmlFor="moveOutOtherExplain"
@@ -200,14 +214,19 @@ export default function Step6_MoveOutCustody({
                     id="moveOutOtherExplain"
                     autoComplete="off"
                     maxLength={MOVE_OUT_13B_OTHER_MAX_LENGTH}
-                    value={form.moveOutOtherExplain}
+                    value={rl.otherDescription}
                     onChange={(e) =>
-                      update("moveOutOtherExplain", e.target.value)
+                      setMoveOut({
+                        rightToLive: {
+                          ...rl,
+                          otherDescription: e.target.value,
+                        },
+                      })
                     }
                     className={textareaClass}
                   />
                   <p className="mt-1 text-xs text-slate-500">
-                    {form.moveOutOtherExplain.length} /{" "}
+                    {rl.otherDescription.length} /{" "}
                     {MOVE_OUT_13B_OTHER_MAX_LENGTH} characters
                   </p>
                 </div>
@@ -222,43 +241,39 @@ export default function Step6_MoveOutCustody({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.otherOrders}
+            checked={moveOut.otherOrders.length > 0}
             onChange={(e) => {
-              const on = e.target.checked;
-              if (!on) {
-                setForm((prev) => ({
-                  ...prev,
-                  otherOrders: false,
-                  otherOrdersDescribe: "",
-                }));
+              if (e.target.checked) {
+                setMoveOut({
+                  otherOrders:
+                    moveOut.otherOrders.length > 0 ? moveOut.otherOrders : " ",
+                });
               } else {
-                update("otherOrders", true);
+                setMoveOut({ otherOrders: "" });
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
           <span className="text-sm font-medium text-slate-800">Other Orders</span>
         </label>
-        {form.otherOrders && (
+        {moveOut.otherOrders.length > 0 && (
           <div>
             <label
-              htmlFor="otherOrdersDescribe"
+              htmlFor="moveOutOtherOrders"
               className="text-sm font-medium text-slate-800"
             >
               14. Describe additional orders you want the judge to make
             </label>
             <textarea
-              id="otherOrdersDescribe"
+              id="moveOutOtherOrders"
               autoComplete="off"
               maxLength={OTHER_ORDERS_14_MAX_LENGTH}
-              value={form.otherOrdersDescribe}
-              onChange={(e) =>
-                update("otherOrdersDescribe", e.target.value)
-              }
+              value={moveOut.otherOrders}
+              onChange={(e) => setMoveOut({ otherOrders: e.target.value })}
               className={textareaClass}
             />
             <p className="mt-1 text-xs text-slate-500">
-              {form.otherOrdersDescribe.length} / {OTHER_ORDERS_14_MAX_LENGTH}{" "}
+              {moveOut.otherOrders.length} / {OTHER_ORDERS_14_MAX_LENGTH}{" "}
               characters
             </p>
           </div>
@@ -270,9 +285,11 @@ export default function Step6_MoveOutCustody({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.childCustodyVisitation}
+            checked={wantsCustodyOrders === "yes"}
             onChange={(e) =>
-              update("childCustodyVisitation", e.target.checked)
+              setCustodyOrders({
+                wantsCustodyOrders: e.target.checked ? "yes" : "",
+              })
             }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
@@ -280,7 +297,7 @@ export default function Step6_MoveOutCustody({
             Child Custody and Visitation
           </span>
         </label>
-        {form.childCustodyVisitation && (
+        {wantsCustodyOrders === "yes" && (
           <div
             className="rounded-xl border border-purple-200/90 bg-purple-50/80 px-4 py-3 text-sm leading-relaxed text-purple-950"
             role="status"
