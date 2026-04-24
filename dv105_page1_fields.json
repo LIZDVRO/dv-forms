@@ -1,0 +1,322 @@
+[
+  {
+    "name": "case_number",
+    "type": "text",
+    "description": "Court case number (top right of the form)."
+  },
+  {
+    "name": "your_name",
+    "type": "text",
+    "description": "Your full name (Section 1 — Your Information)."
+  },
+  {
+    "name": "your_relationship_to_children_parent",
+    "type": "checkbox",
+    "description": "Section 1 — Your relationship to the children: Parent."
+  },
+  {
+    "name": "your_relationship_to_children_legal_guardian",
+    "type": "checkbox",
+    "description": "Section 1 — Your relationship to the children: Legal guardian."
+  },
+  {
+    "name": "your_relationship_to_children_other",
+    "type": "checkbox",
+    "description": "Section 1 — Your relationship to the children: Other (use the describe line if checked)."
+  },
+  {
+    "name": "your_relationship_to_children_other_description",
+    "type": "text",
+    "description": "Section 1 — Describe your relationship to the children if \"Other\" is selected."
+  },
+  {
+    "name": "person_you_want_protection_from_name",
+    "type": "text",
+    "description": "Full name of the person you want protection from (Section 2)."
+  },
+  {
+    "name": "person_in_item_2_relationship_to_children_parent",
+    "type": "checkbox",
+    "description": "Section 2 — That person's relationship to the children: Parent."
+  },
+  {
+    "name": "person_in_item_2_relationship_to_children_legal_guardian",
+    "type": "checkbox",
+    "description": "Section 2 — That person's relationship to the children: Legal guardian."
+  },
+  {
+    "name": "person_in_item_2_relationship_to_children_other",
+    "type": "checkbox",
+    "description": "Section 2 — That person's relationship to the children: Other (use the describe line if checked)."
+  },
+  {
+    "name": "person_in_item_2_relationship_to_children_other_description",
+    "type": "text",
+    "description": "Section 2 — Describe their relationship to the children if \"Other\" is selected."
+  },
+  {
+    "name": "child_a_name",
+    "type": "text",
+    "description": "Section 3 — Oldest child (row a): full name."
+  },
+  {
+    "name": "child_a_date_of_birth",
+    "type": "text",
+    "description": "Section 3 — Oldest child (row a): date of birth."
+  },
+  {
+    "name": "child_b_name",
+    "type": "text",
+    "description": "Section 3 — Child row b: full name."
+  },
+  {
+    "name": "child_b_date_of_birth",
+    "type": "text",
+    "description": "Section 3 — Child row b: date of birth."
+  },
+  {
+    "name": "child_c_name",
+    "type": "text",
+    "description": "Section 3 — Child row c: full name."
+  },
+  {
+    "name": "child_c_date_of_birth",
+    "type": "text",
+    "description": "Section 3 — Child row c: date of birth."
+  },
+  {
+    "name": "child_d_name",
+    "type": "text",
+    "description": "Section 3 — Youngest listed child (row d): full name."
+  },
+  {
+    "name": "child_d_date_of_birth",
+    "type": "text",
+    "description": "Section 3 — Child row d: date of birth."
+  },
+  {
+    "name": "children_need_more_space_attachment",
+    "type": "checkbox",
+    "description": "Section 3 — Check if more space is needed; attach continuation labeled \"DV-105, Children\" per form instructions."
+  },
+  {
+    "name": "all_children_lived_together_five_years_no",
+    "type": "radio",
+    "description": "Section 4a — All children listed in item 3 have not lived together for the last five years (complete DV-105(A); skip 4b on this form per instructions)."
+  },
+  {
+    "name": "all_children_lived_together_five_years_yes",
+    "type": "radio",
+    "description": "Section 4a — All children listed in item 3 have lived together for the last five years (complete item 4b below)."
+  },
+  {
+    "name": "residence_history_row_1_date_from",
+    "type": "text",
+    "description": "Section 4b — Current residence row: start date (month/year) through present."
+  },
+  {
+    "name": "residence_history_row_1_city_state",
+    "type": "text",
+    "description": "Section 4b — Current residence row: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_1_address_confidential",
+    "type": "checkbox",
+    "description": "Section 4b — Row 1: this address is private/confidential; list state only per form note."
+  },
+  {
+    "name": "residence_history_row_1_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 1: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_1_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 1: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_1_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 1: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_1_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 1: relationship to child for \"Other\" caregiver when that box is checked."
+  },
+  {
+    "name": "residence_history_row_2_date_from",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 2: start date (month/year)."
+  },
+  {
+    "name": "residence_history_row_2_date_until",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 2: end date (month/year)."
+  },
+  {
+    "name": "residence_history_row_2_city_state",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 2: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_2_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 2: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_2_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 2: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_2_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 2: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_2_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 2: relationship to child for \"Other\" caregiver when that box is checked."
+  },
+  {
+    "name": "residence_history_row_3_date_from",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 3: start date (month/year)."
+  },
+  {
+    "name": "residence_history_row_3_date_until",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 3: end date (month/year)."
+  },
+  {
+    "name": "residence_history_row_3_city_state",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 3: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_3_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 3: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_3_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 3: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_3_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 3: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_3_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 3: relationship to child for \"Other\" caregiver when that box is checked."
+  },
+  {
+    "name": "residence_history_row_4_date_from",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 4: start date (month/year)."
+  },
+  {
+    "name": "residence_history_row_4_date_until",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 4: end date (month/year)."
+  },
+  {
+    "name": "residence_history_row_4_city_state",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 4: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_4_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 4: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_4_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 4: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_4_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 4: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_4_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 4: relationship to child for \"Other\" caregiver when that box is checked."
+  },
+  {
+    "name": "residence_history_row_5_date_from",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 5: start date (month/year)."
+  },
+  {
+    "name": "residence_history_row_5_date_until",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 5: end date (month/year)."
+  },
+  {
+    "name": "residence_history_row_5_city_state",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 5: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_5_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 5: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_5_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 5: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_5_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 5: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_5_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 5: relationship to child for \"Other\" caregiver when that box is checked."
+  },
+  {
+    "name": "residence_history_row_6_date_from",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 6: start date (month/year)."
+  },
+  {
+    "name": "residence_history_row_6_date_until",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 6: end date (month/year)."
+  },
+  {
+    "name": "residence_history_row_6_city_state",
+    "type": "text",
+    "description": "Section 4b — Prior residence row 6: city and state (include tribal land if applicable)."
+  },
+  {
+    "name": "residence_history_row_6_lived_with_me",
+    "type": "checkbox",
+    "description": "Section 4b — Row 6: children lived with you (Section 1)."
+  },
+  {
+    "name": "residence_history_row_6_lived_with_person_in_item_2",
+    "type": "checkbox",
+    "description": "Section 4b — Row 6: children lived with the person named in item 2."
+  },
+  {
+    "name": "residence_history_row_6_lived_with_other",
+    "type": "checkbox",
+    "description": "Section 4b — Row 6: children lived with someone else (describe relationship on the paired line)."
+  },
+  {
+    "name": "residence_history_row_6_other_caregiver_relationship",
+    "type": "text",
+    "description": "Section 4b — Row 6: relationship to child for \"Other\" caregiver when that box is checked."
+  }
+]
