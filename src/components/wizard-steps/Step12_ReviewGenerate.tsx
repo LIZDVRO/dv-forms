@@ -4,7 +4,9 @@ import Link from "next/link";
 
 import {
   getAbuseIncidentsPdfFieldsFromFormStore,
+  getCourtHistoryPdfFieldsFromFormStore,
   getFirearmsPdfFieldsFromFormStore,
+  getProtectionOrdersPdfFieldsFromFormStore,
   getRelationshipPdfFieldsFromFormStore,
 } from "@/lib/dv100-pdf";
 import type { Dv100PdfFillRow, Dv100PdfFormData } from "@/lib/dv100-pdf";
@@ -73,6 +75,8 @@ export default function Step12_ReviewGenerate({
   const relR = getRelationshipPdfFieldsFromFormStore();
   const abuseR = getAbuseIncidentsPdfFieldsFromFormStore();
   const gunsR = getFirearmsPdfFieldsFromFormStore();
+  const chPdf = getCourtHistoryPdfFieldsFromFormStore();
+  const poPdf = getProtectionOrdersPdfFieldsFromFormStore();
 
   return (
     <div className="space-y-8">
@@ -574,43 +578,43 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-2 text-slate-800">
             <p>
               <span className="text-slate-500">Order to Not Abuse:</span>{" "}
-              {form.orderToNotAbuse ? "Yes" : "No"}
+              {poPdf.orderToNotAbuse ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">No-Contact Order:</span>{" "}
-              {form.noContactOrder ? "Yes" : "No"}
+              {poPdf.noContactOrder ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">Stay-Away Order:</span>{" "}
-              {form.stayAwayOrder ? "Yes" : "No"}
+              {poPdf.stayAwayOrder ? "Yes" : "No"}
             </p>
-            {form.stayAwayOrder ? (
+            {poPdf.stayAwayOrder ? (
               <div className="space-y-1 border-l-2 border-purple-200/80 pl-3 text-slate-800">
                 <p>
                   <span className="text-slate-500">Stay away from:</span>{" "}
                   {(() => {
                     const parts: string[] = [];
-                    if (form.stayAwayMe) parts.push("Me");
-                    if (form.stayAwayHome) parts.push("My home");
-                    if (form.stayAwayWork) {
+                    if (poPdf.stayAwayMe) parts.push("Me");
+                    if (poPdf.stayAwayHome) parts.push("My home");
+                    if (poPdf.stayAwayWork) {
                       parts.push("My job or workplace");
                     }
-                    if (form.stayAwayVehicle) {
+                    if (poPdf.stayAwayVehicle) {
                       parts.push("My vehicle");
                     }
-                    if (form.stayAwaySchool) {
+                    if (poPdf.stayAwaySchool) {
                       parts.push("My school");
                     }
-                    if (form.stayAwayProtectedPersons) {
+                    if (poPdf.stayAwayProtectedPersons) {
                       parts.push("Each person in Section 8");
                     }
-                    if (form.stayAwayChildrenSchool) {
+                    if (poPdf.stayAwayChildrenSchool) {
                       parts.push("My children's school or childcare");
                     }
-                    if (form.stayAwayOther) {
+                    if (poPdf.stayAwayOther) {
                       parts.push(
-                        form.stayAwayOtherExplain.trim()
-                          ? `Other (${form.stayAwayOtherExplain.trim()})`
+                        poPdf.stayAwayOtherExplain.trim()
+                          ? `Other (${poPdf.stayAwayOtherExplain.trim()})`
                           : "Other (please explain)",
                       );
                     }
@@ -619,30 +623,30 @@ export default function Step12_ReviewGenerate({
                 </p>
                 <p>
                   <span className="text-slate-500">Distance:</span>{" "}
-                  {form.stayAwayDistance === "hundred"
+                  {poPdf.stayAwayDistance === "hundred"
                     ? "100 yards (300 feet)"
-                    : form.stayAwayDistance === "other"
-                      ? form.stayAwayDistanceOther.trim()
-                        ? `${form.stayAwayDistanceOther.trim()} yards`
+                    : poPdf.stayAwayDistance === "other"
+                      ? poPdf.stayAwayDistanceOther.trim()
+                        ? `${poPdf.stayAwayDistanceOther.trim()} yards`
                         : "Other (yards not specified)"
                       : "—"}
                 </p>
                 <p>
                   <span className="text-slate-500">Live together/close:</span>{" "}
-                  {form.liveTogether === "no"
+                  {poPdf.liveTogether === "no"
                     ? "No"
-                    : form.liveTogether === "yes"
+                    : poPdf.liveTogether === "yes"
                       ? (() => {
                           const sub =
-                            form.liveTogetherType === "liveTogether"
+                            poPdf.liveTogetherType === "liveTogether"
                               ? "Live together"
-                              : form.liveTogetherType === "sameBuilding"
+                              : poPdf.liveTogetherType === "sameBuilding"
                                 ? "Same building, not same home"
-                                : form.liveTogetherType === "sameNeighborhood"
+                                : poPdf.liveTogetherType === "sameNeighborhood"
                                   ? "Same neighborhood"
-                                  : form.liveTogetherType === "other"
-                                    ? form.liveTogetherOther.trim()
-                                      ? `Other (${form.liveTogetherOther.trim()})`
+                                  : poPdf.liveTogetherType === "other"
+                                    ? poPdf.liveTogetherOther.trim()
+                                      ? `Other (${poPdf.liveTogetherOther.trim()})`
                                       : "Other (please explain)"
                                     : "—";
                           return `Yes — ${sub}`;
@@ -651,29 +655,29 @@ export default function Step12_ReviewGenerate({
                 </p>
                 <p>
                   <span className="text-slate-500">Same workplace/school:</span>{" "}
-                  {form.sameWorkplaceSchool === "no"
+                  {poPdf.sameWorkplaceSchool === "no"
                     ? "No"
-                    : form.sameWorkplaceSchool === "yes"
+                    : poPdf.sameWorkplaceSchool === "yes"
                       ? (() => {
                           const bits: string[] = [];
-                          if (form.workTogether) {
+                          if (poPdf.workTogether) {
                             bits.push(
-                              form.workTogetherCompany.trim()
-                                ? `Work together at ${form.workTogetherCompany.trim()}`
+                              poPdf.workTogetherCompany.trim()
+                                ? `Work together at ${poPdf.workTogetherCompany.trim()}`
                                 : "Work together (company not specified)",
                             );
                           }
-                          if (form.sameSchool) {
+                          if (poPdf.sameSchool) {
                             bits.push(
-                              form.sameSchoolName.trim()
-                                ? `Same school: ${form.sameSchoolName.trim()}`
+                              poPdf.sameSchoolName.trim()
+                                ? `Same school: ${poPdf.sameSchoolName.trim()}`
                                 : "Same school (name not specified)",
                             );
                           }
-                          if (form.sameWorkplaceOther) {
+                          if (poPdf.sameWorkplaceOther) {
                             bits.push(
-                              form.sameWorkplaceOtherExplain.trim()
-                                ? `Other: ${form.sameWorkplaceOtherExplain.trim()}`
+                              poPdf.sameWorkplaceOtherExplain.trim()
+                                ? `Other: ${poPdf.sameWorkplaceOtherExplain.trim()}`
                                 : "Other (please explain)",
                             );
                           }
@@ -1043,80 +1047,80 @@ export default function Step12_ReviewGenerate({
               <span className="text-slate-500">
                 Other restraining/protective orders in effect:
               </span>{" "}
-              {displayYn(form.hasRestrainingOrders)}
+              {displayYn(chPdf.hasRestrainingOrders)}
             </p>
-            {form.hasRestrainingOrders === "yes" && (
+            {chPdf.hasRestrainingOrders === "yes" && (
               <>
                 <p>
                   <span className="text-slate-500">
                     Order 1 — date / expires:
                   </span>{" "}
-                  {display(form.order1Date)} / {display(form.order1Expires)}
+                  {display(chPdf.order1Date)} / {display(chPdf.order1Expires)}
                 </p>
                 <p>
                   <span className="text-slate-500">
                     Order 2 — date / expires:
                   </span>{" "}
-                  {display(form.order2Date)} / {display(form.order2Expires)}
+                  {display(chPdf.order2Date)} / {display(chPdf.order2Expires)}
                 </p>
               </>
             )}
             <p>
               <span className="text-slate-500">Other court case filed:</span>{" "}
-              {displayYn(form.hasOtherCases)}
+              {displayYn(chPdf.hasOtherCases)}
             </p>
-            {form.hasOtherCases === "yes" && (
+            {chPdf.hasOtherCases === "yes" && (
               <>
                 <p>
                   <span className="text-slate-500">Case types:</span>{" "}
-                  {labelsForValues(form.caseTypes, CASE_TYPE_OPTIONS)}
+                  {labelsForValues(chPdf.caseTypes, CASE_TYPE_OPTIONS)}
                 </p>
-                {form.caseTypes.includes("custody") && (
+                {chPdf.caseTypes.includes("custody") && (
                   <p>
                     <span className="text-slate-500">
                       Custody — case details:
                     </span>{" "}
-                    {display(form.custodyCaseDetails)}
+                    {display(chPdf.custodyCaseDetails)}
                   </p>
                 )}
-                {form.caseTypes.includes("divorce") && (
+                {chPdf.caseTypes.includes("divorce") && (
                   <p>
                     <span className="text-slate-500">
                       Divorce — case details:
                     </span>{" "}
-                    {display(form.divorceCaseDetails)}
+                    {display(chPdf.divorceCaseDetails)}
                   </p>
                 )}
-                {form.caseTypes.includes("juvenile") && (
+                {chPdf.caseTypes.includes("juvenile") && (
                   <p>
                     <span className="text-slate-500">
                       Juvenile — case details:
                     </span>{" "}
-                    {display(form.juvenileCaseDetails)}
+                    {display(chPdf.juvenileCaseDetails)}
                   </p>
                 )}
-                {form.caseTypes.includes("guardianship") && (
+                {chPdf.caseTypes.includes("guardianship") && (
                   <p>
                     <span className="text-slate-500">
                       Guardianship — case details:
                     </span>{" "}
-                    {display(form.guardianshipCaseDetails)}
+                    {display(chPdf.guardianshipCaseDetails)}
                   </p>
                 )}
-                {form.caseTypes.includes("criminal") && (
+                {chPdf.caseTypes.includes("criminal") && (
                   <p>
                     <span className="text-slate-500">
                       Criminal — case details:
                     </span>{" "}
-                    {display(form.criminalCaseDetails)}
+                    {display(chPdf.criminalCaseDetails)}
                   </p>
                 )}
-                {form.caseTypes.includes("other") && (
+                {chPdf.caseTypes.includes("other") && (
                   <p>
                     <span className="text-slate-500">
                       Other — what kind of case:
                     </span>{" "}
-                    {display(form.otherCaseType)}
+                    {display(chPdf.otherCaseType)}
                   </p>
                 )}
               </>

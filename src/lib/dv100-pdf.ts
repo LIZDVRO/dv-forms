@@ -15,7 +15,13 @@ import {
 } from "pdf-lib";
 
 import { fillLizInvoiceFromTemplate } from "@/utils/fillInvoice";
-import { useFormStore, type AbuseIncident, type PersonInfo, type RelationshipInfo } from "@/store/useFormStore";
+import {
+  useFormStore,
+  type AbuseIncident,
+  type PersonInfo,
+  type ProtectionOrdersInfo,
+  type RelationshipInfo,
+} from "@/store/useFormStore";
 
 export const DV100_PDF_URL = "/dv100.pdf";
 
@@ -1123,6 +1129,140 @@ export function getFirearmsPdfFieldsFromFormStore(): Pick<Dv100PdfFormData, "has
   return { hasFirearms, firearms };
 }
 
+function courtCaseDetailLine(
+  row: { location: string; year: string; caseNumber: string } | undefined,
+): string {
+  if (!row) return "";
+  return [row.location, row.year, row.caseNumber]
+    .map((s) => String(s ?? "").trim())
+    .filter(Boolean)
+    .join(", ");
+}
+
+/**
+ * Section 4 — other restraining orders and other court cases, from Zustand `courtHistory`.
+ */
+export function getCourtHistoryPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "hasRestrainingOrders"
+  | "order1Date"
+  | "order1Expires"
+  | "order2Date"
+  | "order2Expires"
+  | "hasOtherCases"
+  | "caseTypes"
+  | "otherCaseType"
+  | "custodyCaseDetails"
+  | "divorceCaseDetails"
+  | "juvenileCaseDetails"
+  | "guardianshipCaseDetails"
+  | "criminalCaseDetails"
+> {
+  const ch = useFormStore.getState().courtHistory;
+  const r0 = ch.restrainingOrders[0] ?? { dateOfOrder: "", dateExpires: "" };
+  const r1 = ch.restrainingOrders[1] ?? { dateOfOrder: "", dateExpires: "" };
+  const rows = ch.otherCases ?? [];
+  const caseTypes = [
+    ...new Set(rows.map((c) => c.caseType).filter((t): t is string => Boolean(t))),
+  ];
+  const rowFor = (t: string) => rows.find((c) => c.caseType === t);
+  const other = rowFor("other");
+  return {
+    hasRestrainingOrders: ch.hasRestrainingOrders,
+    order1Date: r0.dateOfOrder,
+    order1Expires: r0.dateExpires,
+    order2Date: r1.dateOfOrder,
+    order2Expires: r1.dateExpires,
+    hasOtherCases: ch.hasOtherCases,
+    caseTypes,
+    otherCaseType: other?.caseTypeOther ?? "",
+    custodyCaseDetails: courtCaseDetailLine(rowFor("custody")),
+    divorceCaseDetails: courtCaseDetailLine(rowFor("divorce")),
+    juvenileCaseDetails: courtCaseDetailLine(rowFor("juvenile")),
+    guardianshipCaseDetails: courtCaseDetailLine(rowFor("guardianship")),
+    criminalCaseDetails: courtCaseDetailLine(rowFor("criminal")),
+  };
+}
+
+function stayAwayDistanceStoreToPdf(
+  d: ProtectionOrdersInfo["stayAwayDistance"],
+): Dv100PdfFormData["stayAwayDistance"] {
+  if (d === "100") return "hundred";
+  if (d === "other") return "other";
+  return "";
+}
+
+function liveTogetherTypeStoreToPdf(
+  t: ProtectionOrdersInfo["liveTogetherType"],
+): Dv100PdfFormData["liveTogetherType"] {
+  if (t === "samehome") return "liveTogether";
+  if (t === "samebuilding") return "sameBuilding";
+  if (t === "sameneighborhood") return "sameNeighborhood";
+  if (t === "other") return "other";
+  return "";
+}
+
+/**
+ * Sections 10–12 — orders requested (not abuse, no-contact, stay-away), from Zustand `protectionOrders`.
+ */
+export function getProtectionOrdersPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "orderToNotAbuse"
+  | "noContactOrder"
+  | "stayAwayOrder"
+  | "stayAwayMe"
+  | "stayAwayHome"
+  | "stayAwayWork"
+  | "stayAwayVehicle"
+  | "stayAwaySchool"
+  | "stayAwayProtectedPersons"
+  | "stayAwayChildrenSchool"
+  | "stayAwayOther"
+  | "stayAwayOtherExplain"
+  | "stayAwayDistance"
+  | "stayAwayDistanceOther"
+  | "liveTogether"
+  | "liveTogetherType"
+  | "liveTogetherOther"
+  | "sameWorkplaceSchool"
+  | "workTogether"
+  | "workTogetherCompany"
+  | "sameSchool"
+  | "sameSchoolName"
+  | "sameWorkplaceOther"
+  | "sameWorkplaceOtherExplain"
+> {
+  const p = useFormStore.getState().protectionOrders;
+  const s = p.stayAwayFrom;
+  const w = p.sameWorkOrSchoolDetails;
+  return {
+    orderToNotAbuse: p.wantsOrderToNotAbuse,
+    noContactOrder: p.wantsNoContact,
+    stayAwayOrder: p.wantsStayAway,
+    stayAwayMe: s.me,
+    stayAwayHome: s.myHome,
+    stayAwayWork: s.myJob,
+    stayAwayVehicle: s.myVehicle,
+    stayAwaySchool: s.mySchool,
+    stayAwayProtectedPersons: s.eachProtectedPerson,
+    stayAwayChildrenSchool: s.childrensSchool,
+    stayAwayOther: s.other,
+    stayAwayOtherExplain: s.otherDescription,
+    stayAwayDistance: stayAwayDistanceStoreToPdf(p.stayAwayDistance),
+    stayAwayDistanceOther: p.stayAwayDistanceOther,
+    liveTogether: p.liveTogether,
+    liveTogetherType: liveTogetherTypeStoreToPdf(p.liveTogetherType),
+    liveTogetherOther: p.liveTogetherOther,
+    sameWorkplaceSchool: p.sameWorkOrSchool,
+    workTogether: w.workTogether,
+    workTogetherCompany: w.workCompanyName,
+    sameSchool: w.sameSchool,
+    sameSchoolName: w.schoolName,
+    sameWorkplaceOther: w.other,
+    sameWorkplaceOtherExplain: w.otherDescription,
+  };
+}
+
 function mapIncidentWitnessToWizard(w: AbuseIncident["witnesses"]): string {
   if (w === "dontKnow") return "idk";
   if (w === "yes" || w === "no") return w;
@@ -1260,6 +1400,8 @@ export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<Gene
     ...getRelationshipPdfFieldsFromFormStore(),
     ...getFirearmsPdfFieldsFromFormStore(),
     ...getAbuseIncidentsPdfFieldsFromFormStore(),
+    ...getCourtHistoryPdfFieldsFromFormStore(),
+    ...getProtectionOrdersPdfFieldsFromFormStore(),
   };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();

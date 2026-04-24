@@ -254,7 +254,8 @@ export interface FirearmsInfo {
 // ══════════════════════════════════════════════════════════════
 
 export interface ProtectionOrdersInfo {
-  // Item 10: auto-checked
+  /** DV-100 Section 10 — Order to not abuse */
+  wantsOrderToNotAbuse: boolean;
   // Item 11: No-Contact
   wantsNoContact: boolean;
   // Item 12: Stay-Away
@@ -867,6 +868,7 @@ const initialFirearms: FirearmsInfo = {
 };
 
 const initialProtectionOrders: ProtectionOrdersInfo = {
+  wantsOrderToNotAbuse: false,
   wantsNoContact: false,
   wantsStayAway: false,
   stayAwayFrom: {

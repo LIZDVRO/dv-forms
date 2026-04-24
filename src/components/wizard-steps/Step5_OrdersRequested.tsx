@@ -1,26 +1,58 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
+import type { ProtectionOrdersInfo } from "@/store/useFormStore";
+import { useFormStore } from "@/store/useFormStore";
 
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
-
-type FormData = Dv100PdfFormData;
-
-type Step5Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-  inputClass: string;
-  resetStayAwayOrders: () => void;
+const clearedStayAwayState: Pick<
+  ProtectionOrdersInfo,
+  | "wantsStayAway"
+  | "stayAwayFrom"
+  | "stayAwayDistance"
+  | "stayAwayDistanceOther"
+  | "liveTogether"
+  | "liveTogetherType"
+  | "liveTogetherOther"
+  | "sameWorkOrSchool"
+  | "sameWorkOrSchoolDetails"
+> = {
+  wantsStayAway: false,
+  stayAwayFrom: {
+    me: false,
+    myHome: false,
+    myJob: false,
+    myVehicle: false,
+    mySchool: false,
+    childrensSchool: false,
+    eachProtectedPerson: false,
+    other: false,
+    otherDescription: "",
+  },
+  stayAwayDistance: "",
+  stayAwayDistanceOther: "",
+  liveTogether: "",
+  liveTogetherType: "",
+  liveTogetherOther: "",
+  sameWorkOrSchool: "",
+  sameWorkOrSchoolDetails: {
+    workTogether: false,
+    workCompanyName: "",
+    sameSchool: false,
+    schoolName: "",
+    other: false,
+    otherDescription: "",
+  },
 };
 
-export default function Step5_OrdersRequested({
-  form,
-  setForm,
-  update,
-  inputClass,
-  resetStayAwayOrders,
-}: Step5Props) {
+type Step5Props = {
+  inputClass: string;
+};
+
+export default function Step5_OrdersRequested({ inputClass }: Step5Props) {
+  const protectionOrders = useFormStore((s) => s.protectionOrders);
+  const setProtectionOrders = useFormStore((s) => s.setProtectionOrders);
+
+  const { stayAwayFrom: sa, sameWorkOrSchoolDetails: ws } = protectionOrders;
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -30,8 +62,10 @@ export default function Step5_OrdersRequested({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.orderToNotAbuse}
-            onChange={(e) => update("orderToNotAbuse", e.target.checked)}
+            checked={protectionOrders.wantsOrderToNotAbuse}
+            onChange={(e) =>
+              setProtectionOrders({ wantsOrderToNotAbuse: e.target.checked })
+            }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
           <span className="text-sm font-medium text-slate-800">
@@ -69,8 +103,10 @@ export default function Step5_OrdersRequested({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.noContactOrder}
-            onChange={(e) => update("noContactOrder", e.target.checked)}
+            checked={protectionOrders.wantsNoContact}
+            onChange={(e) =>
+              setProtectionOrders({ wantsNoContact: e.target.checked })
+            }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
           <span className="text-sm font-medium text-slate-800">No-Contact Order</span>
@@ -88,12 +124,12 @@ export default function Step5_OrdersRequested({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.stayAwayOrder}
+            checked={protectionOrders.wantsStayAway}
             onChange={(e) => {
               if (e.target.checked) {
-                update("stayAwayOrder", true);
+                setProtectionOrders({ wantsStayAway: true });
               } else {
-                resetStayAwayOrders();
+                setProtectionOrders(clearedStayAwayState);
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -101,7 +137,7 @@ export default function Step5_OrdersRequested({
           <span className="text-sm font-medium text-slate-800">Stay-Away Order</span>
         </label>
 
-        {form.stayAwayOrder && (
+        {protectionOrders.wantsStayAway && (
           <div className="space-y-8">
             <p className="text-sm leading-relaxed text-slate-700">
               I ask the judge to order the person in item 2 to stay away from the
@@ -116,16 +152,10 @@ export default function Step5_OrdersRequested({
                 <div className="space-y-3">
                   {(
                     [
-                      { key: "stayAwayMe" as const, label: "Me" },
-                      { key: "stayAwayHome" as const, label: "My home" },
-                      {
-                        key: "stayAwayWork" as const,
-                        label: "My job or workplace",
-                      },
-                      {
-                        key: "stayAwayVehicle" as const,
-                        label: "My vehicle",
-                      },
+                      { key: "me" as const, label: "Me" },
+                      { key: "myHome" as const, label: "My home" },
+                      { key: "myJob" as const, label: "My job or workplace" },
+                      { key: "myVehicle" as const, label: "My vehicle" },
                     ] as const
                   ).map(({ key, label }) => (
                     <label
@@ -134,8 +164,12 @@ export default function Step5_OrdersRequested({
                     >
                       <input
                         type="checkbox"
-                        checked={Boolean(form[key])}
-                        onChange={(e) => update(key, e.target.checked)}
+                        checked={Boolean(sa[key])}
+                        onChange={(e) =>
+                          setProtectionOrders({
+                            stayAwayFrom: { ...sa, [key]: e.target.checked },
+                          })
+                        }
                         className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                       />
                       <span className="text-sm text-slate-800">{label}</span>
@@ -145,17 +179,17 @@ export default function Step5_OrdersRequested({
                 <div className="space-y-3">
                   {(
                     [
-                      { key: "stayAwaySchool" as const, label: "My school" },
+                      { key: "mySchool" as const, label: "My school" },
                       {
-                        key: "stayAwayProtectedPersons" as const,
+                        key: "eachProtectedPerson" as const,
                         label: "Each person in Section 8",
                       },
                       {
-                        key: "stayAwayChildrenSchool" as const,
+                        key: "childrensSchool" as const,
                         label: "My children's school or childcare",
                       },
                       {
-                        key: "stayAwayOther" as const,
+                        key: "other" as const,
                         label: "Other (please explain)",
                       },
                     ] as const
@@ -166,8 +200,12 @@ export default function Step5_OrdersRequested({
                     >
                       <input
                         type="checkbox"
-                        checked={Boolean(form[key])}
-                        onChange={(e) => update(key, e.target.checked)}
+                        checked={Boolean(sa[key])}
+                        onChange={(e) =>
+                          setProtectionOrders({
+                            stayAwayFrom: { ...sa, [key]: e.target.checked },
+                          })
+                        }
                         className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                       />
                       <span className="text-sm text-slate-800">{label}</span>
@@ -175,7 +213,7 @@ export default function Step5_OrdersRequested({
                   ))}
                 </div>
               </div>
-              {form.stayAwayOther && (
+              {sa.other && (
                 <div className="mt-4">
                   <label
                     htmlFor="stayAwayOtherExplain"
@@ -187,9 +225,14 @@ export default function Step5_OrdersRequested({
                     id="stayAwayOtherExplain"
                     type="text"
                     autoComplete="off"
-                    value={form.stayAwayOtherExplain}
+                    value={sa.otherDescription}
                     onChange={(e) =>
-                      update("stayAwayOtherExplain", e.target.value)
+                      setProtectionOrders({
+                        stayAwayFrom: {
+                          ...sa,
+                          otherDescription: e.target.value,
+                        },
+                      })
                     }
                     className={inputClass}
                   />
@@ -204,7 +247,7 @@ export default function Step5_OrdersRequested({
               <div className="space-y-3">
                 {(
                   [
-                    { value: "hundred" as const, label: "100 yards (300 feet)" },
+                    { value: "100" as const, label: "100 yards (300 feet)" },
                     {
                       value: "other" as const,
                       label: "Other (give distance in yards)",
@@ -218,12 +261,15 @@ export default function Step5_OrdersRequested({
                     <input
                       type="radio"
                       name="stayAwayDistance"
-                      checked={form.stayAwayDistance === value}
+                      checked={protectionOrders.stayAwayDistance === value}
                       onChange={() => {
-                        update("stayAwayDistance", value);
-                        if (value !== "other") {
-                          update("stayAwayDistanceOther", "");
-                        }
+                        setProtectionOrders({
+                          stayAwayDistance: value,
+                          stayAwayDistanceOther:
+                            value === "other"
+                              ? protectionOrders.stayAwayDistanceOther
+                              : "",
+                        });
                       }}
                       className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                     />
@@ -233,7 +279,7 @@ export default function Step5_OrdersRequested({
                   </label>
                 ))}
               </div>
-              {form.stayAwayDistance === "other" && (
+              {protectionOrders.stayAwayDistance === "other" && (
                 <div>
                   <label
                     htmlFor="stayAwayDistanceOther"
@@ -246,9 +292,11 @@ export default function Step5_OrdersRequested({
                     type="text"
                     autoComplete="off"
                     placeholder="e.g. 50"
-                    value={form.stayAwayDistanceOther}
+                    value={protectionOrders.stayAwayDistanceOther}
                     onChange={(e) =>
-                      update("stayAwayDistanceOther", e.target.value)
+                      setProtectionOrders({
+                        stayAwayDistanceOther: e.target.value,
+                      })
                     }
                     className={inputClass}
                   />
@@ -275,15 +323,14 @@ export default function Step5_OrdersRequested({
                     <input
                       type="radio"
                       name="liveTogether"
-                      checked={form.liveTogether === value}
-                      onChange={() => {
-                        setForm((prev) => ({
-                          ...prev,
+                      checked={protectionOrders.liveTogether === value}
+                      onChange={() =>
+                        setProtectionOrders({
                           liveTogether: value,
                           liveTogetherType: "",
                           liveTogetherOther: "",
-                        }));
-                      }}
+                        })
+                      }
                       className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                     />
                     <span className="text-sm leading-relaxed text-slate-800">
@@ -292,24 +339,24 @@ export default function Step5_OrdersRequested({
                   </label>
                 ))}
               </div>
-              {form.liveTogether === "yes" && (
+              {protectionOrders.liveTogether === "yes" && (
                 <div className="space-y-3 pl-0 sm:pl-2">
                   <p className="text-sm font-medium text-slate-800">If yes, check one:</p>
                   <div className="space-y-3">
                     {(
                       [
                         {
-                          value: "liveTogether" as const,
+                          value: "samehome" as const,
                           label: "Live together",
                           hint: "(If you live together, you can ask that the person in item 2 move out in Section 13.)",
                         },
                         {
-                          value: "sameBuilding" as const,
+                          value: "samebuilding" as const,
                           label:
                             "Live in the same building, but not in the same home",
                         },
                         {
-                          value: "sameNeighborhood" as const,
+                          value: "sameneighborhood" as const,
                           label: "Live in the same neighborhood",
                         },
                         { value: "other" as const, label: "Other (please explain)" },
@@ -325,15 +372,16 @@ export default function Step5_OrdersRequested({
                           <input
                             type="radio"
                             name="liveTogetherType"
-                            checked={form.liveTogetherType === value}
-                            onChange={() => {
-                              setForm((prev) => ({
-                                ...prev,
+                            checked={protectionOrders.liveTogetherType === value}
+                            onChange={() =>
+                              setProtectionOrders({
                                 liveTogetherType: value,
                                 liveTogetherOther:
-                                  value === "other" ? prev.liveTogetherOther : "",
-                              }));
-                            }}
+                                  value === "other"
+                                    ? protectionOrders.liveTogetherOther
+                                    : "",
+                              })
+                            }
                             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                           />
                           <span className="text-sm leading-relaxed text-slate-800">
@@ -348,7 +396,7 @@ export default function Step5_OrdersRequested({
                       );
                     })}
                   </div>
-                  {form.liveTogetherType === "other" && (
+                  {protectionOrders.liveTogetherType === "other" && (
                     <div>
                       <label
                         htmlFor="liveTogetherOther"
@@ -360,9 +408,11 @@ export default function Step5_OrdersRequested({
                         id="liveTogetherOther"
                         type="text"
                         autoComplete="off"
-                        value={form.liveTogetherOther}
+                        value={protectionOrders.liveTogetherOther}
                         onChange={(e) =>
-                          update("liveTogetherOther", e.target.value)
+                          setProtectionOrders({
+                            liveTogetherOther: e.target.value,
+                          })
                         }
                         className={inputClass}
                       />
@@ -391,19 +441,20 @@ export default function Step5_OrdersRequested({
                     <input
                       type="radio"
                       name="sameWorkplaceSchool"
-                      checked={form.sameWorkplaceSchool === value}
-                      onChange={() => {
-                        setForm((prev) => ({
-                          ...prev,
-                          sameWorkplaceSchool: value,
-                          workTogether: false,
-                          workTogetherCompany: "",
-                          sameSchool: false,
-                          sameSchoolName: "",
-                          sameWorkplaceOther: false,
-                          sameWorkplaceOtherExplain: "",
-                        }));
-                      }}
+                      checked={protectionOrders.sameWorkOrSchool === value}
+                      onChange={() =>
+                        setProtectionOrders({
+                          sameWorkOrSchool: value,
+                          sameWorkOrSchoolDetails: {
+                            workTogether: false,
+                            workCompanyName: "",
+                            sameSchool: false,
+                            schoolName: "",
+                            other: false,
+                            otherDescription: "",
+                          },
+                        })
+                      }
                       className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                     />
                     <span className="text-sm leading-relaxed text-slate-800">
@@ -412,7 +463,7 @@ export default function Step5_OrdersRequested({
                   </label>
                 ))}
               </div>
-              {form.sameWorkplaceSchool === "yes" && (
+              {protectionOrders.sameWorkOrSchool === "yes" && (
                 <div className="space-y-4 pl-0 sm:pl-2">
                   <p className="text-sm font-medium text-slate-800">
                     If yes, check all that apply:
@@ -422,15 +473,17 @@ export default function Step5_OrdersRequested({
                       <label className="flex cursor-pointer items-start gap-3 py-1.5 pr-1">
                         <input
                           type="checkbox"
-                          checked={form.workTogether}
+                          checked={ws.workTogether}
                           onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              workTogether: e.target.checked,
-                              workTogetherCompany: e.target.checked
-                                ? prev.workTogetherCompany
-                                : "",
-                            }))
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                workTogether: e.target.checked,
+                                workCompanyName: e.target.checked
+                                  ? ws.workCompanyName
+                                  : "",
+                              },
+                            })
                           }
                           className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
@@ -438,14 +491,19 @@ export default function Step5_OrdersRequested({
                           Work together at (name of company):
                         </span>
                       </label>
-                      {form.workTogether && (
+                      {ws.workTogether && (
                         <input
                           type="text"
                           autoComplete="off"
                           placeholder="Name of company"
-                          value={form.workTogetherCompany}
+                          value={ws.workCompanyName}
                           onChange={(e) =>
-                            update("workTogetherCompany", e.target.value)
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                workCompanyName: e.target.value,
+                              },
+                            })
                           }
                           className={`${inputClass} mt-2`}
                         />
@@ -455,15 +513,15 @@ export default function Step5_OrdersRequested({
                       <label className="flex cursor-pointer items-start gap-3 py-1.5 pr-1">
                         <input
                           type="checkbox"
-                          checked={form.sameSchool}
+                          checked={ws.sameSchool}
                           onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              sameSchool: e.target.checked,
-                              sameSchoolName: e.target.checked
-                                ? prev.sameSchoolName
-                                : "",
-                            }))
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                sameSchool: e.target.checked,
+                                schoolName: e.target.checked ? ws.schoolName : "",
+                              },
+                            })
                           }
                           className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
@@ -471,14 +529,19 @@ export default function Step5_OrdersRequested({
                           Go to the same school (name of school):
                         </span>
                       </label>
-                      {form.sameSchool && (
+                      {ws.sameSchool && (
                         <input
                           type="text"
                           autoComplete="off"
                           placeholder="Name of school"
-                          value={form.sameSchoolName}
+                          value={ws.schoolName}
                           onChange={(e) =>
-                            update("sameSchoolName", e.target.value)
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                schoolName: e.target.value,
+                              },
+                            })
                           }
                           className={`${inputClass} mt-2`}
                         />
@@ -488,15 +551,17 @@ export default function Step5_OrdersRequested({
                       <label className="flex cursor-pointer items-start gap-3 py-1.5 pr-1">
                         <input
                           type="checkbox"
-                          checked={form.sameWorkplaceOther}
+                          checked={ws.other}
                           onChange={(e) =>
-                            setForm((prev) => ({
-                              ...prev,
-                              sameWorkplaceOther: e.target.checked,
-                              sameWorkplaceOtherExplain: e.target.checked
-                                ? prev.sameWorkplaceOtherExplain
-                                : "",
-                            }))
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                other: e.target.checked,
+                                otherDescription: e.target.checked
+                                  ? ws.otherDescription
+                                  : "",
+                              },
+                            })
                           }
                           className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
@@ -504,14 +569,19 @@ export default function Step5_OrdersRequested({
                           Other (please explain):
                         </span>
                       </label>
-                      {form.sameWorkplaceOther && (
+                      {ws.other && (
                         <input
                           type="text"
                           autoComplete="off"
                           placeholder="Please explain"
-                          value={form.sameWorkplaceOtherExplain}
+                          value={ws.otherDescription}
                           onChange={(e) =>
-                            update("sameWorkplaceOtherExplain", e.target.value)
+                            setProtectionOrders({
+                              sameWorkOrSchoolDetails: {
+                                ...ws,
+                                otherDescription: e.target.value,
+                              },
+                            })
                           }
                           className={`${inputClass} mt-2`}
                         />

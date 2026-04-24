@@ -303,33 +303,6 @@ export default function FormWizardPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const resetStayAwayOrders = () =>
-    setForm((prev) => ({
-      ...prev,
-      stayAwayOrder: false,
-      stayAwayMe: false,
-      stayAwayHome: false,
-      stayAwayWork: false,
-      stayAwayVehicle: false,
-      stayAwaySchool: false,
-      stayAwayProtectedPersons: false,
-      stayAwayChildrenSchool: false,
-      stayAwayOther: false,
-      stayAwayOtherExplain: "",
-      stayAwayDistance: "",
-      stayAwayDistanceOther: "",
-      liveTogether: "",
-      liveTogetherType: "",
-      liveTogetherOther: "",
-      sameWorkplaceSchool: "",
-      workTogether: false,
-      workTogetherCompany: "",
-      sameSchool: false,
-      sameSchoolName: "",
-      sameWorkplaceOther: false,
-      sameWorkplaceOtherExplain: "",
-    }));
-
   const resetMoveOutOrders = () =>
     setForm((prev) => ({
       ...prev,
@@ -657,23 +630,11 @@ export default function FormWizardPage() {
               )}
 
               {step === 4 && (
-                <Step4_OtherCourtCases
-                  form={form}
-                  setForm={setForm}
-                  update={update}
-                  inputClass={inputClass}
-                />
+                <Step4_OtherCourtCases inputClass={inputClass} />
               )}
 
-
               {step === 5 && (
-                <Step5_OrdersRequested
-                  form={form}
-                  setForm={setForm}
-                  update={update}
-                  inputClass={inputClass}
-                  resetStayAwayOrders={resetStayAwayOrders}
-                />
+                <Step5_OrdersRequested inputClass={inputClass} />
               )}
 
               {step === 6 && (
