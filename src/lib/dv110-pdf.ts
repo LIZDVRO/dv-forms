@@ -1,6 +1,11 @@
 import { PDFDocument, PDFForm } from "pdf-lib";
 
-import { getDv110RelationshipLabelFromFormStore } from "@/lib/dv100-pdf";
+import {
+  getDv110RelationshipLabelFromFormStore,
+  getProtectedPeoplePdfFieldsFromFormStore,
+} from "@/lib/dv100-pdf";
+import type { PersonInfo } from "@/store/useFormStore";
+import { useFormStore } from "@/store/useFormStore";
 
 export const DV110_PDF_URL = "/dv110.pdf";
 
@@ -45,10 +50,44 @@ function rowHasData(row: { name: string; relationship: string; age: string } | u
   );
 }
 
+function personFullName(p: PersonInfo): string {
+  return [p.firstName, p.middleName, p.lastName]
+    .map((s) => String(s ?? "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
 /**
  * Loads `/dv110.pdf`, fills items 1–3 on page 1 only. Items 4–24 are court-filled.
+ * Reads all field values from Zustand (`useFormStore.getState()`).
  */
-export async function generateDV110PDF(data: Dv110PdfData): Promise<Uint8Array> {
+export async function generateDV110PDF(): Promise<Uint8Array> {
+  const petitioner = useFormStore.getState().petitioner;
+  const respondent = useFormStore.getState().respondent.person;
+  const pp = getProtectedPeoplePdfFieldsFromFormStore();
+  const data: Dv110PdfData = {
+    protectedPersonName: personFullName(petitioner),
+    fullName: personFullName(respondent),
+    gender: respondent.gender,
+    race: respondent.race,
+    age: respondent.age,
+    dateOfBirth: respondent.dateOfBirth,
+    height: respondent.height,
+    weight: respondent.weight,
+    hairColor: respondent.hairColor,
+    eyeColor: respondent.eyeColor,
+    relationship: "",
+    address: respondent.address.street,
+    city: respondent.address.city,
+    state: respondent.address.state,
+    zip: respondent.address.zip,
+    protectedPeople: pp.protectedPeople.map((p) => ({
+      name: p.name,
+      relationship: p.relationship,
+      age: p.age,
+    })),
+  };
+
   const res = await fetch(DV110_PDF_URL);
   if (!res.ok) {
     throw new Error(`Failed to fetch ${DV110_PDF_URL}: ${res.status} ${res.statusText}`);

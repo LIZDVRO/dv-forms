@@ -12,7 +12,7 @@ import {
   getProtectionOrdersPdfFieldsFromFormStore,
   getRelationshipPdfFieldsFromFormStore,
 } from "@/lib/dv100-pdf";
-import type { Dv100PdfFillRow, Dv100PdfFormData } from "@/lib/dv100-pdf";
+import type { Dv100PdfFillRow } from "@/lib/dv100-pdf";
 import type { PersonInfo } from "@/store/useFormStore";
 import { useFormStore } from "@/store/useFormStore";
 import {
@@ -29,7 +29,6 @@ export type Step12PdfInfo = {
 };
 
 type Step12Props = {
-  form: Dv100PdfFormData;
   petitioner: PersonInfo;
   respondentPerson: PersonInfo;
   pdfError: string | null;
@@ -67,7 +66,6 @@ function frequencyReviewLabel(v: string): string {
 }
 
 export default function Step12_ReviewGenerate({
-  form,
   petitioner,
   respondentPerson,
   pdfError,

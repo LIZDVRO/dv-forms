@@ -4,18 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-import {
-  emptyRestitutionExpenses,
-  emptyWirelessAccounts,
-  generateDV100PDF,
-  getProtectedPeoplePdfFieldsFromFormStore,
-  triggerPdfDownload,
-  type Dv100PdfFormData,
-  type Dv100GenderOption,
-} from "@/lib/dv100-pdf";
-import { generateCLETS001PDF, type Clets001PdfData } from "@/lib/clets001-pdf";
+import { generateDV100PDF, triggerPdfDownload } from "@/lib/dv100-pdf";
+import { generateCLETS001PDF } from "@/lib/clets001-pdf";
 import { generateDV109PDF, type Dv109PdfData } from "@/lib/dv109-pdf";
-import { generateDV110PDF, type Dv110PdfData } from "@/lib/dv110-pdf";
+import { generateDV110PDF } from "@/lib/dv110-pdf";
 import { submitEfile } from "@/lib/efile";
 
 import { useFormStore } from "@/store/useFormStore";
@@ -37,15 +29,7 @@ import Step11_Signature from "@/components/wizard-steps/Step11_Signature";
 import Step12_ReviewGenerate, {
   type Step12PdfInfo,
 } from "@/components/wizard-steps/Step12_ReviewGenerate";
-import {
-  CASE_TYPE_OPTIONS,
-  defaultFirearmRow,
-  defaultProtectedPerson,
-  initialProtectedAnimals,
-  personInfoToDisplayName,
-  RELATED_TYPE_OPTIONS,
-  toggleInList,
-} from "@/components/wizard-steps/wizardShared";
+import { personInfoToDisplayName } from "@/components/wizard-steps/wizardShared";
 
 const STEP_TITLES = [
   "Legal Representation",
@@ -78,171 +62,6 @@ const STEP_BLURBS = [
   "Declare that your answers are true, then sign. Your signature is stored with your answers for PDF generation.",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
-
-type FormData = Dv100PdfFormData;
-
-const initialForm: FormData = {
-  petitionerName: "",
-  petitionerAge: "",
-  petitionerAddress: "",
-  petitionerCity: "",
-  petitionerState: "",
-  petitionerZip: "",
-  petitionerPhone: "",
-  petitionerEmail: "",
-  hasLawyer: false,
-  lawyerName: "",
-  lawyerBarNo: "",
-  lawyerFirm: "",
-  respondentName: "",
-  respondentAge: "",
-  respondentDob: "",
-  respondentGender: "",
-  respondentRace: "",
-  relationshipChecks: [],
-  childrenNames: "",
-  relatedTypes: [],
-  livedTogether: "",
-  hasRestrainingOrders: "",
-  order1Date: "",
-  order1Expires: "",
-  order2Date: "",
-  order2Expires: "",
-  hasOtherCases: "",
-  caseTypes: [],
-  otherCaseType: "",
-  custodyCaseDetails: "",
-  divorceCaseDetails: "",
-  juvenileCaseDetails: "",
-  guardianshipCaseDetails: "",
-  criminalCaseDetails: "",
-  recentAbuseDate: "",
-  recentAbuseWitnesses: "",
-  recentAbuseWitnessDetail: "",
-  recentAbuseWeapon: "",
-  recentAbuseWeaponDetail: "",
-  recentAbuseHarm: "",
-  recentAbuseHarmDetail: "",
-  recentAbusePolice: "",
-  recentAbuseDetails: "",
-  recentAbuseFrequency: "",
-  recentAbuseFrequencyOther: "",
-  recentAbuseDates: "",
-  secondAbuseDate: "",
-  secondAbuseWitnesses: "",
-  secondAbuseWitnessDetail: "",
-  secondAbuseWeapon: "",
-  secondAbuseWeaponDetail: "",
-  secondAbuseHarm: "",
-  secondAbuseHarmDetail: "",
-  secondAbusePolice: "",
-  secondAbuseDetails: "",
-  secondAbuseFrequency: "",
-  secondAbuseFrequencyOther: "",
-  secondAbuseDates: "",
-  thirdAbuseDate: "",
-  thirdAbuseWitnesses: "",
-  thirdAbuseWitnessDetail: "",
-  thirdAbuseWeapon: "",
-  thirdAbuseWeaponDetail: "",
-  thirdAbuseHarm: "",
-  thirdAbuseHarmDetail: "",
-  thirdAbusePolice: "",
-  thirdAbuseDetails: "",
-  thirdAbuseFrequency: "",
-  thirdAbuseFrequencyOther: "",
-  thirdAbuseDates: "",
-  protectOtherPeople: "",
-  protectedPeople: [defaultProtectedPerson()],
-  protectedPeopleWhy: "",
-  hasFirearms: "",
-  firearms: [defaultFirearmRow()],
-  orderToNotAbuse: false,
-  noContactOrder: false,
-  stayAwayOrder: false,
-  stayAwayMe: false,
-  stayAwayHome: false,
-  stayAwayWork: false,
-  stayAwayVehicle: false,
-  stayAwaySchool: false,
-  stayAwayProtectedPersons: false,
-  stayAwayChildrenSchool: false,
-  stayAwayOther: false,
-  stayAwayOtherExplain: "",
-  stayAwayDistance: "",
-  stayAwayDistanceOther: "",
-  liveTogether: "",
-  liveTogetherType: "",
-  liveTogetherOther: "",
-  sameWorkplaceSchool: "",
-  workTogether: false,
-  workTogetherCompany: "",
-  sameSchool: false,
-  sameSchoolName: "",
-  sameWorkplaceOther: false,
-  sameWorkplaceOtherExplain: "",
-  orderToMoveOut: false,
-  moveOutOrderPersonAsk: "",
-  moveOutOwnHome: false,
-  moveOutNameOnLease: false,
-  moveOutWithChildren: false,
-  moveOutLivedFor: false,
-  moveOutLivedYears: "",
-  moveOutLivedMonths: "",
-  moveOutPaysRent: false,
-  moveOutOther: false,
-  moveOutOtherExplain: "",
-  otherOrders: false,
-  otherOrdersDescribe: "",
-  childCustodyVisitation: false,
-  protectAnimals: false,
-  protectedAnimals: initialProtectedAnimals(),
-  protectAnimalsStayAway: false,
-  protectAnimalsStayAwayDistance: "",
-  protectAnimalsStayAwayOtherYards: "",
-  protectAnimalsNotTake: false,
-  protectAnimalsSolePossession: false,
-  protectAnimalsSoleReasonAbuse: false,
-  protectAnimalsSoleReasonCare: false,
-  protectAnimalsSoleReasonPurchased: false,
-  protectAnimalsSoleReasonOther: false,
-  protectAnimalsSoleReasonOtherExplain: "",
-  controlProperty: false,
-  controlPropertyDescribe: "",
-  controlPropertyWhy: "",
-  healthOtherInsurance: false,
-  recordCommunications: false,
-  propertyRestraint: false,
-  extendNoticeDeadline: false,
-  extendNoticeExplain: "",
-  payDebtsForProperty: false,
-  payDebtsRows: [
-    { payTo: "", payFor: "", amount: "", dueDate: "" },
-    { payTo: "", payFor: "", amount: "", dueDate: "" },
-    { payTo: "", payFor: "", amount: "", dueDate: "" },
-  ],
-  payDebtsExplain: "",
-  payDebtsSpecialDecision: "",
-  payDebtsAbuseDebt1: false,
-  payDebtsAbuseDebt2: false,
-  payDebtsAbuseDebt3: false,
-  payDebtsKnowHow: "",
-  payDebtsExplainHow: "",
-  requestRestitution: false,
-  requestAbuserPayLizFee: false,
-  restitutionExpenses: emptyRestitutionExpenses(),
-  requestChildSupport: false,
-  childSupportNoOrderWantOne: false,
-  childSupportHaveOrderWantChanged: false,
-  childSupportTANF: false,
-  requestSpousalSupport: false,
-  requestLawyerFees: false,
-  requestBattererIntervention: false,
-  requestWirelessTransfer: false,
-  wirelessAccounts: emptyWirelessAccounts(),
-  signatureDataUrl: null,
-  attorneySignatureDataUrl: null,
-};
 
 const TOTAL_STEPS = STEP_TITLES.length;
 
@@ -283,7 +102,6 @@ export default function FormWizardPage() {
   const [step, setStep] = useState(0);
   const [showAbuseIncident2, setShowAbuseIncident2] = useState(false);
   const [showAbuseIncident3, setShowAbuseIncident3] = useState(false);
-  const [form, setForm] = useState<FormData>(initialForm);
   const [pdfGenerating, setPdfGenerating] = useState(false);
   const [cletsPdfGenerating, setCletsPdfGenerating] = useState(false);
   const [dv109PdfGenerating, setDv109PdfGenerating] = useState(false);
@@ -297,7 +115,6 @@ export default function FormWizardPage() {
 
   const petitioner = useFormStore((s) => s.petitioner);
   const respondentPerson = useFormStore((s) => s.respondent.person);
-  const respondentCLETS = useFormStore((s) => s.respondent.clets);
 
   const canGoBack = step > 0;
   const isLastStep = step === TOTAL_STEPS - 1;
@@ -315,23 +132,7 @@ export default function FormWizardPage() {
     setPdfError(null);
     setPdfInfo(null);
     try {
-      const pdfPayload: FormData = {
-        ...form,
-        petitionerName: personInfoToDisplayName(petitioner),
-        petitionerAge: petitioner.age,
-        petitionerAddress: petitioner.address.street,
-        petitionerCity: petitioner.address.city,
-        petitionerState: petitioner.address.state,
-        petitionerZip: petitioner.address.zip,
-        petitionerPhone: petitioner.telephone,
-        petitionerEmail: petitioner.email,
-        respondentName: personInfoToDisplayName(respondentPerson),
-        respondentAge: respondentPerson.age,
-        respondentDob: respondentPerson.dateOfBirth,
-        respondentGender: respondentPerson.gender as Dv100GenderOption,
-        respondentRace: respondentPerson.race,
-      };
-      const { bytes, filled, missing } = await generateDV100PDF(pdfPayload);
+      const { bytes, filled, missing } = await generateDV100PDF();
       triggerPdfDownload(bytes, "filled_dv100.pdf");
       setPdfInfo({ filled, missing });
     } catch (e) {
@@ -345,17 +146,7 @@ export default function FormWizardPage() {
     setCletsPdfGenerating(true);
     setPdfError(null);
     try {
-      const ppClets = getProtectedPeoplePdfFieldsFromFormStore();
-      const cletsPayload: Clets001PdfData = {
-        petitioner,
-        respondent: respondentPerson,
-        respondentCLETS,
-        protectOtherPeople: ppClets.protectOtherPeople,
-        protectedPeople: ppClets.protectedPeople,
-        hasFirearms: form.hasFirearms,
-        firearms: form.firearms,
-      };
-      const bytes = await generateCLETS001PDF(cletsPayload);
+      const bytes = await generateCLETS001PDF();
       triggerPdfDownload(bytes, "filled_clets001.pdf");
     } catch (e) {
       setPdfError(e instanceof Error ? e.message : String(e));
@@ -385,30 +176,7 @@ export default function FormWizardPage() {
     setDv110PdfGenerating(true);
     setPdfError(null);
     try {
-      const ppDv110 = getProtectedPeoplePdfFieldsFromFormStore();
-      const payload: Dv110PdfData = {
-        protectedPersonName: personInfoToDisplayName(petitioner),
-        fullName: personInfoToDisplayName(respondentPerson),
-        gender: respondentPerson.gender,
-        race: respondentPerson.race,
-        age: respondentPerson.age,
-        dateOfBirth: respondentPerson.dateOfBirth,
-        height: respondentPerson.height,
-        weight: respondentPerson.weight,
-        hairColor: respondentPerson.hairColor,
-        eyeColor: respondentPerson.eyeColor,
-        relationship: "",
-        address: respondentPerson.address.street,
-        city: respondentPerson.address.city,
-        state: respondentPerson.address.state,
-        zip: respondentPerson.address.zip,
-        protectedPeople: ppDv110.protectedPeople.map((p) => ({
-          name: p.name,
-          relationship: p.relationship,
-          age: p.age,
-        })),
-      };
-      const bytes = await generateDV110PDF(payload);
+      const bytes = await generateDV110PDF();
       triggerPdfDownload(bytes, "filled_dv110.pdf");
     } catch (e) {
       setPdfError(e instanceof Error ? e.message : String(e));
@@ -421,35 +189,9 @@ export default function FormWizardPage() {
     setEfileStatus("sending");
     setEfileError("");
     try {
-      const pdfPayload: FormData = {
-        ...form,
-        petitionerName: personInfoToDisplayName(petitioner),
-        petitionerAge: petitioner.age,
-        petitionerAddress: petitioner.address.street,
-        petitionerCity: petitioner.address.city,
-        petitionerState: petitioner.address.state,
-        petitionerZip: petitioner.address.zip,
-        petitionerPhone: petitioner.telephone,
-        petitionerEmail: petitioner.email,
-        respondentName: personInfoToDisplayName(respondentPerson),
-        respondentAge: respondentPerson.age,
-        respondentDob: respondentPerson.dateOfBirth,
-        respondentGender: respondentPerson.gender as Dv100GenderOption,
-        respondentRace: respondentPerson.race,
-      };
-      const { bytes: dv100Bytes } = await generateDV100PDF(pdfPayload);
+      const { bytes: dv100Bytes } = await generateDV100PDF();
 
-      const ppEfile = getProtectedPeoplePdfFieldsFromFormStore();
-      const cletsPayload: Clets001PdfData = {
-        petitioner,
-        respondent: respondentPerson,
-        respondentCLETS,
-        protectOtherPeople: ppEfile.protectOtherPeople,
-        protectedPeople: ppEfile.protectedPeople,
-        hasFirearms: form.hasFirearms,
-        firearms: form.firearms,
-      };
-      const clets001Bytes = await generateCLETS001PDF(cletsPayload);
+      const clets001Bytes = await generateCLETS001PDF();
 
       const dv109Payload: Dv109PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
@@ -457,29 +199,7 @@ export default function FormWizardPage() {
       };
       const dv109Bytes = await generateDV109PDF(dv109Payload);
 
-      const dv110Payload: Dv110PdfData = {
-        protectedPersonName: personInfoToDisplayName(petitioner),
-        fullName: personInfoToDisplayName(respondentPerson),
-        gender: respondentPerson.gender,
-        race: respondentPerson.race,
-        age: respondentPerson.age,
-        dateOfBirth: respondentPerson.dateOfBirth,
-        height: respondentPerson.height,
-        weight: respondentPerson.weight,
-        hairColor: respondentPerson.hairColor,
-        eyeColor: respondentPerson.eyeColor,
-        relationship: "",
-        address: respondentPerson.address.street,
-        city: respondentPerson.address.city,
-        state: respondentPerson.address.state,
-        zip: respondentPerson.address.zip,
-        protectedPeople: ppEfile.protectedPeople.map((p) => ({
-          name: p.name,
-          relationship: p.relationship,
-          age: p.age,
-        })),
-      };
-      const dv110Bytes = await generateDV110PDF(dv110Payload);
+      const dv110Bytes = await generateDV110PDF();
 
       const petName = [petitioner.firstName, petitioner.middleName, petitioner.lastName]
         .filter(Boolean)
@@ -601,13 +321,10 @@ export default function FormWizardPage() {
                 <Step10_InterventionWireless inputClass={inputClass} />
               )}
 
-              {step === 11 && (
-                <Step11_Signature form={form} setForm={setForm} />
-              )}
+              {step === 11 && <Step11_Signature />}
 
               {step === 12 && (
                 <Step12_ReviewGenerate
-                  form={form}
                   petitioner={petitioner}
                   respondentPerson={respondentPerson}
                   pdfError={pdfError}

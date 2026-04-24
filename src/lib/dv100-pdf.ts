@@ -1070,6 +1070,45 @@ function respondentDisplayName(p: PersonInfo): string {
     .join(" ");
 }
 
+/** Item 1 — petitioner identity on DV-100 (page 1), sourced from Zustand. */
+export function getPetitionerPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "petitionerName"
+  | "petitionerAge"
+  | "petitionerAddress"
+  | "petitionerCity"
+  | "petitionerState"
+  | "petitionerZip"
+  | "petitionerPhone"
+  | "petitionerEmail"
+> {
+  const p = useFormStore.getState().petitioner;
+  return {
+    petitionerName: respondentDisplayName(p),
+    petitionerAge: p.age,
+    petitionerAddress: p.address.street,
+    petitionerCity: p.address.city,
+    petitionerState: p.address.state,
+    petitionerZip: p.address.zip,
+    petitionerPhone: p.telephone,
+    petitionerEmail: p.email,
+  };
+}
+
+/** Section 33–34 signature images for DV-100 page 13, sourced from Zustand `signature` slice. */
+export function getSignaturePdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  "signatureDataUrl" | "attorneySignatureDataUrl"
+> {
+  const sig = useFormStore.getState().signature;
+  const sigUrl = String(sig.signatureDataUrl ?? "").trim();
+  const lawyerUrl = String(sig.lawyerSignatureDataUrl ?? "").trim();
+  return {
+    signatureDataUrl: sigUrl ? sig.signatureDataUrl : null,
+    attorneySignatureDataUrl: lawyerUrl ? sig.lawyerSignatureDataUrl : null,
+  };
+}
+
 /** Item 1–1 — respondent identity on DV-100, sourced from Zustand. */
 export function getRespondentPdfFieldsFromFormStore(): Pick<
   Dv100PdfFormData,
@@ -1635,9 +1674,11 @@ export function getDv110RelationshipLabelFromFormStore(): string {
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
  * `form.updateFieldAppearances()` so Acrobat renders filled values, and saves without flattening.
  */
-export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<GenerateDv100PdfResult> {
+export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   const data: Dv100PdfFormData = {
-    ...incoming,
+    ...getPetitionerPdfFieldsFromFormStore(),
+    ...getAttorneyPdfFieldsFromFormStore(),
+    ...getProtectedPeoplePdfFieldsFromFormStore(),
     ...getRespondentPdfFieldsFromFormStore(),
     ...getRelationshipPdfFieldsFromFormStore(),
     ...getFirearmsPdfFieldsFromFormStore(),
@@ -1648,6 +1689,7 @@ export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<Gene
     ...getCustodyOrdersPdfFieldsFromFormStore(),
     ...getPropertyAnimalsPdfFieldsFromFormStore(),
     ...getFinancialRequestsPdfFieldsFromFormStore(),
+    ...getSignaturePdfFieldsFromFormStore(),
   };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
