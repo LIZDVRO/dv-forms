@@ -1,8 +1,6 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
-
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
+import { useFormStore } from "@/store/useFormStore";
 
 import {
   PAGE10_DEBT_AMOUNT_MAX,
@@ -14,25 +12,34 @@ import {
   PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX,
 } from "./wizardShared";
 
-type FormData = Dv100PdfFormData;
-
 type Step8Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
   inputClass: string;
   textareaClass: string;
-  resetPayDebtsForProperty: () => void;
 };
 
 export default function Step8_PropertyNoticeDebts({
-  form,
-  setForm,
-  update,
   inputClass,
   textareaClass,
-  resetPayDebtsForProperty,
 }: Step8Props) {
+  const fr = useFormStore((s) => s.financial.requests);
+  const setFinancialRequests = useFormStore((s) => s.setFinancialRequests);
+
+  const resetPayDebts = () => {
+    setFinancialRequests({
+      wantsDebtPayment: false,
+      debts: [
+        { payTo: "", forWhat: "", amount: "", dueDate: "" },
+        { payTo: "", forWhat: "", amount: "", dueDate: "" },
+        { payTo: "", forWhat: "", amount: "", dueDate: "" },
+      ],
+      debtExplanation: "",
+      debtSpecialFinding: "",
+      debtSpecialFindingWhich: { debt1: false, debt2: false, debt3: false },
+      debtSpecialFindingKnowHow: "",
+      debtSpecialFindingExplanation: "",
+    });
+  };
+
   return (
     <div className="space-y-10">
       <section className="space-y-4">
@@ -42,9 +49,9 @@ export default function Step8_PropertyNoticeDebts({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.propertyRestraint}
+            checked={fr.wantsPropertyRestraint}
             onChange={(e) =>
-              update("propertyRestraint", e.target.checked)
+              setFinancialRequests({ wantsPropertyRestraint: e.target.checked })
             }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
@@ -63,14 +70,13 @@ export default function Step8_PropertyNoticeDebts({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.extendNoticeDeadline}
+            checked={fr.wantsExtraServiceTime}
             onChange={(e) => {
               const on = e.target.checked;
-              setForm((prev) => ({
-                ...prev,
-                extendNoticeDeadline: on,
-                ...(!on ? { extendNoticeExplain: "" } : {}),
-              }));
+              setFinancialRequests({
+                wantsExtraServiceTime: on,
+                ...(!on ? { extraServiceTimeExplanation: "" } : {}),
+              });
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
@@ -83,26 +89,26 @@ export default function Step8_PropertyNoticeDebts({
           If you need more time to serve, the judge may be able to give you a few
           extra days.
         </p>
-        {form.extendNoticeDeadline && (
+        {fr.wantsExtraServiceTime && (
           <div>
             <label
-              htmlFor="extendNoticeExplain"
+              htmlFor="extraServiceTimeExplanation"
               className="text-sm font-medium text-slate-800"
             >
               Explain why you need more time
             </label>
             <textarea
-              id="extendNoticeExplain"
+              id="extraServiceTimeExplanation"
               autoComplete="off"
               maxLength={PAGE10_EXTEND_NOTICE_EXPLAIN_MAX}
-              value={form.extendNoticeExplain}
+              value={fr.extraServiceTimeExplanation}
               onChange={(e) =>
-                update("extendNoticeExplain", e.target.value)
+                setFinancialRequests({ extraServiceTimeExplanation: e.target.value })
               }
               className={textareaClass}
             />
             <p className="mt-1 text-xs text-slate-500">
-              {form.extendNoticeExplain.length} /{" "}
+              {fr.extraServiceTimeExplanation.length} /{" "}
               {PAGE10_EXTEND_NOTICE_EXPLAIN_MAX} characters
             </p>
           </div>
@@ -116,12 +122,12 @@ export default function Step8_PropertyNoticeDebts({
         <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
           <input
             type="checkbox"
-            checked={form.payDebtsForProperty}
+            checked={fr.wantsDebtPayment}
             onChange={(e) => {
               if (e.target.checked) {
-                update("payDebtsForProperty", true);
+                setFinancialRequests({ wantsDebtPayment: true });
               } else {
-                resetPayDebtsForProperty();
+                resetPayDebts();
               }
             }}
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -136,7 +142,7 @@ export default function Step8_PropertyNoticeDebts({
           Some examples include rent, mortgage, car payment, etc.
         </p>
 
-        {form.payDebtsForProperty && (
+        {fr.wantsDebtPayment && (
           <div className="space-y-6">
             <div>
               <h3 className="text-sm font-medium text-slate-800">Debts (up to three)</h3>
@@ -152,7 +158,7 @@ export default function Step8_PropertyNoticeDebts({
                     </tr>
                   </thead>
                   <tbody>
-                    {form.payDebtsRows.map((row, idx) => (
+                    {fr.debts.map((row, idx) => (
                       <tr
                         key={`debt-${idx}`}
                         className="border-b border-purple-100/80 last:border-b-0"
@@ -170,13 +176,12 @@ export default function Step8_PropertyNoticeDebts({
                             autoComplete="off"
                             maxLength={PAGE10_DEBT_PAY_TO_MAX}
                             value={row.payTo}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                const next = [...prev.payDebtsRows];
-                                next[idx] = { ...next[idx], payTo: e.target.value };
-                                return { ...prev, payDebtsRows: next };
-                              })
-                            }
+                            onChange={(e) => {
+                              const r = useFormStore.getState().financial.requests;
+                              const next = [...r.debts];
+                              next[idx] = { ...next[idx]!, payTo: e.target.value };
+                              setFinancialRequests({ debts: next });
+                            }}
                             className={inputClass}
                           />
                         </td>
@@ -189,17 +194,13 @@ export default function Step8_PropertyNoticeDebts({
                             type="text"
                             autoComplete="off"
                             maxLength={PAGE10_DEBT_FOR_MAX}
-                            value={row.payFor}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                const next = [...prev.payDebtsRows];
-                                next[idx] = {
-                                  ...next[idx],
-                                  payFor: e.target.value,
-                                };
-                                return { ...prev, payDebtsRows: next };
-                              })
-                            }
+                            value={row.forWhat}
+                            onChange={(e) => {
+                              const r = useFormStore.getState().financial.requests;
+                              const next = [...r.debts];
+                              next[idx] = { ...next[idx]!, forWhat: e.target.value };
+                              setFinancialRequests({ debts: next });
+                            }}
                             className={inputClass}
                           />
                         </td>
@@ -213,16 +214,12 @@ export default function Step8_PropertyNoticeDebts({
                             autoComplete="off"
                             maxLength={PAGE10_DEBT_AMOUNT_MAX}
                             value={row.amount}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                const next = [...prev.payDebtsRows];
-                                next[idx] = {
-                                  ...next[idx],
-                                  amount: e.target.value,
-                                };
-                                return { ...prev, payDebtsRows: next };
-                              })
-                            }
+                            onChange={(e) => {
+                              const r = useFormStore.getState().financial.requests;
+                              const next = [...r.debts];
+                              next[idx] = { ...next[idx]!, amount: e.target.value };
+                              setFinancialRequests({ debts: next });
+                            }}
                             className={inputClass}
                           />
                         </td>
@@ -236,16 +233,12 @@ export default function Step8_PropertyNoticeDebts({
                             autoComplete="off"
                             maxLength={PAGE10_DEBT_DUE_MAX}
                             value={row.dueDate}
-                            onChange={(e) =>
-                              setForm((prev) => {
-                                const next = [...prev.payDebtsRows];
-                                next[idx] = {
-                                  ...next[idx],
-                                  dueDate: e.target.value,
-                                };
-                                return { ...prev, payDebtsRows: next };
-                              })
-                            }
+                            onChange={(e) => {
+                              const r = useFormStore.getState().financial.requests;
+                              const next = [...r.debts];
+                              next[idx] = { ...next[idx]!, dueDate: e.target.value };
+                              setFinancialRequests({ debts: next });
+                            }}
                             className={inputClass}
                           />
                         </td>
@@ -258,23 +251,23 @@ export default function Step8_PropertyNoticeDebts({
 
             <div>
               <label
-                htmlFor="payDebtsExplain"
+                htmlFor="debtExplanation"
                 className="text-sm font-medium text-slate-800"
               >
                 Explain why you want the person to pay the debts listed above
               </label>
               <textarea
-                id="payDebtsExplain"
+                id="debtExplanation"
                 autoComplete="off"
                 maxLength={PAGE10_PAY_DEBTS_EXPLAIN_MAX}
-                value={form.payDebtsExplain}
+                value={fr.debtExplanation}
                 onChange={(e) =>
-                  update("payDebtsExplain", e.target.value)
+                  setFinancialRequests({ debtExplanation: e.target.value })
                 }
                 className={textareaClass}
               />
               <p className="mt-1 text-xs text-slate-500">
-                {form.payDebtsExplain.length} / {PAGE10_PAY_DEBTS_EXPLAIN_MAX}{" "}
+                {fr.debtExplanation.length} / {PAGE10_PAY_DEBTS_EXPLAIN_MAX}{" "}
                 characters
               </p>
             </div>
@@ -294,13 +287,12 @@ export default function Step8_PropertyNoticeDebts({
                 <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                   <input
                     type="radio"
-                    name="payDebtsSpecialDecision"
-                    checked={form.payDebtsSpecialDecision === "yes"}
+                    name="debtSpecialFinding"
+                    checked={fr.debtSpecialFinding === "yes"}
                     onChange={() =>
-                      setForm((prev) => ({
-                        ...prev,
-                        payDebtsSpecialDecision: "yes",
-                      }))
+                      setFinancialRequests({
+                        debtSpecialFinding: "yes",
+                      })
                     }
                     className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                   />
@@ -309,18 +301,19 @@ export default function Step8_PropertyNoticeDebts({
                 <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                   <input
                     type="radio"
-                    name="payDebtsSpecialDecision"
-                    checked={form.payDebtsSpecialDecision === "no"}
+                    name="debtSpecialFinding"
+                    checked={fr.debtSpecialFinding === "no"}
                     onChange={() =>
-                      setForm((prev) => ({
-                        ...prev,
-                        payDebtsSpecialDecision: "no",
-                        payDebtsAbuseDebt1: false,
-                        payDebtsAbuseDebt2: false,
-                        payDebtsAbuseDebt3: false,
-                        payDebtsKnowHow: "",
-                        payDebtsExplainHow: "",
-                      }))
+                      setFinancialRequests({
+                        debtSpecialFinding: "no",
+                        debtSpecialFindingWhich: {
+                          debt1: false,
+                          debt2: false,
+                          debt3: false,
+                        },
+                        debtSpecialFindingKnowHow: "",
+                        debtSpecialFindingExplanation: "",
+                      })
                     }
                     className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                   />
@@ -328,7 +321,7 @@ export default function Step8_PropertyNoticeDebts({
                 </label>
               </div>
 
-              {form.payDebtsSpecialDecision === "yes" && (
+              {fr.debtSpecialFinding === "yes" && (
                 <div className="mt-4 space-y-4 border-t border-purple-200/60 pt-4">
                   <p className="text-sm font-medium text-slate-800">
                     Which of the debts listed above resulted from the abuse?
@@ -336,19 +329,27 @@ export default function Step8_PropertyNoticeDebts({
                   <div className="space-y-2">
                     {(
                       [
-                        { key: "payDebtsAbuseDebt1" as const, label: "Debt 1" },
-                        { key: "payDebtsAbuseDebt2" as const, label: "Debt 2" },
-                        { key: "payDebtsAbuseDebt3" as const, label: "Debt 3" },
+                        { k: "debt1" as const, label: "Debt 1" },
+                        { k: "debt2" as const, label: "Debt 2" },
+                        { k: "debt3" as const, label: "Debt 3" },
                       ] as const
-                    ).map(({ key, label }) => (
+                    ).map(({ k, label }) => (
                       <label
-                        key={key}
+                        key={k}
                         className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800"
                       >
                         <input
                           type="checkbox"
-                          checked={Boolean(form[key])}
-                          onChange={(e) => update(key, e.target.checked)}
+                          checked={Boolean(fr.debtSpecialFindingWhich[k])}
+                          onChange={(e) => {
+                            const r = useFormStore.getState().financial.requests;
+                            setFinancialRequests({
+                              debtSpecialFindingWhich: {
+                                ...r.debtSpecialFindingWhich,
+                                [k]: e.target.checked,
+                              },
+                            });
+                          }}
                           className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
                         {label}
@@ -364,13 +365,12 @@ export default function Step8_PropertyNoticeDebts({
                       <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                         <input
                           type="radio"
-                          name="payDebtsKnowHow"
-                          checked={form.payDebtsKnowHow === "yes"}
+                          name="debtSpecialFindingKnowHow"
+                          checked={fr.debtSpecialFindingKnowHow === "yes"}
                           onChange={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              payDebtsKnowHow: "yes",
-                            }))
+                            setFinancialRequests({
+                              debtSpecialFindingKnowHow: "yes",
+                            })
                           }
                           className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
@@ -379,14 +379,13 @@ export default function Step8_PropertyNoticeDebts({
                       <label className="flex cursor-pointer items-center gap-2 py-1 text-sm text-slate-800">
                         <input
                           type="radio"
-                          name="payDebtsKnowHow"
-                          checked={form.payDebtsKnowHow === "no"}
+                          name="debtSpecialFindingKnowHow"
+                          checked={fr.debtSpecialFindingKnowHow === "no"}
                           onChange={() =>
-                            setForm((prev) => ({
-                              ...prev,
-                              payDebtsKnowHow: "no",
-                              payDebtsExplainHow: "",
-                            }))
+                            setFinancialRequests({
+                              debtSpecialFindingKnowHow: "no",
+                              debtSpecialFindingExplanation: "",
+                            })
                           }
                           className="size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                         />
@@ -395,26 +394,28 @@ export default function Step8_PropertyNoticeDebts({
                     </div>
                   </div>
 
-                  {form.payDebtsKnowHow === "yes" && (
+                  {fr.debtSpecialFindingKnowHow === "yes" && (
                     <div>
                       <label
-                        htmlFor="payDebtsExplainHow"
+                        htmlFor="debtSpecialFindingExplanation"
                         className="text-sm font-medium text-slate-800"
                       >
                         Explain how they made the debt or debts
                       </label>
                       <textarea
-                        id="payDebtsExplainHow"
+                        id="debtSpecialFindingExplanation"
                         autoComplete="off"
                         maxLength={PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX}
-                        value={form.payDebtsExplainHow}
+                        value={fr.debtSpecialFindingExplanation}
                         onChange={(e) =>
-                          update("payDebtsExplainHow", e.target.value)
+                          setFinancialRequests({
+                            debtSpecialFindingExplanation: e.target.value,
+                          })
                         }
                         className={textareaClass}
                       />
                       <p className="mt-1 text-xs text-slate-500">
-                        {form.payDebtsExplainHow.length} /{" "}
+                        {fr.debtSpecialFindingExplanation.length} /{" "}
                         {PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX} characters
                       </p>
                     </div>

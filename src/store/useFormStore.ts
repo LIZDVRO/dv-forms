@@ -490,6 +490,7 @@ export interface RestitutionRow {
 export interface WirelessAccountRow {
   phoneNumber: string;
   isMyNumber: boolean;
+  isChildNumber: boolean;
 }
 
 export interface FinancialRequestsInfo {
@@ -505,9 +506,13 @@ export interface FinancialRequestsInfo {
   debtSpecialFindingExplanation: string;
   // Restitution (DV-100 Item 23)
   wantsRestitution: boolean;
+  /** LIZ $250 first-row lock + invoice (same as PDF). */
+  requestAbuserPayLizFee: boolean;
   restitutionExpenses: RestitutionRow[];
   // Child support (DV-100 Item 24)
-  wantsChildSupport: "" | "noOrderWantOne" | "haveOrderWantChange" | "no";
+  wantsChildSupport: boolean;
+  childSupportNoOrderWantOne: boolean;
+  childSupportHaveOrderWantChanged: boolean;
   receivingTANF: boolean;
   // Spousal support (DV-100 Item 25, married/RDP only)
   wantsSpousalSupport: boolean;
@@ -983,21 +988,25 @@ const initialFinancialRequests: FinancialRequestsInfo = {
   debtSpecialFinding: "", debtSpecialFindingWhich: { debt1: false, debt2: false, debt3: false },
   debtSpecialFindingKnowHow: "", debtSpecialFindingExplanation: "",
   wantsRestitution: false,
+  requestAbuserPayLizFee: false,
   restitutionExpenses: [
     { payTo: "", forWhat: "", amount: "" },
     { payTo: "", forWhat: "", amount: "" },
     { payTo: "", forWhat: "", amount: "" },
     { payTo: "", forWhat: "", amount: "" },
   ],
-  wantsChildSupport: "no", receivingTANF: false,
+  wantsChildSupport: false,
+  childSupportNoOrderWantOne: false,
+  childSupportHaveOrderWantChanged: false,
+  receivingTANF: false,
   wantsSpousalSupport: false, wantsLawyerFees: false,
   wantsBattererIntervention: false,
   wantsWirelessTransfer: false,
   wirelessAccounts: [
-    { phoneNumber: "", isMyNumber: true },
-    { phoneNumber: "", isMyNumber: true },
-    { phoneNumber: "", isMyNumber: true },
-    { phoneNumber: "", isMyNumber: true },
+    { phoneNumber: "", isMyNumber: false, isChildNumber: false },
+    { phoneNumber: "", isMyNumber: false, isChildNumber: false },
+    { phoneNumber: "", isMyNumber: false, isChildNumber: false },
+    { phoneNumber: "", isMyNumber: false, isChildNumber: false },
   ],
   wantsExtraServiceTime: false, extraServiceTimeExplanation: "",
 };
@@ -1271,7 +1280,7 @@ export const useFormStore = create<FormState>((set, get) => ({
   needsFinancialDeclaration: () => {
     const f = get().financial.requests;
     return (
-      f.wantsChildSupport !== "no" ||
+      f.wantsChildSupport ||
       f.wantsSpousalSupport ||
       f.wantsLawyerFees
     );

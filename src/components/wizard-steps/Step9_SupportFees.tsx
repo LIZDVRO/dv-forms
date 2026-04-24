@@ -1,29 +1,22 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
-
 import { formFieldInputControlClassName } from "@/components/ui/input";
-import type { Dv100PdfFormData, Dv100RestitutionExpenseRow } from "@/lib/dv100-pdf";
 import {
   DV100_LIZ_DOC_ASSIST_FOR,
   DV100_LIZ_FEE_AMOUNT,
   DV100_LIZ_INVOICE_LINE_AMOUNT,
   DV100_LIZ_PAYEE,
-  emptyRestitutionExpenses,
 } from "@/lib/dv100-pdf";
+import { type FinancialRequestsInfo, useFormStore } from "@/store/useFormStore";
 
-type FormData = Dv100PdfFormData;
-
-type Step9Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-};
-
-type RestitutionTuple = FormData["restitutionExpenses"];
+type RestitutionTuple = FinancialRequestsInfo["restitutionExpenses"];
 
 function mapRestitutionTuple(
-  prev: FormData,
-  mapRow: (row: Dv100RestitutionExpenseRow, index: number) => Dv100RestitutionExpenseRow,
+  prev: FinancialRequestsInfo,
+  mapRow: (
+    row: RestitutionTuple[number],
+    index: number,
+  ) => RestitutionTuple[number],
 ): RestitutionTuple {
   return prev.restitutionExpenses.map(mapRow) as RestitutionTuple;
 }
@@ -34,19 +27,22 @@ const checkboxClass =
 const labelCardClass =
   "flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30";
 
-export default function Step9_SupportFees({ form, setForm }: Step9Props) {
+export default function Step9_SupportFees() {
+  const fr = useFormStore((s) => s.financial.requests);
+  const setFinancialRequests = useFormStore((s) => s.setFinancialRequests);
+
   const updateRestitutionRow = (
     index: number,
-    key: keyof Dv100RestitutionExpenseRow,
+    key: keyof RestitutionTuple[number],
     value: string,
   ) => {
-    if (form.requestAbuserPayLizFee && index === 0) return;
-    setForm((prev) => ({
-      ...prev,
+    if (fr.requestAbuserPayLizFee && index === 0) return;
+    const prev = useFormStore.getState().financial.requests;
+    setFinancialRequests({
       restitutionExpenses: mapRestitutionTuple(prev, (row, i) =>
         i === index ? { ...row, [key]: value } : row,
       ),
-    }));
+    });
   };
 
   return (
@@ -58,18 +54,22 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestRestitution}
+            checked={fr.wantsRestitution}
             onChange={(e) => {
               const checked = e.target.checked;
               if (!checked) {
-                setForm((prev) => ({
-                  ...prev,
-                  requestRestitution: false,
+                setFinancialRequests({
+                  wantsRestitution: false,
                   requestAbuserPayLizFee: false,
-                  restitutionExpenses: emptyRestitutionExpenses(),
-                }));
+                  restitutionExpenses: [
+                    { payTo: "", forWhat: "", amount: "" },
+                    { payTo: "", forWhat: "", amount: "" },
+                    { payTo: "", forWhat: "", amount: "" },
+                    { payTo: "", forWhat: "", amount: "" },
+                  ],
+                });
               } else {
-                setForm((prev) => ({ ...prev, requestRestitution: true }));
+                setFinancialRequests({ wantsRestitution: true });
               }
             }}
             className={checkboxClass}
@@ -79,36 +79,36 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
           </span>
         </label>
 
-        {form.requestRestitution ? (
+        {fr.wantsRestitution ? (
           <div className="space-y-6">
             <label className={labelCardClass}>
               <input
                 type="checkbox"
-                checked={form.requestAbuserPayLizFee}
+                checked={fr.requestAbuserPayLizFee}
                 onChange={(e) => {
                   const checked = e.target.checked;
                   if (checked) {
-                    setForm((prev) => ({
-                      ...prev,
+                    const prev = useFormStore.getState().financial.requests;
+                    setFinancialRequests({
                       requestAbuserPayLizFee: true,
                       restitutionExpenses: mapRestitutionTuple(prev, (row, i) =>
                         i === 0
                           ? {
                               payTo: DV100_LIZ_PAYEE,
-                              forReason: DV100_LIZ_DOC_ASSIST_FOR,
+                              forWhat: DV100_LIZ_DOC_ASSIST_FOR,
                               amount: DV100_LIZ_FEE_AMOUNT,
                             }
                           : row,
                       ),
-                    }));
+                    });
                   } else {
-                    setForm((prev) => ({
-                      ...prev,
+                    const prev = useFormStore.getState().financial.requests;
+                    setFinancialRequests({
                       requestAbuserPayLizFee: false,
                       restitutionExpenses: mapRestitutionTuple(prev, (row, i) =>
-                        i === 0 ? { payTo: "", forReason: "", amount: "" } : row,
+                        i === 0 ? { payTo: "", forWhat: "", amount: "" } : row,
                       ),
-                    }));
+                    });
                   }
                 }}
                 className={checkboxClass}
@@ -119,7 +119,7 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
               </span>
             </label>
 
-            {form.requestAbuserPayLizFee ? (
+            {fr.requestAbuserPayLizFee ? (
               <div
                 className="rounded-xl border border-liz/30 bg-liz/8 px-4 py-3 text-sm leading-relaxed text-slate-800"
                 role="status"
@@ -146,8 +146,8 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {form.restitutionExpenses.map((row, idx) => {
-                      const rowLocked = form.requestAbuserPayLizFee && idx === 0;
+                    {fr.restitutionExpenses.map((row, idx) => {
+                      const rowLocked = fr.requestAbuserPayLizFee && idx === 0;
                       return (
                         <tr key={idx} className="border-b border-purple-50 last:border-0">
                           <td className="px-3 py-2 align-top text-slate-500">{idx + 1}</td>
@@ -171,9 +171,9 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
                               autoComplete="off"
                               disabled={rowLocked}
                               readOnly={rowLocked}
-                              value={row.forReason}
+                              value={row.forWhat}
                               onChange={(e) =>
-                                updateRestitutionRow(idx, "forReason", e.target.value)
+                                updateRestitutionRow(idx, "forWhat", e.target.value)
                               }
                               className={formFieldInputControlClassName}
                               aria-label={`For, row ${idx + 1}`}
@@ -209,20 +209,19 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestChildSupport}
+            checked={fr.wantsChildSupport}
             onChange={(e) => {
               const checked = e.target.checked;
-              setForm((prev) => ({
-                ...prev,
-                requestChildSupport: checked,
+              setFinancialRequests({
+                wantsChildSupport: checked,
                 ...(checked
                   ? {}
                   : {
                       childSupportNoOrderWantOne: false,
                       childSupportHaveOrderWantChanged: false,
-                      childSupportTANF: false,
+                      receivingTANF: false,
                     }),
-              }));
+              });
             }}
             className={checkboxClass}
           />
@@ -234,7 +233,7 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
           </span>
         </label>
 
-        {form.requestChildSupport ? (
+        {fr.wantsChildSupport ? (
           <div className="ml-2 space-y-3 border-l-2 border-purple-100 pl-4">
             <p className="text-xs font-medium uppercase tracking-wide text-slate-500">
               Check all that apply
@@ -242,12 +241,11 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
             <label className={labelCardClass}>
               <input
                 type="checkbox"
-                checked={form.childSupportNoOrderWantOne}
+                checked={fr.childSupportNoOrderWantOne}
                 onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
+                  setFinancialRequests({
                     childSupportNoOrderWantOne: e.target.checked,
-                  }))
+                  })
                 }
                 className={checkboxClass}
               />
@@ -258,12 +256,11 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
             <label className={labelCardClass}>
               <input
                 type="checkbox"
-                checked={form.childSupportHaveOrderWantChanged}
+                checked={fr.childSupportHaveOrderWantChanged}
                 onChange={(e) =>
-                  setForm((prev) => ({
-                    ...prev,
+                  setFinancialRequests({
                     childSupportHaveOrderWantChanged: e.target.checked,
-                  }))
+                  })
                 }
                 className={checkboxClass}
               />
@@ -275,9 +272,9 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
             <label className={labelCardClass}>
               <input
                 type="checkbox"
-                checked={form.childSupportTANF}
+                checked={fr.receivingTANF}
                 onChange={(e) =>
-                  setForm((prev) => ({ ...prev, childSupportTANF: e.target.checked }))
+                  setFinancialRequests({ receivingTANF: e.target.checked })
                 }
                 className={checkboxClass}
               />
@@ -294,9 +291,9 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestSpousalSupport}
+            checked={fr.wantsSpousalSupport}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, requestSpousalSupport: e.target.checked }))
+              setFinancialRequests({ wantsSpousalSupport: e.target.checked })
             }
             className={checkboxClass}
           />
@@ -319,9 +316,9 @@ export default function Step9_SupportFees({ form, setForm }: Step9Props) {
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestLawyerFees}
+            checked={fr.wantsLawyerFees}
             onChange={(e) =>
-              setForm((prev) => ({ ...prev, requestLawyerFees: e.target.checked }))
+              setFinancialRequests({ wantsLawyerFees: e.target.checked })
             }
             className={checkboxClass}
           />

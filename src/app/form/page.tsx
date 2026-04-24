@@ -299,28 +299,6 @@ export default function FormWizardPage() {
   const respondentPerson = useFormStore((s) => s.respondent.person);
   const respondentCLETS = useFormStore((s) => s.respondent.clets);
 
-  const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const resetPayDebtsForProperty = () =>
-    setForm((prev) => ({
-      ...prev,
-      payDebtsForProperty: false,
-      payDebtsRows: [
-        { payTo: "", payFor: "", amount: "", dueDate: "" },
-        { payTo: "", payFor: "", amount: "", dueDate: "" },
-        { payTo: "", payFor: "", amount: "", dueDate: "" },
-      ],
-      payDebtsExplain: "",
-      payDebtsSpecialDecision: "",
-      payDebtsAbuseDebt1: false,
-      payDebtsAbuseDebt2: false,
-      payDebtsAbuseDebt3: false,
-      payDebtsKnowHow: "",
-      payDebtsExplainHow: "",
-    }));
-
   const canGoBack = step > 0;
   const isLastStep = step === TOTAL_STEPS - 1;
 
@@ -612,25 +590,15 @@ export default function FormWizardPage() {
 
               {step === 8 && (
                 <Step8_PropertyNoticeDebts
-                  form={form}
-                  setForm={setForm}
-                  update={update}
                   inputClass={inputClass}
                   textareaClass={textareaClass}
-                  resetPayDebtsForProperty={resetPayDebtsForProperty}
                 />
               )}
 
-              {step === 9 && (
-                <Step9_SupportFees form={form} setForm={setForm} />
-              )}
+              {step === 9 && <Step9_SupportFees />}
 
               {step === 10 && (
-                <Step10_InterventionWireless
-                  form={form}
-                  setForm={setForm}
-                  inputClass={inputClass}
-                />
+                <Step10_InterventionWireless inputClass={inputClass} />
               )}
 
               {step === 11 && (

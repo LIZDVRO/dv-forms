@@ -1491,6 +1491,133 @@ export function getPropertyAnimalsPdfFieldsFromFormStore(): Pick<
   };
 }
 
+type FinancialPdfSlice = Pick<
+  Dv100PdfFormData,
+  | "propertyRestraint"
+  | "extendNoticeDeadline"
+  | "extendNoticeExplain"
+  | "payDebtsForProperty"
+  | "payDebtsRows"
+  | "payDebtsExplain"
+  | "payDebtsSpecialDecision"
+  | "payDebtsAbuseDebt1"
+  | "payDebtsAbuseDebt2"
+  | "payDebtsAbuseDebt3"
+  | "payDebtsKnowHow"
+  | "payDebtsExplainHow"
+  | "requestRestitution"
+  | "requestAbuserPayLizFee"
+  | "restitutionExpenses"
+  | "requestChildSupport"
+  | "childSupportNoOrderWantOne"
+  | "childSupportHaveOrderWantChanged"
+  | "childSupportTANF"
+  | "requestSpousalSupport"
+  | "requestLawyerFees"
+  | "requestBattererIntervention"
+  | "requestWirelessTransfer"
+  | "wirelessAccounts"
+>;
+
+/**
+ * DV-100 pages 10–12 — property restraint, extra time to serve, pay debts, restitution,
+ * support/fee requests, batterer program, and wireless (from `financial.requests`).
+ */
+export function getFinancialRequestsPdfFieldsFromFormStore(): FinancialPdfSlice {
+  const f = useFormStore.getState().financial.requests;
+  const which = f.debtSpecialFindingWhich;
+
+  const d = (i: 0 | 1 | 2) => f.debts[i] ?? { payTo: "", forWhat: "", amount: "", dueDate: "" };
+
+  const payRows: Dv100PdfFormData["payDebtsRows"] = [
+    {
+      payTo: d(0).payTo,
+      payFor: d(0).forWhat,
+      amount: d(0).amount,
+      dueDate: d(0).dueDate,
+    },
+    {
+      payTo: d(1).payTo,
+      payFor: d(1).forWhat,
+      amount: d(1).amount,
+      dueDate: d(1).dueDate,
+    },
+    {
+      payTo: d(2).payTo,
+      payFor: d(2).forWhat,
+      amount: d(2).amount,
+      dueDate: d(2).dueDate,
+    },
+  ];
+
+  const restR = (i: 0 | 1 | 2 | 3) =>
+    f.restitutionExpenses[i] ?? { payTo: "", forWhat: "", amount: "" };
+
+  const restitutionExpenses: Dv100PdfFormData["restitutionExpenses"] = [
+    { payTo: restR(0).payTo, forReason: restR(0).forWhat, amount: restR(0).amount },
+    { payTo: restR(1).payTo, forReason: restR(1).forWhat, amount: restR(1).amount },
+    { payTo: restR(2).payTo, forReason: restR(2).forWhat, amount: restR(2).amount },
+    { payTo: restR(3).payTo, forReason: restR(3).forWhat, amount: restR(3).amount },
+  ];
+
+  const wireR = (i: 0 | 1 | 2 | 3) =>
+    f.wirelessAccounts[i] ?? {
+      phoneNumber: "",
+      isMyNumber: false,
+      isChildNumber: false,
+    };
+
+  const wirelessAccounts: Dv100PdfFormData["wirelessAccounts"] = [
+    {
+      isMyNumber: wireR(0).isMyNumber,
+      isChildNumber: wireR(0).isChildNumber,
+      phoneNumber: wireR(0).phoneNumber,
+    },
+    {
+      isMyNumber: wireR(1).isMyNumber,
+      isChildNumber: wireR(1).isChildNumber,
+      phoneNumber: wireR(1).phoneNumber,
+    },
+    {
+      isMyNumber: wireR(2).isMyNumber,
+      isChildNumber: wireR(2).isChildNumber,
+      phoneNumber: wireR(2).phoneNumber,
+    },
+    {
+      isMyNumber: wireR(3).isMyNumber,
+      isChildNumber: wireR(3).isChildNumber,
+      phoneNumber: wireR(3).phoneNumber,
+    },
+  ];
+
+  return {
+    propertyRestraint: f.wantsPropertyRestraint,
+    extendNoticeDeadline: f.wantsExtraServiceTime,
+    extendNoticeExplain: f.extraServiceTimeExplanation,
+    payDebtsForProperty: f.wantsDebtPayment,
+    payDebtsRows: payRows,
+    payDebtsExplain: f.debtExplanation,
+    payDebtsSpecialDecision: f.debtSpecialFinding,
+    payDebtsAbuseDebt1: which.debt1,
+    payDebtsAbuseDebt2: which.debt2,
+    payDebtsAbuseDebt3: which.debt3,
+    payDebtsKnowHow: f.debtSpecialFindingKnowHow,
+    payDebtsExplainHow: f.debtSpecialFindingExplanation,
+    requestRestitution: f.wantsRestitution,
+    requestAbuserPayLizFee: f.requestAbuserPayLizFee,
+    restitutionExpenses,
+    requestChildSupport: f.wantsChildSupport,
+    childSupportNoOrderWantOne: f.childSupportNoOrderWantOne,
+    childSupportHaveOrderWantChanged: f.childSupportHaveOrderWantChanged,
+    childSupportTANF: f.receivingTANF,
+    requestSpousalSupport: f.wantsSpousalSupport,
+    requestLawyerFees: f.wantsLawyerFees,
+    requestBattererIntervention: f.wantsBattererIntervention,
+    requestWirelessTransfer: f.wantsWirelessTransfer,
+    wirelessAccounts,
+  };
+}
+
 export function getDv110RelationshipLabelFromFormStore(): string {
   const r = useFormStore.getState().relationship;
   const out: string[] = [];
@@ -1520,6 +1647,7 @@ export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<Gene
     ...getMoveOutPdfFieldsFromFormStore(),
     ...getCustodyOrdersPdfFieldsFromFormStore(),
     ...getPropertyAnimalsPdfFieldsFromFormStore(),
+    ...getFinancialRequestsPdfFieldsFromFormStore(),
   };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();

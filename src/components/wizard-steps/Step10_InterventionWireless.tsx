@@ -1,18 +1,9 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
-
-import type {
-  Dv100PdfFormData,
-  Dv100WirelessAccountRow,
-} from "@/lib/dv100-pdf";
 import { emptyWirelessAccounts } from "@/lib/dv100-pdf";
-
-type FormData = Dv100PdfFormData;
+import { type FinancialRequestsInfo, useFormStore } from "@/store/useFormStore";
 
 type Step10Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
   inputClass: string;
 };
 
@@ -22,35 +13,34 @@ const checkboxClass =
 const labelCardClass =
   "flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30";
 
-type WirelessTuple = FormData["wirelessAccounts"];
+type WirelessTuple = FinancialRequestsInfo["wirelessAccounts"];
 
 function mapWirelessTuple(
-  prev: FormData,
+  prev: FinancialRequestsInfo,
   mapRow: (
-    row: Dv100WirelessAccountRow,
+    row: WirelessTuple[number],
     index: number,
-  ) => Dv100WirelessAccountRow,
+  ) => WirelessTuple[number],
 ): WirelessTuple {
   return prev.wirelessAccounts.map(mapRow) as WirelessTuple;
 }
 
 const ROW_LABELS = ["a", "b", "c", "d"] as const;
 
-export default function Step10_InterventionWireless({
-  form,
-  setForm,
-  inputClass,
-}: Step10Props) {
+export default function Step10_InterventionWireless({ inputClass }: Step10Props) {
+  const fr = useFormStore((s) => s.financial.requests);
+  const setFinancialRequests = useFormStore((s) => s.setFinancialRequests);
+
   const updateWirelessRow = (
     index: number,
-    patch: Partial<Dv100WirelessAccountRow>,
+    patch: Partial<WirelessTuple[number]>,
   ) => {
-    setForm((prev) => ({
-      ...prev,
+    const prev = useFormStore.getState().financial.requests;
+    setFinancialRequests({
       wirelessAccounts: mapWirelessTuple(prev, (row, i) =>
         i === index ? { ...row, ...patch } : row,
       ),
-    }));
+    });
   };
 
   return (
@@ -62,12 +52,9 @@ export default function Step10_InterventionWireless({
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestBattererIntervention}
+            checked={fr.wantsBattererIntervention}
             onChange={(e) =>
-              setForm((prev) => ({
-                ...prev,
-                requestBattererIntervention: e.target.checked,
-              }))
+              setFinancialRequests({ wantsBattererIntervention: e.target.checked })
             }
             className={checkboxClass}
           />
@@ -90,14 +77,19 @@ export default function Step10_InterventionWireless({
         <label className={labelCardClass}>
           <input
             type="checkbox"
-            checked={form.requestWirelessTransfer}
+            checked={fr.wantsWirelessTransfer}
             onChange={(e) => {
               const on = e.target.checked;
-              setForm((prev) => ({
-                ...prev,
-                requestWirelessTransfer: on,
-                ...(!on ? { wirelessAccounts: emptyWirelessAccounts() } : {}),
-              }));
+              setFinancialRequests({
+                wantsWirelessTransfer: on,
+                ...(!on
+                  ? {
+                      wirelessAccounts: emptyWirelessAccounts().map((r) => ({
+                        ...r,
+                      })),
+                    }
+                  : {}),
+              });
             }}
             className={checkboxClass}
           />
@@ -114,7 +106,7 @@ export default function Step10_InterventionWireless({
           </div>
         </label>
 
-        {form.requestWirelessTransfer ? (
+        {fr.wantsWirelessTransfer ? (
           <div className="overflow-x-auto rounded-xl border border-purple-100/80 bg-white shadow-sm">
             <table className="w-full min-w-[36rem] text-left text-sm">
               <thead>
@@ -126,7 +118,7 @@ export default function Step10_InterventionWireless({
                 </tr>
               </thead>
               <tbody>
-                {form.wirelessAccounts.map((row, idx) => (
+                {fr.wirelessAccounts.map((row, idx) => (
                   <tr
                     key={`wireless-${idx}`}
                     className="border-b border-purple-100/80 last:border-b-0"

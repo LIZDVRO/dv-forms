@@ -83,6 +83,7 @@ export default function Step12_ReviewGenerate({
   const moveOutPdf = getMoveOutPdfFieldsFromFormStore();
   const custodyPdf = getCustodyOrdersPdfFieldsFromFormStore();
   const propertyAnimalsPdf = getPropertyAnimalsPdfFieldsFromFormStore();
+  const fr = useFormStore((s) => s.financial.requests);
 
   return (
     <div className="space-y-8">
@@ -879,53 +880,53 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-2 text-slate-800">
             <p>
               <span className="text-slate-500">Property restraint:</span>{" "}
-              {form.propertyRestraint ? "Yes" : "No"}
+              {fr.wantsPropertyRestraint ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">
                 Extend deadline to give notice:
               </span>{" "}
-              {form.extendNoticeDeadline ? "Yes" : "No"}
+              {fr.wantsExtraServiceTime ? "Yes" : "No"}
             </p>
-            {form.extendNoticeDeadline ? (
+            {fr.wantsExtraServiceTime ? (
               <p>
                 <span className="text-slate-500">Why more time:</span>{" "}
-                {display(form.extendNoticeExplain)}
+                {display(fr.extraServiceTimeExplanation)}
               </p>
             ) : null}
             <p>
               <span className="text-slate-500">Pay debts for property:</span>{" "}
-              {form.payDebtsForProperty ? "Yes" : "No"}
+              {fr.wantsDebtPayment ? "Yes" : "No"}
             </p>
-            {form.payDebtsForProperty ? (
+            {fr.wantsDebtPayment ? (
               <div className="space-y-1 border-l-2 border-purple-200/80 pl-3">
-                {form.payDebtsRows.map((d, i) => (
+                {fr.debts.map((d, i) => (
                   <p key={`pd-${i}`}>
                     <span className="text-slate-500">Debt {i + 1}:</span>{" "}
-                    {display(d.payTo)} / {display(d.payFor)} /{" "}
+                    {display(d.payTo)} / {display(d.forWhat)} /{" "}
                     {display(d.amount)} / {display(d.dueDate)}
                   </p>
                 ))}
                 <p>
                   <span className="text-slate-500">Why they should pay:</span>{" "}
-                  {display(form.payDebtsExplain)}
+                  {display(fr.debtExplanation)}
                 </p>
                 <p>
                   <span className="text-slate-500">Special judge finding:</span>{" "}
-                  {form.payDebtsSpecialDecision === "yes"
+                  {fr.debtSpecialFinding === "yes"
                     ? "Yes"
-                    : form.payDebtsSpecialDecision === "no"
+                    : fr.debtSpecialFinding === "no"
                       ? "No"
                       : "—"}
                 </p>
-                {form.payDebtsSpecialDecision === "yes" ? (
+                {fr.debtSpecialFinding === "yes" ? (
                   <>
                     <p>
                       <span className="text-slate-500">Debts from abuse:</span>{" "}
                       {[
-                        form.payDebtsAbuseDebt1 && "1",
-                        form.payDebtsAbuseDebt2 && "2",
-                        form.payDebtsAbuseDebt3 && "3",
+                        fr.debtSpecialFindingWhich.debt1 && "1",
+                        fr.debtSpecialFindingWhich.debt2 && "2",
+                        fr.debtSpecialFindingWhich.debt3 && "3",
                       ]
                         .filter(Boolean)
                         .join(", ") || "—"}
@@ -934,16 +935,16 @@ export default function Step12_ReviewGenerate({
                       <span className="text-slate-500">
                         Know how debts were made:
                       </span>{" "}
-                      {form.payDebtsKnowHow === "yes"
+                      {fr.debtSpecialFindingKnowHow === "yes"
                         ? "Yes"
-                        : form.payDebtsKnowHow === "no"
+                        : fr.debtSpecialFindingKnowHow === "no"
                           ? "No"
                           : "—"}
                     </p>
-                    {form.payDebtsKnowHow === "yes" ? (
+                    {fr.debtSpecialFindingKnowHow === "yes" ? (
                       <p>
                         <span className="text-slate-500">How:</span>{" "}
-                        {display(form.payDebtsExplainHow)}
+                        {display(fr.debtSpecialFindingExplanation)}
                       </p>
                     ) : null}
                   </>
@@ -961,23 +962,23 @@ export default function Step12_ReviewGenerate({
               <span className="text-slate-500">
                 Pay expenses caused by abuse (Section 23):
               </span>{" "}
-              {form.requestRestitution ? "Yes" : "No"}
+              {fr.wantsRestitution ? "Yes" : "No"}
             </p>
-            {form.requestRestitution ? (
+            {fr.wantsRestitution ? (
               <>
                 <p>
                   <span className="text-slate-500">
                     Abuser pays $250 LIZ fee (invoice appended):
                   </span>{" "}
-                  {form.requestAbuserPayLizFee ? "Yes" : "No"}
+                  {fr.requestAbuserPayLizFee ? "Yes" : "No"}
                 </p>
                 <div className="mt-2 space-y-1">
                   <p className="text-slate-500">Expense grid:</p>
                   <ul className="list-inside list-disc text-slate-700">
-                    {form.restitutionExpenses.map((row, i) => (
+                    {fr.restitutionExpenses.map((row, i) => (
                       <li key={i}>
                         {i + 1}. Pay to: {display(row.payTo)} · For:{" "}
-                        {display(row.forReason)} · Amount: {display(row.amount)}
+                        {display(row.forWhat)} · Amount: {display(row.amount)}
                       </li>
                     ))}
                   </ul>
@@ -986,33 +987,33 @@ export default function Step12_ReviewGenerate({
             ) : null}
             <p>
               <span className="text-slate-500">Child support:</span>{" "}
-              {form.requestChildSupport ? "Yes" : "No"}
+              {fr.wantsChildSupport ? "Yes" : "No"}
             </p>
-            {form.requestChildSupport ? (
+            {fr.wantsChildSupport ? (
               <ul className="ml-4 list-inside list-disc space-y-0.5 text-slate-700">
                 <li>
                   No order, want one:{" "}
-                  {form.childSupportNoOrderWantOne ? "Yes" : "No"}
+                  {fr.childSupportNoOrderWantOne ? "Yes" : "No"}
                 </li>
                 <li>
                   Have order, want changed:{" "}
-                  {form.childSupportHaveOrderWantChanged ? "Yes" : "No"}
+                  {fr.childSupportHaveOrderWantChanged ? "Yes" : "No"}
                 </li>
                 <li>
                   TANF / Welfare / CalWORKS:{" "}
-                  {form.childSupportTANF ? "Yes" : "No"}
+                  {fr.receivingTANF ? "Yes" : "No"}
                 </li>
               </ul>
             ) : null}
             <p>
               <span className="text-slate-500">Spousal support:</span>{" "}
-              {form.requestSpousalSupport ? "Yes" : "No"}
+              {fr.wantsSpousalSupport ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">
                 Lawyer&apos;s fees and costs:
               </span>{" "}
-              {form.requestLawyerFees ? "Yes" : "No"}
+              {fr.wantsLawyerFees ? "Yes" : "No"}
             </p>
           </dd>
         </div>
@@ -1025,19 +1026,19 @@ export default function Step12_ReviewGenerate({
               <span className="text-slate-500">
                 Batterer intervention program (Section 27):
               </span>{" "}
-              {form.requestBattererIntervention ? "Yes" : "No"}
+              {fr.wantsBattererIntervention ? "Yes" : "No"}
             </p>
             <p>
               <span className="text-slate-500">
                 Transfer of wireless phone account (Section 28):
               </span>{" "}
-              {form.requestWirelessTransfer ? "Yes" : "No"}
+              {fr.wantsWirelessTransfer ? "Yes" : "No"}
             </p>
-            {form.requestWirelessTransfer ? (
+            {fr.wantsWirelessTransfer ? (
               <div className="mt-2 space-y-1">
                 <p className="text-slate-500">Wireless number rows:</p>
                 <ul className="list-inside list-disc text-slate-700">
-                  {form.wirelessAccounts.map((row, i) => (
+                  {fr.wirelessAccounts.map((row, i) => (
                     <li key={i}>
                       Row {String.fromCharCode(97 + i)}: My number{" "}
                       {row.isMyNumber ? "Yes" : "No"} · Child in my care{" "}
