@@ -1,47 +1,98 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
-import type { PersonInfo, RespondentCLETSInfo } from "@/store/useFormStore";
+import type { RelationshipInfo } from "@/store/useFormStore";
+import { useFormStore, type FirearmRow } from "@/store/useFormStore";
 
 import {
-  defaultFirearmRow,
   GENDER_OPTIONS,
   invoiceFieldInputClassName,
   parseDisplayNameToPersonInfo,
+  personInfoToDisplayName,
   RELATED_TYPE_OPTIONS,
   RELATIONSHIP_OPTIONS,
   toggleInList,
 } from "./wizardShared";
 
-type FormData = Dv100PdfFormData;
+const RELATIONSHIP_TO_STORE_KEY: Record<
+  string,
+  keyof Pick<
+    RelationshipInfo,
+    | "childrenTogether"
+    | "marriedOrRDP"
+    | "formerlyMarriedOrRDP"
+    | "datingOrFormerlyDating"
+    | "engagedOrFormerlyEngaged"
+    | "related"
+    | "liveTogetherOrUsedTo"
+  >
+> = {
+  children: "childrenTogether",
+  married: "marriedOrRDP",
+  usedToBeMarried: "formerlyMarriedOrRDP",
+  dating: "datingOrFormerlyDating",
+  engaged: "engagedOrFormerlyEngaged",
+  related: "related",
+  liveTogether: "liveTogetherOrUsedTo",
+};
 
 type Step2Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-  respondentPerson: PersonInfo;
-  setRespondentPerson: (patch: Partial<PersonInfo>) => void;
-  respondentCLETS: RespondentCLETSInfo;
-  setRespondentCLETS: (patch: Partial<RespondentCLETSInfo>) => void;
-  respondentFullName: string;
-  setRespondentFullName: (v: string) => void;
   inputClass: string;
 };
 
-export default function Step2_PersonCausingHarm({
-  form,
-  setForm,
-  update,
-  respondentPerson,
-  setRespondentPerson,
-  respondentCLETS,
-  setRespondentCLETS,
-  respondentFullName,
-  setRespondentFullName,
-  inputClass,
-}: Step2Props) {
+export default function Step2_PersonCausingHarm({ inputClass }: Step2Props) {
+  const respondentPerson = useFormStore((s) => s.respondent.person);
+  const setRespondentPerson = useFormStore((s) => s.setRespondentPerson);
+  const respondentCLETS = useFormStore((s) => s.respondent.clets);
+  const setRespondentCLETS = useFormStore((s) => s.setRespondentCLETS);
+  const relationship = useFormStore((s) => s.relationship);
+  const setRelationship = useFormStore((s) => s.setRelationship);
+  const firearms = useFormStore((s) => s.firearms);
+  const setFirearms = useFormStore((s) => s.setFirearms);
+
+  const [respondentFullName, setRespondentFullName] = useState(() =>
+    personInfoToDisplayName(respondentPerson),
+  );
+
+  const setFirearmRow = (index: number, patch: Partial<FirearmRow>) => {
+    const rows = useFormStore.getState().firearms.firearms;
+    setFirearms({
+      firearms: rows.map((r, i) => (i === index ? { ...r, ...patch } : r)),
+    });
+  };
+
+  const toggleRelationship = (value: string) => {
+    const k = RELATIONSHIP_TO_STORE_KEY[value];
+    if (!k) {
+      return;
+    }
+    const r = useFormStore.getState().relationship;
+    const was = Boolean(r[k]);
+    const on = !was;
+    if (value === "children" && !on) {
+      setRelationship({ [k]: on, childrenNames: "" });
+      return;
+    }
+    if (value === "related" && !on) {
+      setRelationship({ [k]: on, relatedType: [] });
+      return;
+    }
+    if (value === "liveTogether" && !on) {
+      setRelationship({ [k]: on, livedAsFamily: "" });
+      return;
+    }
+    setRelationship({ [k]: on } as Partial<RelationshipInfo>);
+  };
+
+  const isRelChecked = (r: typeof relationship, value: string) => {
+    const k = RELATIONSHIP_TO_STORE_KEY[value];
+    if (!k) {
+      return false;
+    }
+    return Boolean(r[k]);
+  };
+
   return (
     <div className="space-y-6">
       <div>
@@ -141,6 +192,93 @@ export default function Step2_PersonCausingHarm({
           onChange={(e) => setRespondentPerson({ race: e.target.value })}
           className={inputClass}
         />
+      </div>
+      <div>
+        <label
+          htmlFor="respondentStreet"
+          className="text-sm font-medium text-slate-800"
+        >
+          Street address
+        </label>
+        <input
+          id="respondentStreet"
+          name="respondentStreet"
+          type="text"
+          autoComplete="street-address"
+          value={respondentPerson.address.street}
+          onChange={(e) =>
+            setRespondentPerson({
+              address: { ...respondentPerson.address, street: e.target.value },
+            })
+          }
+          className={inputClass}
+        />
+      </div>
+      <div className="grid gap-6 sm:grid-cols-2">
+        <div>
+          <label
+            htmlFor="respondentCity"
+            className="text-sm font-medium text-slate-800"
+          >
+            City
+          </label>
+          <input
+            id="respondentCity"
+            name="respondentCity"
+            type="text"
+            autoComplete="address-level2"
+            value={respondentPerson.address.city}
+            onChange={(e) =>
+              setRespondentPerson({
+                address: { ...respondentPerson.address, city: e.target.value },
+              })
+            }
+            className={inputClass}
+          />
+        </div>
+        <div>
+          <label
+            htmlFor="respondentState"
+            className="text-sm font-medium text-slate-800"
+          >
+            State
+          </label>
+          <input
+            id="respondentState"
+            name="respondentState"
+            type="text"
+            autoComplete="address-level1"
+            value={respondentPerson.address.state}
+            onChange={(e) =>
+              setRespondentPerson({
+                address: { ...respondentPerson.address, state: e.target.value },
+              })
+            }
+            className={inputClass}
+          />
+        </div>
+        <div className="sm:col-span-2">
+          <label
+            htmlFor="respondentZip"
+            className="text-sm font-medium text-slate-800"
+          >
+            Zip
+          </label>
+          <input
+            id="respondentZip"
+            name="respondentZip"
+            type="text"
+            inputMode="numeric"
+            autoComplete="postal-code"
+            value={respondentPerson.address.zip}
+            onChange={(e) =>
+              setRespondentPerson({
+                address: { ...respondentPerson.address, zip: e.target.value },
+              })
+            }
+            className={inputClass}
+          />
+        </div>
       </div>
       <div>
         <label
@@ -517,20 +655,8 @@ export default function Step2_PersonCausingHarm({
             >
               <input
                 type="checkbox"
-                checked={form.relationshipChecks.includes(value)}
-                onChange={() => {
-                  const next = toggleInList(form.relationshipChecks, value);
-                  update("relationshipChecks", next);
-                  if (!next.includes("children")) {
-                    update("childrenNames", "");
-                  }
-                  if (!next.includes("related")) {
-                    update("relatedTypes", []);
-                  }
-                  if (!next.includes("liveTogether")) {
-                    update("livedTogether", "");
-                  }
-                }}
+                checked={isRelChecked(relationship, value)}
+                onChange={() => toggleRelationship(value)}
                 className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
               />
               <span className="text-sm leading-relaxed text-slate-800">
@@ -541,7 +667,7 @@ export default function Step2_PersonCausingHarm({
         </div>
       </fieldset>
 
-      {form.relationshipChecks.includes("children") && (
+      {relationship.childrenTogether && (
         <div>
           <label
             htmlFor="childrenNames"
@@ -554,14 +680,16 @@ export default function Step2_PersonCausingHarm({
             name="childrenNames"
             type="text"
             autoComplete="off"
-            value={form.childrenNames}
-            onChange={(e) => update("childrenNames", e.target.value)}
+            value={relationship.childrenNames}
+            onChange={(e) =>
+              setRelationship({ childrenNames: e.target.value })
+            }
             className={inputClass}
           />
         </div>
       )}
 
-      {form.relationshipChecks.includes("related") && (
+      {relationship.related && (
         <fieldset className="space-y-4 border-t border-purple-100/90 pt-6">
           <legend className="text-sm font-medium text-slate-800">
             The person in 2 is my (check all that apply)
@@ -574,13 +702,13 @@ export default function Step2_PersonCausingHarm({
               >
                 <input
                   type="checkbox"
-                  checked={form.relatedTypes.includes(value)}
-                  onChange={() =>
-                    update(
-                      "relatedTypes",
-                      toggleInList(form.relatedTypes, value),
-                    )
-                  }
+                  checked={relationship.relatedType.includes(value)}
+                  onChange={() => {
+                    const r = useFormStore.getState().relationship;
+                    setRelationship({
+                      relatedType: toggleInList(r.relatedType, value),
+                    });
+                  }}
                   className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
                 <span className="text-sm leading-relaxed text-slate-800">
@@ -592,7 +720,7 @@ export default function Step2_PersonCausingHarm({
         </fieldset>
       )}
 
-      {form.relationshipChecks.includes("liveTogether") && (
+      {relationship.liveTogetherOrUsedTo && (
         <fieldset className="space-y-4 border-t border-purple-100/90 pt-6">
           <legend className="text-sm font-medium text-slate-800">
             Have you lived together with the person in 2?
@@ -602,8 +730,8 @@ export default function Step2_PersonCausingHarm({
               <input
                 type="radio"
                 name="livedTogether"
-                checked={form.livedTogether === "yes"}
-                onChange={() => update("livedTogether", "yes")}
+                checked={relationship.livedAsFamily === "yes"}
+                onChange={() => setRelationship({ livedAsFamily: "yes" })}
                 className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
               />
               <span className="text-sm leading-relaxed text-slate-800">Yes</span>
@@ -612,8 +740,8 @@ export default function Step2_PersonCausingHarm({
               <input
                 type="radio"
                 name="livedTogether"
-                checked={form.livedTogether === "no"}
-                onChange={() => update("livedTogether", "no")}
+                checked={relationship.livedAsFamily === "no"}
+                onChange={() => setRelationship({ livedAsFamily: "no" })}
                 className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
               />
               <span className="text-sm leading-relaxed text-slate-800">No</span>
@@ -632,7 +760,7 @@ export default function Step2_PersonCausingHarm({
           <div className="space-y-3">
             {(
               [
-                { value: "idk" as const, label: "I don't know" },
+                { value: "dontKnow" as const, label: "I don't know" },
                 { value: "no" as const, label: "No" },
                 { value: "yes" as const, label: "Yes" },
               ] as const
@@ -644,8 +772,8 @@ export default function Step2_PersonCausingHarm({
                 <input
                   type="radio"
                   name="hasFirearms"
-                  checked={form.hasFirearms === value}
-                  onChange={() => update("hasFirearms", value)}
+                  checked={firearms.hasFirearms === value}
+                  onChange={() => setFirearms({ hasFirearms: value })}
                   className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
                 <span className="text-sm leading-relaxed text-slate-800">
@@ -656,9 +784,9 @@ export default function Step2_PersonCausingHarm({
           </div>
         </fieldset>
 
-        {form.hasFirearms === "yes" && (
+        {firearms.hasFirearms === "yes" && (
           <div className="space-y-6">
-            {form.firearms.map((row, index) => (
+            {firearms.firearms.map((row, index) => (
               <div
                 key={index}
                 className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
@@ -679,14 +807,7 @@ export default function Step2_PersonCausingHarm({
                     autoComplete="off"
                     value={row.description}
                     onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        firearms: prev.firearms.map((f, i) =>
-                          i === index
-                            ? { ...f, description: e.target.value }
-                            : f,
-                        ),
-                      }))
+                      setFirearmRow(index, { description: e.target.value })
                     }
                     className={inputClass}
                   />
@@ -702,14 +823,9 @@ export default function Step2_PersonCausingHarm({
                     id={`firearm-amt-${index}`}
                     type="text"
                     autoComplete="off"
-                    value={row.amount}
+                    value={row.numberOrAmount}
                     onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        firearms: prev.firearms.map((f, i) =>
-                          i === index ? { ...f, amount: e.target.value } : f,
-                        ),
-                      }))
+                      setFirearmRow(index, { numberOrAmount: e.target.value })
                     }
                     className={inputClass}
                   />
@@ -727,33 +843,13 @@ export default function Step2_PersonCausingHarm({
                     autoComplete="off"
                     value={row.location}
                     onChange={(e) =>
-                      setForm((prev) => ({
-                        ...prev,
-                        firearms: prev.firearms.map((f, i) =>
-                          i === index
-                            ? { ...f, location: e.target.value }
-                            : f,
-                        ),
-                      }))
+                      setFirearmRow(index, { location: e.target.value })
                     }
                     className={inputClass}
                   />
                 </div>
               </div>
             ))}
-            <button
-              type="button"
-              disabled={form.firearms.length >= 6}
-              onClick={() =>
-                setForm((prev) => ({
-                  ...prev,
-                  firearms: [...prev.firearms, defaultFirearmRow()],
-                }))
-              }
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              Add Firearm
-            </button>
           </div>
         )}
       </div>

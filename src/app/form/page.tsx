@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 
 import {
   emptyRestitutionExpenses,
@@ -44,7 +44,6 @@ import {
   initialProtectedAnimals,
   personInfoToDisplayName,
   RELATED_TYPE_OPTIONS,
-  RELATIONSHIP_OPTIONS,
   toggleInList,
 } from "@/components/wizard-steps/wizardShared";
 
@@ -79,27 +78,6 @@ const STEP_BLURBS = [
   "Declare that your answers are true, then sign. Your signature is stored with your answers for PDF generation.",
   "Confirm everything below, then generate your filled PDF.",
 ] as const;
-
-const DV110_RELATIONSHIP_LABEL_BY_CHECK: Record<string, string> = {
-  married: "Spouse/Domestic Partner",
-  usedToBeMarried: "Former Spouse/Domestic Partner",
-  children: "Parent of shared children",
-  dating: "Dating/Former Dating Partner",
-  engaged: "Engaged/Former Fiance(e)",
-  related: "Related",
-  liveTogether: "Cohabitant",
-};
-
-function relationshipChecksToDv110Relationship(checks: readonly string[]): string {
-  const labels: string[] = [];
-  for (const { value } of RELATIONSHIP_OPTIONS) {
-    const mapped = DV110_RELATIONSHIP_LABEL_BY_CHECK[value];
-    if (mapped && checks.includes(value)) {
-      labels.push(mapped);
-    }
-  }
-  return labels.join(", ");
-}
 
 type FormData = Dv100PdfFormData;
 
@@ -320,20 +298,6 @@ export default function FormWizardPage() {
   const petitioner = useFormStore((s) => s.petitioner);
   const respondentPerson = useFormStore((s) => s.respondent.person);
   const respondentCLETS = useFormStore((s) => s.respondent.clets);
-  const setRespondentPerson = useFormStore((s) => s.setRespondentPerson);
-  const setRespondentCLETS = useFormStore((s) => s.setRespondentCLETS);
-
-  const [respondentFullName, setRespondentFullName] = useState(() =>
-    personInfoToDisplayName(respondentPerson),
-  );
-
-  const prevStepRef = useRef(step);
-  useEffect(() => {
-    if (step === 2 && prevStepRef.current !== 2) {
-      setRespondentFullName(personInfoToDisplayName(respondentPerson));
-    }
-    prevStepRef.current = step;
-  }, [step, respondentPerson]);
 
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -523,7 +487,7 @@ export default function FormWizardPage() {
         weight: respondentPerson.weight,
         hairColor: respondentPerson.hairColor,
         eyeColor: respondentPerson.eyeColor,
-        relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
+        relationship: "",
         address: respondentPerson.address.street,
         city: respondentPerson.address.city,
         state: respondentPerson.address.state,
@@ -594,7 +558,7 @@ export default function FormWizardPage() {
         weight: respondentPerson.weight,
         hairColor: respondentPerson.hairColor,
         eyeColor: respondentPerson.eyeColor,
-        relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
+        relationship: "",
         address: respondentPerson.address.street,
         city: respondentPerson.address.city,
         state: respondentPerson.address.state,
@@ -678,23 +642,12 @@ export default function FormWizardPage() {
 
               {step === 2 && (
                 <Step2_PersonCausingHarm
-                  form={form}
-                  setForm={setForm}
-                  update={update}
-                  respondentPerson={respondentPerson}
-                  setRespondentPerson={setRespondentPerson}
-                  respondentCLETS={respondentCLETS}
-                  setRespondentCLETS={setRespondentCLETS}
-                  respondentFullName={respondentFullName}
-                  setRespondentFullName={setRespondentFullName}
                   inputClass={inputClass}
                 />
               )}
 
               {step === 3 && (
                 <Step3_DescribeAbuse
-                  form={form}
-                  update={update}
                   showAbuseIncident2={showAbuseIncident2}
                   setShowAbuseIncident2={setShowAbuseIncident2}
                   showAbuseIncident3={showAbuseIncident3}

@@ -1,7 +1,11 @@
 import { PDFDocument, PDFForm } from "pdf-lib";
 
+import {
+  getFirearmsPdfFieldsFromFormStore,
+  type Dv100FirearmRow,
+  type Dv100ProtectedPerson,
+} from "@/lib/dv100-pdf";
 import type { PersonInfo, RespondentCLETSInfo } from "@/store/useFormStore";
-import type { Dv100FirearmRow, Dv100ProtectedPerson } from "@/lib/dv100-pdf";
 
 export const CLETS001_PDF_URL = "/clets001.pdf";
 
@@ -109,7 +113,10 @@ function firearmsDescriptionText(rows: Dv100FirearmRow[]): string {
  * @param data Combined petitioner, respondent, CLETS extras, and Section 8–9 answers (see {@link Clets001PdfData}).
  */
 export async function generateCLETS001PDF(data: any): Promise<Uint8Array> {
-  const d = data as Clets001PdfData;
+  const d = { ...(data as Clets001PdfData) };
+  const fFrom = getFirearmsPdfFieldsFromFormStore();
+  d.hasFirearms = fFrom.hasFirearms;
+  d.firearms = fFrom.firearms;
   const res = await fetch(CLETS001_PDF_URL);
   if (!res.ok) {
     throw new Error(`Failed to fetch ${CLETS001_PDF_URL}: ${res.status} ${res.statusText}`);

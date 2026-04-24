@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 
+import {
+  getAbuseIncidentsPdfFieldsFromFormStore,
+  getFirearmsPdfFieldsFromFormStore,
+  getRelationshipPdfFieldsFromFormStore,
+} from "@/lib/dv100-pdf";
 import type { Dv100PdfFillRow, Dv100PdfFormData } from "@/lib/dv100-pdf";
 import type { PersonInfo } from "@/store/useFormStore";
 import { useFormStore } from "@/store/useFormStore";
@@ -65,6 +70,9 @@ export default function Step12_ReviewGenerate({
 }: Step12Props) {
   const attorney = useFormStore((s) => s.attorney);
   const otherProtectedPeople = useFormStore((s) => s.otherProtectedPeople);
+  const relR = getRelationshipPdfFieldsFromFormStore();
+  const abuseR = getAbuseIncidentsPdfFieldsFromFormStore();
+  const gunsR = getFirearmsPdfFieldsFromFormStore();
 
   return (
     <div className="space-y-8">
@@ -256,6 +264,13 @@ export default function Step12_ReviewGenerate({
               <span className="text-slate-500">Telephone:</span>{" "}
               {display(respondentPerson.telephone)}
             </p>
+            <p>
+              <span className="text-slate-500">Address:</span>{" "}
+              {display(respondentPerson.address.street)};{" "}
+              {display(respondentPerson.address.city)},{" "}
+              {display(respondentPerson.address.state)}{" "}
+              {display(respondentPerson.address.zip)}
+            </p>
           </dd>
         </div>
         <div className="rounded-xl border border-purple-100/90 bg-purple-50/40 px-4 py-4">
@@ -265,26 +280,26 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Applies:</span>{" "}
-              {labelsForValues(form.relationshipChecks, RELATIONSHIP_OPTIONS)}
+              {labelsForValues(relR.relationshipChecks, RELATIONSHIP_OPTIONS)}
             </p>
-            {form.relationshipChecks.includes("children") && (
+            {relR.relationshipChecks.includes("children") && (
               <p>
                 <span className="text-slate-500">Children&apos;s names:</span>{" "}
-                {display(form.childrenNames)}
+                {display(relR.childrenNames)}
               </p>
             )}
-            {form.relationshipChecks.includes("related") && (
+            {relR.relationshipChecks.includes("related") && (
               <p>
                 <span className="text-slate-500">Related as:</span>{" "}
-                {labelsForValues(form.relatedTypes, RELATED_TYPE_OPTIONS)}
+                {labelsForValues(relR.relatedTypes, RELATED_TYPE_OPTIONS)}
               </p>
             )}
-            {form.relationshipChecks.includes("liveTogether") && (
+            {relR.relationshipChecks.includes("liveTogether") && (
               <p>
                 <span className="text-slate-500">
                   Lived together with person in 2:
                 </span>{" "}
-                {displayYn(form.livedTogether)}
+                {displayYn(relR.livedTogether)}
               </p>
             )}
           </dd>
@@ -296,67 +311,67 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Date of abuse:</span>{" "}
-              {display(form.recentAbuseDate)}
+              {display(abuseR.recentAbuseDate)}
             </p>
             <p>
               <span className="text-slate-500">Anyone else hear or see:</span>{" "}
-              {displayIdkNoYes(form.recentAbuseWitnesses)}
+              {displayIdkNoYes(abuseR.recentAbuseWitnesses)}
             </p>
-            {form.recentAbuseWitnesses === "yes" && (
+            {abuseR.recentAbuseWitnesses === "yes" && (
               <p>
                 <span className="text-slate-500">
                   Names / who saw or heard:
                 </span>{" "}
-                {display(form.recentAbuseWitnessDetail)}
+                {display(abuseR.recentAbuseWitnessDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Weapon used or threatened:</span>{" "}
-              {displayYn(form.recentAbuseWeapon)}
+              {displayYn(abuseR.recentAbuseWeapon)}
             </p>
-            {form.recentAbuseWeapon === "yes" && (
+            {abuseR.recentAbuseWeapon === "yes" && (
               <p>
                 <span className="text-slate-500">Weapon:</span>{" "}
-                {display(form.recentAbuseWeaponDetail)}
+                {display(abuseR.recentAbuseWeaponDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">
                 Emotional or physical harm:
               </span>{" "}
-              {displayYn(form.recentAbuseHarm)}
+              {displayYn(abuseR.recentAbuseHarm)}
             </p>
-            {form.recentAbuseHarm === "yes" && (
+            {abuseR.recentAbuseHarm === "yes" && (
               <p>
                 <span className="text-slate-500">Harm:</span>{" "}
-                {display(form.recentAbuseHarmDetail)}
+                {display(abuseR.recentAbuseHarmDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Police came:</span>{" "}
-              {displayIdkNoYes(form.recentAbusePolice)}
+              {displayIdkNoYes(abuseR.recentAbusePolice)}
             </p>
             <p>
               <span className="text-slate-500">Details of abuse:</span>{" "}
-              {display(form.recentAbuseDetails)}
+              {display(abuseR.recentAbuseDetails)}
             </p>
             <p>
               <span className="text-slate-500">Frequency:</span>{" "}
-              {frequencyReviewLabel(form.recentAbuseFrequency)}
+              {frequencyReviewLabel(abuseR.recentAbuseFrequency)}
             </p>
-            {form.recentAbuseFrequency === "other" && (
+            {abuseR.recentAbuseFrequency === "other" && (
               <p>
                 <span className="text-slate-500">Frequency (other):</span>{" "}
-                {display(form.recentAbuseFrequencyOther)}
+                {display(abuseR.recentAbuseFrequencyOther)}
               </p>
             )}
-            {form.recentAbuseFrequency !== "" &&
-              form.recentAbuseFrequency !== "once" && (
+            {abuseR.recentAbuseFrequency !== "" &&
+              abuseR.recentAbuseFrequency !== "once" && (
                 <p>
                   <span className="text-slate-500">
                     Dates when it happened:
                   </span>{" "}
-                  {display(form.recentAbuseDates)}
+                  {display(abuseR.recentAbuseDates)}
                 </p>
               )}
           </dd>
@@ -368,65 +383,65 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Date of abuse:</span>{" "}
-              {display(form.secondAbuseDate)}
+              {display(abuseR.secondAbuseDate)}
             </p>
             <p>
               <span className="text-slate-500">Anyone else hear or see:</span>{" "}
-              {displayIdkNoYes(form.secondAbuseWitnesses)}
+              {displayIdkNoYes(abuseR.secondAbuseWitnesses)}
             </p>
-            {form.secondAbuseWitnesses === "yes" && (
+            {abuseR.secondAbuseWitnesses === "yes" && (
               <p>
                 <span className="text-slate-500">
                   Names / who saw or heard:
                 </span>{" "}
-                {display(form.secondAbuseWitnessDetail)}
+                {display(abuseR.secondAbuseWitnessDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Weapon used or threatened:</span>{" "}
-              {displayYn(form.secondAbuseWeapon)}
+              {displayYn(abuseR.secondAbuseWeapon)}
             </p>
-            {form.secondAbuseWeapon === "yes" && (
+            {abuseR.secondAbuseWeapon === "yes" && (
               <p>
                 <span className="text-slate-500">Weapon:</span>{" "}
-                {display(form.secondAbuseWeaponDetail)}
+                {display(abuseR.secondAbuseWeaponDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">
                 Emotional or physical harm:
               </span>{" "}
-              {displayYn(form.secondAbuseHarm)}
+              {displayYn(abuseR.secondAbuseHarm)}
             </p>
-            {form.secondAbuseHarm === "yes" && (
+            {abuseR.secondAbuseHarm === "yes" && (
               <p>
                 <span className="text-slate-500">Harm:</span>{" "}
-                {display(form.secondAbuseHarmDetail)}
+                {display(abuseR.secondAbuseHarmDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Police came:</span>{" "}
-              {displayIdkNoYes(form.secondAbusePolice)}
+              {displayIdkNoYes(abuseR.secondAbusePolice)}
             </p>
             <p>
               <span className="text-slate-500">Details of abuse:</span>{" "}
-              {display(form.secondAbuseDetails)}
+              {display(abuseR.secondAbuseDetails)}
             </p>
             <p>
               <span className="text-slate-500">Frequency:</span>{" "}
-              {frequencyReviewLabel(form.secondAbuseFrequency)}
+              {frequencyReviewLabel(abuseR.secondAbuseFrequency)}
             </p>
-            {form.secondAbuseFrequency === "other" && (
+            {abuseR.secondAbuseFrequency === "other" && (
               <p>
                 <span className="text-slate-500">Frequency (other):</span>{" "}
-                {display(form.secondAbuseFrequencyOther)}
+                {display(abuseR.secondAbuseFrequencyOther)}
               </p>
             )}
-            {form.secondAbuseFrequency !== "" &&
-              form.secondAbuseFrequency !== "once" && (
+            {abuseR.secondAbuseFrequency !== "" &&
+              abuseR.secondAbuseFrequency !== "once" && (
                 <p>
                   <span className="text-slate-500">Dates or estimates:</span>{" "}
-                  {display(form.secondAbuseDates)}
+                  {display(abuseR.secondAbuseDates)}
                 </p>
               )}
           </dd>
@@ -438,65 +453,65 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Date of abuse:</span>{" "}
-              {display(form.thirdAbuseDate)}
+              {display(abuseR.thirdAbuseDate)}
             </p>
             <p>
               <span className="text-slate-500">Anyone else hear or see:</span>{" "}
-              {displayIdkNoYes(form.thirdAbuseWitnesses)}
+              {displayIdkNoYes(abuseR.thirdAbuseWitnesses)}
             </p>
-            {form.thirdAbuseWitnesses === "yes" && (
+            {abuseR.thirdAbuseWitnesses === "yes" && (
               <p>
                 <span className="text-slate-500">
                   Names / who saw or heard:
                 </span>{" "}
-                {display(form.thirdAbuseWitnessDetail)}
+                {display(abuseR.thirdAbuseWitnessDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Weapon used or threatened:</span>{" "}
-              {displayYn(form.thirdAbuseWeapon)}
+              {displayYn(abuseR.thirdAbuseWeapon)}
             </p>
-            {form.thirdAbuseWeapon === "yes" && (
+            {abuseR.thirdAbuseWeapon === "yes" && (
               <p>
                 <span className="text-slate-500">Weapon:</span>{" "}
-                {display(form.thirdAbuseWeaponDetail)}
+                {display(abuseR.thirdAbuseWeaponDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">
                 Emotional or physical harm:
               </span>{" "}
-              {displayYn(form.thirdAbuseHarm)}
+              {displayYn(abuseR.thirdAbuseHarm)}
             </p>
-            {form.thirdAbuseHarm === "yes" && (
+            {abuseR.thirdAbuseHarm === "yes" && (
               <p>
                 <span className="text-slate-500">Harm:</span>{" "}
-                {display(form.thirdAbuseHarmDetail)}
+                {display(abuseR.thirdAbuseHarmDetail)}
               </p>
             )}
             <p>
               <span className="text-slate-500">Police came:</span>{" "}
-              {displayIdkNoYes(form.thirdAbusePolice)}
+              {displayIdkNoYes(abuseR.thirdAbusePolice)}
             </p>
             <p>
               <span className="text-slate-500">Details of abuse:</span>{" "}
-              {display(form.thirdAbuseDetails)}
+              {display(abuseR.thirdAbuseDetails)}
             </p>
             <p>
               <span className="text-slate-500">Frequency:</span>{" "}
-              {frequencyReviewLabel(form.thirdAbuseFrequency)}
+              {frequencyReviewLabel(abuseR.thirdAbuseFrequency)}
             </p>
-            {form.thirdAbuseFrequency === "other" && (
+            {abuseR.thirdAbuseFrequency === "other" && (
               <p>
                 <span className="text-slate-500">Frequency (other):</span>{" "}
-                {display(form.thirdAbuseFrequencyOther)}
+                {display(abuseR.thirdAbuseFrequencyOther)}
               </p>
             )}
-            {form.thirdAbuseFrequency !== "" &&
-              form.thirdAbuseFrequency !== "once" && (
+            {abuseR.thirdAbuseFrequency !== "" &&
+              abuseR.thirdAbuseFrequency !== "once" && (
                 <p>
                   <span className="text-slate-500">Dates or estimates:</span>{" "}
-                  {display(form.thirdAbuseDates)}
+                  {display(abuseR.thirdAbuseDates)}
                 </p>
               )}
           </dd>
@@ -540,10 +555,10 @@ export default function Step12_ReviewGenerate({
             )}
             <p>
               <span className="text-slate-500">Firearms:</span>{" "}
-              {displayIdkNoYes(form.hasFirearms)}
+              {displayIdkNoYes(gunsR.hasFirearms)}
             </p>
-            {form.hasFirearms === "yes" &&
-              form.firearms.map((f, i) => (
+            {gunsR.hasFirearms === "yes" &&
+              gunsR.firearms.map((f, i) => (
                 <p key={`fa-${i}`}>
                   <span className="text-slate-500">Firearm {i + 1}:</span>{" "}
                   {display(f.description)} / amount {display(f.amount)} /

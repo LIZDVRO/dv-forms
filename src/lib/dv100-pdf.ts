@@ -15,7 +15,7 @@ import {
 } from "pdf-lib";
 
 import { fillLizInvoiceFromTemplate } from "@/utils/fillInvoice";
-import { useFormStore } from "@/store/useFormStore";
+import { useFormStore, type AbuseIncident, type PersonInfo, type RelationshipInfo } from "@/store/useFormStore";
 
 export const DV100_PDF_URL = "/dv100.pdf";
 
@@ -1055,11 +1055,212 @@ export function getProtectedPeoplePdfFieldsFromFormStore(): {
   };
 }
 
+function respondentDisplayName(p: PersonInfo): string {
+  return [p.firstName, p.middleName, p.lastName]
+    .map((s) => String(s ?? "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+/** Item 1–1 — respondent identity on DV-100, sourced from Zustand. */
+export function getRespondentPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  "respondentName" | "respondentAge" | "respondentDob" | "respondentGender" | "respondentRace"
+> {
+  const p = useFormStore.getState().respondent.person;
+  return {
+    respondentName: respondentDisplayName(p),
+    respondentAge: p.age,
+    respondentDob: p.dateOfBirth,
+    respondentGender: p.gender as Dv100GenderOption,
+    respondentRace: p.race,
+  };
+}
+
+/**
+ * Section 3 (DV-100 p.2) checkboxes and related text, sourced from Zustand
+ * `relationship` slice.
+ */
+export function getRelationshipPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  "relationshipChecks" | "childrenNames" | "relatedTypes" | "livedTogether"
+> {
+  const r: RelationshipInfo = useFormStore.getState().relationship;
+  const relationshipChecks: string[] = [];
+  if (r.childrenTogether) relationshipChecks.push("children");
+  if (r.marriedOrRDP) relationshipChecks.push("married");
+  if (r.formerlyMarriedOrRDP) relationshipChecks.push("usedToBeMarried");
+  if (r.datingOrFormerlyDating) relationshipChecks.push("dating");
+  if (r.engagedOrFormerlyEngaged) relationshipChecks.push("engaged");
+  if (r.related) relationshipChecks.push("related");
+  if (r.liveTogetherOrUsedTo) relationshipChecks.push("liveTogether");
+  const livedTogether =
+    r.livedAsFamily === "yes" || r.livedAsFamily === "no" ? r.livedAsFamily : "";
+  return {
+    relationshipChecks,
+    childrenNames: r.childrenNames,
+    relatedTypes: Array.isArray(r.relatedType) ? [...r.relatedType] : [],
+    livedTogether,
+  };
+}
+
+/**
+ * Item 8–9 firearms section — maps store `hasFirearms` and `numberOrAmount` to PDF row shape.
+ */
+export function getFirearmsPdfFieldsFromFormStore(): Pick<Dv100PdfFormData, "hasFirearms" | "firearms"> {
+  const f = useFormStore.getState().firearms;
+  let hasFirearms: Dv100PdfFormData["hasFirearms"] = "";
+  if (f.hasFirearms === "dontKnow") {
+    hasFirearms = "idk";
+  } else if (f.hasFirearms === "yes" || f.hasFirearms === "no" || f.hasFirearms === "") {
+    hasFirearms = f.hasFirearms;
+  }
+  const firearms: Dv100FirearmRow[] = (f.firearms ?? []).map((row) => ({
+    description: row.description,
+    amount: row.numberOrAmount,
+    location: row.location,
+  }));
+  return { hasFirearms, firearms };
+}
+
+function mapIncidentWitnessToWizard(w: AbuseIncident["witnesses"]): string {
+  if (w === "dontKnow") return "idk";
+  if (w === "yes" || w === "no") return w;
+  return "";
+}
+
+function mapIncidentPoliceToWizard(p: AbuseIncident["policeCame"]): string {
+  if (p === "dontKnow") return "idk";
+  if (p === "yes" || p === "no") return p;
+  return "";
+}
+
+function mapFrequencyToWizard(fr: AbuseIncident["frequency"]): string {
+  if (fr === "2to5") return "2-5";
+  if (fr === "once" || fr === "weekly" || fr === "other") return fr;
+  return "";
+}
+
+function mapWeaponHarmToWizard(v: "" | "yes" | "no"): string {
+  if (v === "yes" || v === "no") return v;
+  return "";
+}
+
+/**
+ * Sections 5–7 (three abuse blocks), sourced from `abuseIncidents[0..2]`.
+ */
+export function getAbuseIncidentsPdfFieldsFromFormStore(): Pick<
+  Dv100PdfFormData,
+  | "recentAbuseDate"
+  | "recentAbuseWitnesses"
+  | "recentAbuseWitnessDetail"
+  | "recentAbuseWeapon"
+  | "recentAbuseWeaponDetail"
+  | "recentAbuseHarm"
+  | "recentAbuseHarmDetail"
+  | "recentAbusePolice"
+  | "recentAbuseDetails"
+  | "recentAbuseFrequency"
+  | "recentAbuseFrequencyOther"
+  | "recentAbuseDates"
+  | "secondAbuseDate"
+  | "secondAbuseWitnesses"
+  | "secondAbuseWitnessDetail"
+  | "secondAbuseWeapon"
+  | "secondAbuseWeaponDetail"
+  | "secondAbuseHarm"
+  | "secondAbuseHarmDetail"
+  | "secondAbusePolice"
+  | "secondAbuseDetails"
+  | "secondAbuseFrequency"
+  | "secondAbuseFrequencyOther"
+  | "secondAbuseDates"
+  | "thirdAbuseDate"
+  | "thirdAbuseWitnesses"
+  | "thirdAbuseWitnessDetail"
+  | "thirdAbuseWeapon"
+  | "thirdAbuseWeaponDetail"
+  | "thirdAbuseHarm"
+  | "thirdAbuseHarmDetail"
+  | "thirdAbusePolice"
+  | "thirdAbuseDetails"
+  | "thirdAbuseFrequency"
+  | "thirdAbuseFrequencyOther"
+  | "thirdAbuseDates"
+> {
+  const incs = useFormStore.getState().abuseIncidents;
+  const a0 = incs[0] ?? ({} as AbuseIncident);
+  const a1 = incs[1] ?? ({} as AbuseIncident);
+  const a2 = incs[2] ?? ({} as AbuseIncident);
+  return {
+    recentAbuseDate: a0.dateOfAbuse,
+    recentAbuseWitnesses: mapIncidentWitnessToWizard(a0.witnesses),
+    recentAbuseWitnessDetail: a0.witnessNames,
+    recentAbuseWeapon: mapWeaponHarmToWizard(a0.weaponUsed),
+    recentAbuseWeaponDetail: a0.weaponDescription,
+    recentAbuseHarm: mapWeaponHarmToWizard(a0.harmCaused),
+    recentAbuseHarmDetail: a0.harmDescription,
+    recentAbusePolice: mapIncidentPoliceToWizard(a0.policeCame),
+    recentAbuseDetails: a0.narrative,
+    recentAbuseFrequency: mapFrequencyToWizard(a0.frequency),
+    recentAbuseFrequencyOther: a0.frequencyOther,
+    recentAbuseDates: a0.frequencyDates,
+    secondAbuseDate: a1.dateOfAbuse,
+    secondAbuseWitnesses: mapIncidentWitnessToWizard(a1.witnesses),
+    secondAbuseWitnessDetail: a1.witnessNames,
+    secondAbuseWeapon: mapWeaponHarmToWizard(a1.weaponUsed),
+    secondAbuseWeaponDetail: a1.weaponDescription,
+    secondAbuseHarm: mapWeaponHarmToWizard(a1.harmCaused),
+    secondAbuseHarmDetail: a1.harmDescription,
+    secondAbusePolice: mapIncidentPoliceToWizard(a1.policeCame),
+    secondAbuseDetails: a1.narrative,
+    secondAbuseFrequency: mapFrequencyToWizard(a1.frequency),
+    secondAbuseFrequencyOther: a1.frequencyOther,
+    secondAbuseDates: a1.frequencyDates,
+    thirdAbuseDate: a2.dateOfAbuse,
+    thirdAbuseWitnesses: mapIncidentWitnessToWizard(a2.witnesses),
+    thirdAbuseWitnessDetail: a2.witnessNames,
+    thirdAbuseWeapon: mapWeaponHarmToWizard(a2.weaponUsed),
+    thirdAbuseWeaponDetail: a2.weaponDescription,
+    thirdAbuseHarm: mapWeaponHarmToWizard(a2.harmCaused),
+    thirdAbuseHarmDetail: a2.harmDescription,
+    thirdAbusePolice: mapIncidentPoliceToWizard(a2.policeCame),
+    thirdAbuseDetails: a2.narrative,
+    thirdAbuseFrequency: mapFrequencyToWizard(a2.frequency),
+    thirdAbuseFrequencyOther: a2.frequencyOther,
+    thirdAbuseDates: a2.frequencyDates,
+  };
+}
+
+/**
+ * Human-readable “relationship to restrained person” for DV-110, same ordering as
+ * the former `form.relationshipChecks` mapping.
+ */
+export function getDv110RelationshipLabelFromFormStore(): string {
+  const r = useFormStore.getState().relationship;
+  const out: string[] = [];
+  if (r.childrenTogether) out.push("Parent of shared children");
+  if (r.marriedOrRDP) out.push("Spouse/Domestic Partner");
+  if (r.formerlyMarriedOrRDP) out.push("Former Spouse/Domestic Partner");
+  if (r.datingOrFormerlyDating) out.push("Dating/Former Dating Partner");
+  if (r.engagedOrFormerlyEngaged) out.push("Engaged/Former Fiance(e)");
+  if (r.related) out.push("Related");
+  if (r.liveTogetherOrUsedTo) out.push("Cohabitant");
+  return out.join(", ");
+}
+
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
  * `form.updateFieldAppearances()` so Acrobat renders filled values, and saves without flattening.
  */
-export async function generateDV100PDF(data: Dv100PdfFormData): Promise<GenerateDv100PdfResult> {
+export async function generateDV100PDF(incoming: Dv100PdfFormData): Promise<GenerateDv100PdfResult> {
+  const data: Dv100PdfFormData = {
+    ...incoming,
+    ...getRespondentPdfFieldsFromFormStore(),
+    ...getRelationshipPdfFieldsFromFormStore(),
+    ...getFirearmsPdfFieldsFromFormStore(),
+    ...getAbuseIncidentsPdfFieldsFromFormStore(),
+  };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
   const attorneyPdf = getAttorneyPdfFieldsFromFormStore();

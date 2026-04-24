@@ -1,5 +1,7 @@
 import { PDFDocument, PDFForm } from "pdf-lib";
 
+import { getDv110RelationshipLabelFromFormStore } from "@/lib/dv100-pdf";
+
 export const DV110_PDF_URL = "/dv110.pdf";
 
 export type Dv110PdfData = {
@@ -122,7 +124,9 @@ export async function generateDV110PDF(data: Dv110PdfData): Promise<Uint8Array> 
   }
 
   try {
-    safeSetText(form, "Relationship to person in 1", String(data.relationship ?? "").trim());
+    const rel =
+      getDv110RelationshipLabelFromFormStore() || String(data.relationship ?? "");
+    safeSetText(form, "Relationship to person in 1", rel.trim());
   } catch (err) {
     console.warn('DV-110: failed to set "Relationship to person in 1"', err);
   }
