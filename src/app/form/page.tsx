@@ -8,6 +8,7 @@ import {
   emptyRestitutionExpenses,
   emptyWirelessAccounts,
   generateDV100PDF,
+  getProtectedPeoplePdfFieldsFromFormStore,
   triggerPdfDownload,
   type Dv100PdfFormData,
   type Dv100GenderOption,
@@ -319,27 +320,20 @@ export default function FormWizardPage() {
   const petitioner = useFormStore((s) => s.petitioner);
   const respondentPerson = useFormStore((s) => s.respondent.person);
   const respondentCLETS = useFormStore((s) => s.respondent.clets);
-  const setPetitioner = useFormStore((s) => s.setPetitioner);
   const setRespondentPerson = useFormStore((s) => s.setRespondentPerson);
   const setRespondentCLETS = useFormStore((s) => s.setRespondentCLETS);
 
-  const [petitionerFullName, setPetitionerFullName] = useState(() =>
-    personInfoToDisplayName(petitioner),
-  );
   const [respondentFullName, setRespondentFullName] = useState(() =>
     personInfoToDisplayName(respondentPerson),
   );
 
   const prevStepRef = useRef(step);
   useEffect(() => {
-    if (step === 1 && prevStepRef.current !== 1) {
-      setPetitionerFullName(personInfoToDisplayName(petitioner));
-    }
     if (step === 2 && prevStepRef.current !== 2) {
       setRespondentFullName(personInfoToDisplayName(respondentPerson));
     }
     prevStepRef.current = step;
-  }, [step, petitioner, respondentPerson]);
+  }, [step, respondentPerson]);
 
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -477,12 +471,13 @@ export default function FormWizardPage() {
     setCletsPdfGenerating(true);
     setPdfError(null);
     try {
+      const ppClets = getProtectedPeoplePdfFieldsFromFormStore();
       const cletsPayload: Clets001PdfData = {
         petitioner,
         respondent: respondentPerson,
         respondentCLETS,
-        protectOtherPeople: form.protectOtherPeople,
-        protectedPeople: form.protectedPeople,
+        protectOtherPeople: ppClets.protectOtherPeople,
+        protectedPeople: ppClets.protectedPeople,
         hasFirearms: form.hasFirearms,
         firearms: form.firearms,
       };
@@ -516,6 +511,7 @@ export default function FormWizardPage() {
     setDv110PdfGenerating(true);
     setPdfError(null);
     try {
+      const ppDv110 = getProtectedPeoplePdfFieldsFromFormStore();
       const payload: Dv110PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
         fullName: personInfoToDisplayName(respondentPerson),
@@ -532,7 +528,7 @@ export default function FormWizardPage() {
         city: respondentPerson.address.city,
         state: respondentPerson.address.state,
         zip: respondentPerson.address.zip,
-        protectedPeople: form.protectedPeople.map((p) => ({
+        protectedPeople: ppDv110.protectedPeople.map((p) => ({
           name: p.name,
           relationship: p.relationship,
           age: p.age,
@@ -569,12 +565,13 @@ export default function FormWizardPage() {
       };
       const { bytes: dv100Bytes } = await generateDV100PDF(pdfPayload);
 
+      const ppEfile = getProtectedPeoplePdfFieldsFromFormStore();
       const cletsPayload: Clets001PdfData = {
         petitioner,
         respondent: respondentPerson,
         respondentCLETS,
-        protectOtherPeople: form.protectOtherPeople,
-        protectedPeople: form.protectedPeople,
+        protectOtherPeople: ppEfile.protectOtherPeople,
+        protectedPeople: ppEfile.protectedPeople,
         hasFirearms: form.hasFirearms,
         firearms: form.firearms,
       };
@@ -602,7 +599,7 @@ export default function FormWizardPage() {
         city: respondentPerson.address.city,
         state: respondentPerson.address.state,
         zip: respondentPerson.address.zip,
-        protectedPeople: form.protectedPeople.map((p) => ({
+        protectedPeople: ppEfile.protectedPeople.map((p) => ({
           name: p.name,
           relationship: p.relationship,
           age: p.age,
@@ -675,26 +672,9 @@ export default function FormWizardPage() {
             </p>
 
             <div className="mt-8 flex flex-1 flex-col">
-              {step === 0 && (
-                <Step0_LegalRep
-                  form={form}
-                  update={update}
-                  inputClass={inputClass}
-                />
-              )}
+              {step === 0 && <Step0_LegalRep inputClass={inputClass} />}
 
-              {step === 1 && (
-                <Step1_ProtectedPeople
-                  form={form}
-                  setForm={setForm}
-                  update={update}
-                  petitioner={petitioner}
-                  setPetitioner={setPetitioner}
-                  petitionerFullName={petitionerFullName}
-                  setPetitionerFullName={setPetitionerFullName}
-                  inputClass={inputClass}
-                />
-              )}
+              {step === 1 && <Step1_ProtectedPeople inputClass={inputClass} />}
 
               {step === 2 && (
                 <Step2_PersonCausingHarm

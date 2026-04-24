@@ -1,44 +1,47 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
+import { useState } from "react";
 
-import type { Dv100PdfFormData } from "@/lib/dv100-pdf";
-import type { PetitionerInfo } from "@/store/useFormStore";
+import { useFormStore, type ProtectedPerson } from "@/store/useFormStore";
 import { formFieldTextareaClassName } from "@/components/ui/textarea";
 
 import {
-  defaultProtectedPerson,
   GENDER_OPTIONS,
   invoiceFieldInputClassName,
   parseDisplayNameToPersonInfo,
+  personInfoToDisplayName,
   PROTECTED_PEOPLE_WHY_MAX_LENGTH,
 } from "./wizardShared";
 
-type FormData = Dv100PdfFormData;
-
 type Step1Props = {
-  form: FormData;
-  setForm: Dispatch<SetStateAction<FormData>>;
-  update: <K extends keyof FormData>(key: K, value: FormData[K]) => void;
-  petitioner: PetitionerInfo;
-  setPetitioner: (patch: Partial<PetitionerInfo>) => void;
-  petitionerFullName: string;
-  setPetitionerFullName: (v: string) => void;
   inputClass: string;
 };
 
 const textareaClass = formFieldTextareaClassName;
 
-export default function Step1_ProtectedPeople({
-  form,
-  setForm,
-  update,
-  petitioner,
-  setPetitioner,
-  petitionerFullName,
-  setPetitionerFullName,
-  inputClass,
-}: Step1Props) {
+function blankProtectedPerson(): ProtectedPerson {
+  return {
+    fullName: "",
+    age: "",
+    gender: "",
+    race: "",
+    dateOfBirth: "",
+    relationship: "",
+    livesWithPetitioner: "",
+  };
+}
+
+export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
+  const petitioner = useFormStore((s) => s.petitioner);
+  const setPetitioner = useFormStore((s) => s.setPetitioner);
+  const otherProtectedPeople = useFormStore((s) => s.otherProtectedPeople);
+  const setOtherProtectedPeople = useFormStore((s) => s.setOtherProtectedPeople);
+  const updateProtectedPerson = useFormStore((s) => s.updateProtectedPerson);
+
+  const [petitionerFullName, setPetitionerFullName] = useState(() =>
+    personInfoToDisplayName(petitioner),
+  );
+
   return (
     <>
       <div className="space-y-6">
@@ -358,10 +361,10 @@ export default function Step1_ProtectedPeople({
                 <input
                   type="radio"
                   name="protectOtherPeople"
-                  checked={form.protectOtherPeople === value}
-                  onChange={() => {
-                    update("protectOtherPeople", value);
-                  }}
+                  checked={otherProtectedPeople.wantsProtectionForOthers === value}
+                  onChange={() =>
+                    setOtherProtectedPeople({ wantsProtectionForOthers: value })
+                  }
                   className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                 />
                 <span className="text-sm leading-relaxed text-slate-800">
@@ -372,9 +375,9 @@ export default function Step1_ProtectedPeople({
           </div>
         </fieldset>
 
-        {form.protectOtherPeople === "yes" && (
+        {otherProtectedPeople.wantsProtectionForOthers === "yes" && (
           <>
-            {form.protectedPeople.length > 4 && (
+            {otherProtectedPeople.people.length > 4 && (
               <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-950">
                 Note: You have listed more than 4 people. An extra page titled
                 &apos;DV-100, Other Protected People&apos; will automatically be
@@ -383,7 +386,7 @@ export default function Step1_ProtectedPeople({
             )}
 
             <div className="space-y-6">
-              {form.protectedPeople.map((person, index) => (
+              {otherProtectedPeople.people.map((person, index) => (
                 <div
                   key={index}
                   className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
@@ -402,14 +405,9 @@ export default function Step1_ProtectedPeople({
                       id={`protected-name-${index}`}
                       type="text"
                       autoComplete="off"
-                      value={person.name}
+                      value={person.fullName}
                       onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          protectedPeople: prev.protectedPeople.map((p, i) =>
-                            i === index ? { ...p, name: e.target.value } : p,
-                          ),
-                        }))
+                        updateProtectedPerson(index, { fullName: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -427,12 +425,7 @@ export default function Step1_ProtectedPeople({
                       autoComplete="off"
                       value={person.age}
                       onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          protectedPeople: prev.protectedPeople.map((p, i) =>
-                            i === index ? { ...p, age: e.target.value } : p,
-                          ),
-                        }))
+                        updateProtectedPerson(index, { age: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -451,14 +444,9 @@ export default function Step1_ProtectedPeople({
                       autoComplete="off"
                       value={person.dateOfBirth}
                       onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          protectedPeople: prev.protectedPeople.map((p, i) =>
-                            i === index
-                              ? { ...p, dateOfBirth: e.target.value }
-                              : p,
-                          ),
-                        }))
+                        updateProtectedPerson(index, {
+                          dateOfBirth: e.target.value,
+                        })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -479,15 +467,7 @@ export default function Step1_ProtectedPeople({
                             value={option}
                             checked={person.gender === option}
                             onChange={() =>
-                              setForm((prev) => ({
-                                ...prev,
-                                protectedPeople: prev.protectedPeople.map(
-                                  (p, i) =>
-                                    i === index
-                                      ? { ...p, gender: option }
-                                      : p,
-                                ),
-                              }))
+                              updateProtectedPerson(index, { gender: option })
                             }
                             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                           />
@@ -511,12 +491,7 @@ export default function Step1_ProtectedPeople({
                       autoComplete="off"
                       value={person.race}
                       onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          protectedPeople: prev.protectedPeople.map((p, i) =>
-                            i === index ? { ...p, race: e.target.value } : p,
-                          ),
-                        }))
+                        updateProtectedPerson(index, { race: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -534,14 +509,9 @@ export default function Step1_ProtectedPeople({
                       autoComplete="off"
                       value={person.relationship}
                       onChange={(e) =>
-                        setForm((prev) => ({
-                          ...prev,
-                          protectedPeople: prev.protectedPeople.map((p, i) =>
-                            i === index
-                              ? { ...p, relationship: e.target.value }
-                              : p,
-                          ),
-                        }))
+                        updateProtectedPerson(index, {
+                          relationship: e.target.value,
+                        })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -553,8 +523,8 @@ export default function Step1_ProtectedPeople({
                     <div className="space-y-2">
                       {(
                         [
-                          { v: "Yes" as const, lab: "Yes" },
-                          { v: "No" as const, lab: "No" },
+                          { v: "yes" as const, lab: "Yes" },
+                          { v: "no" as const, lab: "No" },
                         ] as const
                       ).map(({ v, lab }) => (
                         <label
@@ -564,17 +534,11 @@ export default function Step1_ProtectedPeople({
                           <input
                             type="radio"
                             name={`protected-lives-${index}`}
-                            checked={person.livesWithYou === v}
+                            checked={person.livesWithPetitioner === v}
                             onChange={() =>
-                              setForm((prev) => ({
-                                ...prev,
-                                protectedPeople: prev.protectedPeople.map(
-                                  (p, i) =>
-                                    i === index
-                                      ? { ...p, livesWithYou: v }
-                                      : p,
-                                ),
-                              }))
+                              updateProtectedPerson(index, {
+                                livesWithPetitioner: v,
+                              })
                             }
                             className="mt-0.5 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                           />
@@ -590,13 +554,9 @@ export default function Step1_ProtectedPeople({
             <button
               type="button"
               onClick={() =>
-                setForm((prev) => ({
-                  ...prev,
-                  protectedPeople: [
-                    ...prev.protectedPeople,
-                    defaultProtectedPerson(),
-                  ],
-                }))
+                setOtherProtectedPeople({
+                  people: [...otherProtectedPeople.people, blankProtectedPerson()],
+                })
               }
               className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
             >
@@ -619,8 +579,10 @@ export default function Step1_ProtectedPeople({
                 rows={5}
                 maxLength={PROTECTED_PEOPLE_WHY_MAX_LENGTH}
                 autoComplete="off"
-                value={form.protectedPeopleWhy}
-                onChange={(e) => update("protectedPeopleWhy", e.target.value)}
+                value={otherProtectedPeople.whyProtectionNeeded}
+                onChange={(e) =>
+                  setOtherProtectedPeople({ whyProtectionNeeded: e.target.value })
+                }
                 className={textareaClass}
                 aria-describedby="protectedPeopleWhy-counter"
               />
@@ -628,7 +590,7 @@ export default function Step1_ProtectedPeople({
                 id="protectedPeopleWhy-counter"
                 className="mt-1.5 text-xs tabular-nums text-slate-500"
               >
-                {form.protectedPeopleWhy.length}/
+                {otherProtectedPeople.whyProtectionNeeded.length}/
                 {PROTECTED_PEOPLE_WHY_MAX_LENGTH} characters
               </p>
             </div>

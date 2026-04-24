@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import type { Dv100PdfFillRow, Dv100PdfFormData } from "@/lib/dv100-pdf";
 import type { PersonInfo } from "@/store/useFormStore";
+import { useFormStore } from "@/store/useFormStore";
 import {
   CASE_TYPE_OPTIONS,
   labelsForValues,
@@ -62,6 +63,9 @@ export default function Step12_ReviewGenerate({
   pdfError,
   pdfInfo,
 }: Step12Props) {
+  const attorney = useFormStore((s) => s.attorney);
+  const otherProtectedPeople = useFormStore((s) => s.otherProtectedPeople);
+
   return (
     <div className="space-y-8">
       {pdfError && (
@@ -183,21 +187,25 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Has a lawyer:</span>{" "}
-              {form.hasLawyer ? "Yes" : "No"}
+              {attorney.hasAttorney === "yes"
+                ? "Yes"
+                : attorney.hasAttorney === "no"
+                  ? "No"
+                  : "—"}
             </p>
-            {form.hasLawyer && (
+            {attorney.hasAttorney === "yes" && (
               <>
                 <p>
                   <span className="text-slate-500">Lawyer:</span>{" "}
-                  {display(form.lawyerName)}
+                  {display(attorney.name)}
                 </p>
                 <p>
                   <span className="text-slate-500">Bar No.:</span>{" "}
-                  {display(form.lawyerBarNo)}
+                  {display(attorney.barNumber)}
                 </p>
                 <p>
                   <span className="text-slate-500">Firm:</span>{" "}
-                  {display(form.lawyerFirm)}
+                  {display(attorney.firmName)}
                 </p>
               </>
             )}
@@ -500,23 +508,25 @@ export default function Step12_ReviewGenerate({
           <dd className="mt-2 space-y-1 text-slate-800">
             <p>
               <span className="text-slate-500">Others need protection:</span>{" "}
-              {form.protectOtherPeople === "yes"
+              {otherProtectedPeople.wantsProtectionForOthers === "yes"
                 ? "Yes"
-                : form.protectOtherPeople === "no"
+                : otherProtectedPeople.wantsProtectionForOthers === "no"
                   ? "No"
                   : "—"}
             </p>
-            {form.protectOtherPeople === "yes" && (
+            {otherProtectedPeople.wantsProtectionForOthers === "yes" && (
               <>
-                {form.protectedPeople.map((p, i) => (
+                {otherProtectedPeople.people.map((p, i) => (
                   <p key={`pp-${i}`}>
                     <span className="text-slate-500">Person {i + 1}:</span>{" "}
-                    {display(p.name)}; age {display(p.age)}; DOB{" "}
+                    {display(p.fullName)}; age {display(p.age)}; DOB{" "}
                     {display(p.dateOfBirth)}; gender {display(p.gender)}; race{" "}
                     {display(p.race)}; relationship {display(p.relationship)};
                     lives with you{" "}
-                    {p.livesWithYou === "Yes" || p.livesWithYou === "No"
-                      ? p.livesWithYou
+                    {p.livesWithPetitioner === "yes" || p.livesWithPetitioner === "no"
+                      ? p.livesWithPetitioner === "yes"
+                        ? "Yes"
+                        : "No"
                       : "—"}
                   </p>
                 ))}
@@ -524,7 +534,7 @@ export default function Step12_ReviewGenerate({
                   <span className="text-slate-500">
                     Why they need protection:
                   </span>{" "}
-                  {display(form.protectedPeopleWhy)}
+                  {display(otherProtectedPeople.whyProtectionNeeded)}
                 </p>
               </>
             )}

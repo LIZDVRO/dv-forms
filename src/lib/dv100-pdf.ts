@@ -15,6 +15,7 @@ import {
 } from "pdf-lib";
 
 import { fillLizInvoiceFromTemplate } from "@/utils/fillInvoice";
+import { useFormStore } from "@/store/useFormStore";
 
 export const DV100_PDF_URL = "/dv100.pdf";
 
@@ -1006,6 +1007,54 @@ async function handleAbuseOverflow(
   return true;
 }
 
+/** Attorney block on DV-100 — sourced from Zustand so it stays in sync after Step 0 migration. */
+export function getAttorneyPdfFieldsFromFormStore(): {
+  hasLawyer: boolean;
+  lawyerName: string;
+  lawyerBarNo: string;
+  lawyerFirm: string;
+} {
+  const a = useFormStore.getState().attorney;
+  return {
+    hasLawyer: a.hasAttorney === "yes",
+    lawyerName: a.name,
+    lawyerBarNo: a.barNumber,
+    lawyerFirm: a.firmName,
+  };
+}
+
+/** Section 8 other protected people — sourced from Zustand (`otherProtectedPeople` slice). */
+export function getProtectedPeoplePdfFieldsFromFormStore(): {
+  protectOtherPeople: "" | "no" | "yes";
+  protectedPeople: Dv100ProtectedPerson[];
+  protectedPeopleWhy: string;
+} {
+  const opp = useFormStore.getState().otherProtectedPeople;
+  const wants = opp.wantsProtectionForOthers;
+  const protectOtherPeople = wants === "no" || wants === "yes" ? wants : "";
+  const protectedPeople = (opp.people ?? []).map(
+    (p): Dv100ProtectedPerson => ({
+      name: p.fullName ?? "",
+      age: p.age ?? "",
+      relationship: p.relationship ?? "",
+      livesWithYou:
+        p.livesWithPetitioner === "yes"
+          ? "Yes"
+          : p.livesWithPetitioner === "no"
+            ? "No"
+            : null,
+      race: p.race ?? "",
+      gender: p.gender ?? "",
+      dateOfBirth: p.dateOfBirth ?? "",
+    }),
+  );
+  return {
+    protectOtherPeople,
+    protectedPeople,
+    protectedPeopleWhy: opp.whyProtectionNeeded ?? "",
+  };
+}
+
 /**
  * Loads DV-100, fills known AcroForm fields from the wizard (pages 1–3), calls
  * `form.updateFieldAppearances()` so Acrobat renders filled values, and saves without flattening.
@@ -1013,6 +1062,8 @@ async function handleAbuseOverflow(
 export async function generateDV100PDF(data: Dv100PdfFormData): Promise<GenerateDv100PdfResult> {
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
+  const attorneyPdf = getAttorneyPdfFieldsFromFormStore();
+  const protectedPdf = getProtectedPeoplePdfFieldsFromFormStore();
   const narrativeFont = await doc.embedFont(StandardFonts.Helvetica);
   const filled: Dv100PdfFillRow[] = [];
   const missing: Dv100PdfFillRow[] = [];
@@ -1132,45 +1183,45 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     }
   }
 
-  if (data.hasLawyer) {
+  if (attorneyPdf.hasLawyer) {
     try {
       const field = pdfForm.getTextField(PDF_PAGE1_LAWYER_NAME);
-      const v = data.lawyerName.trim();
+      const v = attorneyPdf.lawyerName.trim();
       if (field && v) {
         field.setText(v);
         filled.push({ label: "Lawyer name", pdfFieldName: PDF_PAGE1_LAWYER_NAME });
       }
     } catch (err) {
       console.warn("Failed to map Lawyer Name", err);
-      if (data.lawyerName.trim()) {
+      if (attorneyPdf.lawyerName.trim()) {
         missing.push({ label: "Lawyer name", pdfFieldName: PDF_PAGE1_LAWYER_NAME });
       }
     }
 
     try {
       const field = pdfForm.getTextField(PDF_PAGE1_LAWYER_BAR);
-      const v = data.lawyerBarNo.trim();
+      const v = attorneyPdf.lawyerBarNo.trim();
       if (field && v) {
         field.setText(v);
         filled.push({ label: "State Bar No.", pdfFieldName: PDF_PAGE1_LAWYER_BAR });
       }
     } catch (err) {
       console.warn("Failed to map State Bar No.", err);
-      if (data.lawyerBarNo.trim()) {
+      if (attorneyPdf.lawyerBarNo.trim()) {
         missing.push({ label: "State Bar No.", pdfFieldName: PDF_PAGE1_LAWYER_BAR });
       }
     }
 
     try {
       const field = pdfForm.getTextField(PDF_PAGE1_LAWYER_FIRM);
-      const v = data.lawyerFirm.trim();
+      const v = attorneyPdf.lawyerFirm.trim();
       if (field && v) {
         field.setText(v);
         filled.push({ label: "Firm Name", pdfFieldName: PDF_PAGE1_LAWYER_FIRM });
       }
     } catch (err) {
       console.warn("Failed to map Firm Name", err);
-      if (data.lawyerFirm.trim()) {
+      if (attorneyPdf.lawyerFirm.trim()) {
         missing.push({ label: "Firm Name", pdfFieldName: PDF_PAGE1_LAWYER_FIRM });
       }
     }
@@ -3058,11 +3109,13 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
   }
 
   const protect =
-    data.protectOtherPeople === "no" || data.protectOtherPeople === "yes"
-      ? data.protectOtherPeople
+    protectedPdf.protectOtherPeople === "no" || protectedPdf.protectOtherPeople === "yes"
+      ? protectedPdf.protectOtherPeople
       : "";
-  const people = Array.isArray(data.protectedPeople) ? data.protectedPeople : [];
-  const sec8Why = (data.protectedPeopleWhy ?? "").trim();
+  const people = Array.isArray(protectedPdf.protectedPeople)
+    ? protectedPdf.protectedPeople
+    : [];
+  const sec8Why = (protectedPdf.protectedPeopleWhy ?? "").trim();
 
   try {
     pdfForm.getCheckBox(PDF_PAGE6_8A_NO).uncheck();
@@ -4751,14 +4804,14 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
     console.warn(`Failed to map ${PDF_PAGE13_SECTION33_PRINT_NAME}`, err);
   }
 
-  if (data.hasLawyer) {
+  if (attorneyPdf.hasLawyer) {
     try {
       pdfForm.getTextField(PDF_PAGE13_SECTION34_DATE).setText(today);
     } catch (err) {
       console.warn(`Failed to map ${PDF_PAGE13_SECTION34_DATE}`, err);
     }
     try {
-      const attorneyPrintName = data.lawyerName.trim();
+      const attorneyPrintName = attorneyPdf.lawyerName.trim();
       if (attorneyPrintName) {
         pdfForm.getTextField(PDF_PAGE13_SECTION34_PRINT_NAME).setText(attorneyPrintName);
       }
@@ -4790,7 +4843,7 @@ export async function generateDV100PDF(data: Dv100PdfFormData): Promise<Generate
   }
 
   const attorneySignatureDataUrl = data.attorneySignatureDataUrl?.trim();
-  if (attorneySignatureDataUrl && data.hasLawyer) {
+  if (attorneySignatureDataUrl && attorneyPdf.hasLawyer) {
     try {
       const attorneySig = await doc.embedPng(attorneySignatureDataUrl);
       const aDims = attorneySig.scale(0.35);

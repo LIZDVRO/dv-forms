@@ -3,6 +3,8 @@
 import React, { useState, useRef } from "react";
 import SignatureCanvas from "react-signature-canvas";
 
+import { useFormStore } from "@/store/useFormStore";
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- props match wizard snippet
 export default function SignatureStep({ formData, updateFormData }: any) {
   const [perjuryChecked, setPerjuryChecked] = useState(false);
@@ -10,7 +12,7 @@ export default function SignatureStep({ formData, updateFormData }: any) {
   const sigPetitionerRef = useRef<SignatureCanvas>(null);
   const sigAttorneyRef = useRef<SignatureCanvas>(null);
 
-  const hasLawyer = formData.hasLawyer === true;
+  const hasLawyer = useFormStore((s) => s.attorney.hasAttorney === "yes");
 
   const handleClear = () => {
     sigPetitionerRef.current?.clear();
