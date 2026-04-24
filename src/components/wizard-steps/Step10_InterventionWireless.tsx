@@ -2,12 +2,17 @@
 
 import type { Dispatch, SetStateAction } from "react";
 
-import type { Dv100PdfFormData, Dv100WirelessAccountRow } from "@/lib/dv100-pdf";
+import type {
+  Dv100PdfFormData,
+  Dv100WirelessAccountRow,
+} from "@/lib/dv100-pdf";
 import { emptyWirelessAccounts } from "@/lib/dv100-pdf";
 
-type Props = {
-  form: Dv100PdfFormData;
-  setForm: Dispatch<SetStateAction<Dv100PdfFormData>>;
+type FormData = Dv100PdfFormData;
+
+type Step10Props = {
+  form: FormData;
+  setForm: Dispatch<SetStateAction<FormData>>;
   inputClass: string;
 };
 
@@ -17,18 +22,25 @@ const checkboxClass =
 const labelCardClass =
   "flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30";
 
-type WirelessTuple = Dv100PdfFormData["wirelessAccounts"];
+type WirelessTuple = FormData["wirelessAccounts"];
 
 function mapWirelessTuple(
-  prev: Dv100PdfFormData,
-  mapRow: (row: Dv100WirelessAccountRow, index: number) => Dv100WirelessAccountRow,
+  prev: FormData,
+  mapRow: (
+    row: Dv100WirelessAccountRow,
+    index: number,
+  ) => Dv100WirelessAccountRow,
 ): WirelessTuple {
   return prev.wirelessAccounts.map(mapRow) as WirelessTuple;
 }
 
 const ROW_LABELS = ["a", "b", "c", "d"] as const;
 
-export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Props) {
+export default function Step10_InterventionWireless({
+  form,
+  setForm,
+  inputClass,
+}: Step10Props) {
   const updateWirelessRow = (
     index: number,
     patch: Partial<Dv100WirelessAccountRow>,
@@ -64,8 +76,8 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
               Batterer Intervention Program
             </span>
             <p className="text-xs leading-relaxed text-slate-500">
-              I ask the judge to order the person listed in 2 to go to a 52-week batterer intervention
-              program.
+              I ask the judge to order the person listed in 2 to go to a 52-week
+              batterer intervention program.
             </p>
           </div>
         </label>
@@ -94,9 +106,10 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
               Transfer of Wireless Phone Account
             </span>
             <p className="text-xs leading-relaxed text-slate-500">
-              You may ask the court to order the transfer of wireless telephone numbers and billing
-              responsibility as allowed by law. If granted, billing for the numbers you list may shift
-              according to the order; confirm details with your provider and the court.
+              You may ask the court to order the transfer of wireless telephone
+              numbers and billing responsibility as allowed by law. If granted,
+              billing for the numbers you list may shift according to the order;
+              confirm details with your provider and the court.
             </p>
           </div>
         </label>
@@ -127,11 +140,15 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
                           type="checkbox"
                           checked={row.isMyNumber}
                           onChange={(e) =>
-                            updateWirelessRow(idx, { isMyNumber: e.target.checked })
+                            updateWirelessRow(idx, {
+                              isMyNumber: e.target.checked,
+                            })
                           }
                           className="size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
-                        <span className="sr-only sm:not-sr-only sm:inline">My number</span>
+                        <span className="sr-only sm:not-sr-only sm:inline">
+                          My number
+                        </span>
                       </label>
                     </td>
                     <td className="px-3 py-2 align-top">
@@ -140,15 +157,22 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
                           type="checkbox"
                           checked={row.isChildNumber}
                           onChange={(e) =>
-                            updateWirelessRow(idx, { isChildNumber: e.target.checked })
+                            updateWirelessRow(idx, {
+                              isChildNumber: e.target.checked,
+                            })
                           }
                           className="size-4 shrink-0 border-purple-200 accent-liz focus:ring-liz"
                         />
-                        <span className="sr-only sm:not-sr-only sm:inline">Child</span>
+                        <span className="sr-only sm:not-sr-only sm:inline">
+                          Child
+                        </span>
                       </label>
                     </td>
                     <td className="px-3 py-2 align-top">
-                      <label htmlFor={`wireless-phone-${idx}`} className="sr-only">
+                      <label
+                        htmlFor={`wireless-phone-${idx}`}
+                        className="sr-only"
+                      >
                         Row {ROW_LABELS[idx]} phone number
                       </label>
                       <input
@@ -159,7 +183,9 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
                         maxLength={15}
                         value={row.phoneNumber}
                         onChange={(e) =>
-                          updateWirelessRow(idx, { phoneNumber: e.target.value })
+                          updateWirelessRow(idx, {
+                            phoneNumber: e.target.value,
+                          })
                         }
                         className={inputClass}
                       />
@@ -176,10 +202,13 @@ export function Page12InterventionWirelessStep({ form, setForm, inputClass }: Pr
         className="rounded-xl border border-liz/30 bg-liz/10 px-4 py-4 text-sm text-slate-800 shadow-sm"
         role="note"
       >
-        <p className="font-semibold text-purple-950">Sections 29–31: Automatic orders</p>
+        <p className="font-semibold text-purple-950">
+          Sections 29–31: Automatic orders
+        </p>
         <p className="mt-2 leading-relaxed text-slate-700">
-          If the judge grants the restraining order, automatic orders regarding firearms, body armor,
-          and looking for protected people will apply. No input is required for these sections.
+          If the judge grants the restraining order, automatic orders regarding
+          firearms, body armor, and looking for protected people will apply. No
+          input is required for these sections.
         </p>
       </aside>
     </div>

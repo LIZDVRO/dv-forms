@@ -153,6 +153,16 @@ export function personInfoToDisplayName(p: PersonInfo): string {
     .join(" ");
 }
 
+export function labelsForValues(
+  values: string[],
+  options: { value: string; label: string }[],
+): string {
+  if (values.length === 0) return "—";
+  return values
+    .map((v) => options.find((o) => o.value === v)?.label ?? v)
+    .join(", ");
+}
+
 export function parseDisplayNameToPersonInfo(
   value: string,
 ): Pick<PersonInfo, "firstName" | "middleName" | "lastName"> {
