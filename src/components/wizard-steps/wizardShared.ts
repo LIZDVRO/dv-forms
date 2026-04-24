@@ -1,5 +1,6 @@
 import {
   type Dv100FirearmRow,
+  type Dv100ProtectedAnimal,
   type Dv100ProtectedPerson,
   DV100_GENDER_OPTIONS,
 } from "@/lib/dv100-pdf";
@@ -9,6 +10,18 @@ export const GENDER_OPTIONS = DV100_GENDER_OPTIONS;
 
 export const PROTECTED_PEOPLE_WHY_MAX_LENGTH = 400;
 export const HARM_DETAIL_MAX_LENGTH = 85;
+
+export const MOVE_OUT_13A_MAX_LENGTH = 65;
+export const MOVE_OUT_DURATION_MAX_LENGTH = 3;
+export const MOVE_OUT_13B_OTHER_MAX_LENGTH = 400;
+export const OTHER_ORDERS_14_MAX_LENGTH = 1000;
+export const PAGE10_EXTEND_NOTICE_EXPLAIN_MAX = 300;
+export const PAGE10_PAY_DEBTS_EXPLAIN_MAX = 300;
+export const PAGE10_PAY_DEBTS_SPECIAL_EXPLAIN_MAX = 300;
+export const PAGE10_DEBT_PAY_TO_MAX = 20;
+export const PAGE10_DEBT_FOR_MAX = 20;
+export const PAGE10_DEBT_AMOUNT_MAX = 10;
+export const PAGE10_DEBT_DUE_MAX = 15;
 
 export const invoiceFieldInputClassName =
   "mt-2 w-full rounded-none border-0 border-b border-gray-300 bg-white px-0 py-3 text-base text-slate-900 shadow-none outline-none ring-0 transition placeholder:text-slate-400 focus:border-[#662D91] focus:outline-none focus:ring-0 focus-visible:border-[#662D91] focus-visible:outline-none focus-visible:ring-0";
@@ -110,6 +123,19 @@ export function defaultProtectedPerson(): Dv100ProtectedPerson {
     gender: "",
     dateOfBirth: "",
   };
+}
+
+export function defaultProtectedAnimal(): Dv100ProtectedAnimal {
+  return { name: "", type: "", breed: "", color: "" };
+}
+
+export function initialProtectedAnimals(): Dv100ProtectedAnimal[] {
+  return [
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+    defaultProtectedAnimal(),
+  ];
 }
 
 export function defaultFirearmRow(): Dv100FirearmRow {

@@ -12,15 +12,17 @@ import {
   emptyRestitutionExpenses,
 } from "@/lib/dv100-pdf";
 
-type Props = {
-  form: Dv100PdfFormData;
-  setForm: Dispatch<SetStateAction<Dv100PdfFormData>>;
+type FormData = Dv100PdfFormData;
+
+type Step9Props = {
+  form: FormData;
+  setForm: Dispatch<SetStateAction<FormData>>;
 };
 
-type RestitutionTuple = Dv100PdfFormData["restitutionExpenses"];
+type RestitutionTuple = FormData["restitutionExpenses"];
 
 function mapRestitutionTuple(
-  prev: Dv100PdfFormData,
+  prev: FormData,
   mapRow: (row: Dv100RestitutionExpenseRow, index: number) => Dv100RestitutionExpenseRow,
 ): RestitutionTuple {
   return prev.restitutionExpenses.map(mapRow) as RestitutionTuple;
@@ -32,7 +34,7 @@ const checkboxClass =
 const labelCardClass =
   "flex cursor-pointer items-start gap-3 rounded-xl border border-purple-100 bg-white px-4 py-3 shadow-sm transition hover:border-purple-200 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-liz/30";
 
-export function Page11SupportFeesRestitutionStep({ form, setForm }: Props) {
+export default function Step9_SupportFees({ form, setForm }: Step9Props) {
   const updateRestitutionRow = (
     index: number,
     key: keyof Dv100RestitutionExpenseRow,
