@@ -498,20 +498,18 @@ export default function FormWizardPage() {
   >("idle");
   const [efileError, setEfileError] = useState("");
 
-  const {
-    petitioner,
-    respondent,
-    respondentCLETS,
-    setPetitioner,
-    setRespondent,
-    setRespondentCLETS,
-  } = useFormStore();
+  const petitioner = useFormStore((s) => s.petitioner);
+  const respondentPerson = useFormStore((s) => s.respondent.person);
+  const respondentCLETS = useFormStore((s) => s.respondent.clets);
+  const setPetitioner = useFormStore((s) => s.setPetitioner);
+  const setRespondentPerson = useFormStore((s) => s.setRespondentPerson);
+  const setRespondentCLETS = useFormStore((s) => s.setRespondentCLETS);
 
   const [petitionerFullName, setPetitionerFullName] = useState(() =>
     personInfoToDisplayName(petitioner),
   );
   const [respondentFullName, setRespondentFullName] = useState(() =>
-    personInfoToDisplayName(respondent),
+    personInfoToDisplayName(respondentPerson),
   );
 
   const prevStepRef = useRef(step);
@@ -520,10 +518,10 @@ export default function FormWizardPage() {
       setPetitionerFullName(personInfoToDisplayName(petitioner));
     }
     if (step === 2 && prevStepRef.current !== 2) {
-      setRespondentFullName(personInfoToDisplayName(respondent));
+      setRespondentFullName(personInfoToDisplayName(respondentPerson));
     }
     prevStepRef.current = step;
-  }, [step, petitioner, respondent]);
+  }, [step, petitioner, respondentPerson]);
 
   const update = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -641,11 +639,11 @@ export default function FormWizardPage() {
         petitionerZip: petitioner.address.zip,
         petitionerPhone: petitioner.telephone,
         petitionerEmail: petitioner.email,
-        respondentName: personInfoToDisplayName(respondent),
-        respondentAge: respondent.age,
-        respondentDob: respondent.dateOfBirth,
-        respondentGender: respondent.gender as Dv100GenderOption,
-        respondentRace: respondent.race,
+        respondentName: personInfoToDisplayName(respondentPerson),
+        respondentAge: respondentPerson.age,
+        respondentDob: respondentPerson.dateOfBirth,
+        respondentGender: respondentPerson.gender as Dv100GenderOption,
+        respondentRace: respondentPerson.race,
       };
       const { bytes, filled, missing } = await generateDV100PDF(pdfPayload);
       triggerPdfDownload(bytes, "filled_dv100.pdf");
@@ -663,7 +661,7 @@ export default function FormWizardPage() {
     try {
       const cletsPayload: Clets001PdfData = {
         petitioner,
-        respondent,
+        respondent: respondentPerson,
         respondentCLETS,
         protectOtherPeople: form.protectOtherPeople,
         protectedPeople: form.protectedPeople,
@@ -685,7 +683,7 @@ export default function FormWizardPage() {
     try {
       const payload: Dv109PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
-        restrainedPersonName: personInfoToDisplayName(respondent),
+        restrainedPersonName: personInfoToDisplayName(respondentPerson),
       };
       const bytes = await generateDV109PDF(payload);
       triggerPdfDownload(bytes, "filled_dv109.pdf");
@@ -702,20 +700,20 @@ export default function FormWizardPage() {
     try {
       const payload: Dv110PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
-        fullName: personInfoToDisplayName(respondent),
-        gender: respondent.gender,
-        race: respondent.race,
-        age: respondent.age,
-        dateOfBirth: respondent.dateOfBirth,
-        height: respondent.height,
-        weight: respondent.weight,
-        hairColor: respondent.hairColor,
-        eyeColor: respondent.eyeColor,
+        fullName: personInfoToDisplayName(respondentPerson),
+        gender: respondentPerson.gender,
+        race: respondentPerson.race,
+        age: respondentPerson.age,
+        dateOfBirth: respondentPerson.dateOfBirth,
+        height: respondentPerson.height,
+        weight: respondentPerson.weight,
+        hairColor: respondentPerson.hairColor,
+        eyeColor: respondentPerson.eyeColor,
         relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
-        address: respondent.address.street,
-        city: respondent.address.city,
-        state: respondent.address.state,
-        zip: respondent.address.zip,
+        address: respondentPerson.address.street,
+        city: respondentPerson.address.city,
+        state: respondentPerson.address.state,
+        zip: respondentPerson.address.zip,
         protectedPeople: form.protectedPeople.map((p) => ({
           name: p.name,
           relationship: p.relationship,
@@ -745,17 +743,17 @@ export default function FormWizardPage() {
         petitionerZip: petitioner.address.zip,
         petitionerPhone: petitioner.telephone,
         petitionerEmail: petitioner.email,
-        respondentName: personInfoToDisplayName(respondent),
-        respondentAge: respondent.age,
-        respondentDob: respondent.dateOfBirth,
-        respondentGender: respondent.gender as Dv100GenderOption,
-        respondentRace: respondent.race,
+        respondentName: personInfoToDisplayName(respondentPerson),
+        respondentAge: respondentPerson.age,
+        respondentDob: respondentPerson.dateOfBirth,
+        respondentGender: respondentPerson.gender as Dv100GenderOption,
+        respondentRace: respondentPerson.race,
       };
       const { bytes: dv100Bytes } = await generateDV100PDF(pdfPayload);
 
       const cletsPayload: Clets001PdfData = {
         petitioner,
-        respondent,
+        respondent: respondentPerson,
         respondentCLETS,
         protectOtherPeople: form.protectOtherPeople,
         protectedPeople: form.protectedPeople,
@@ -766,26 +764,26 @@ export default function FormWizardPage() {
 
       const dv109Payload: Dv109PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
-        restrainedPersonName: personInfoToDisplayName(respondent),
+        restrainedPersonName: personInfoToDisplayName(respondentPerson),
       };
       const dv109Bytes = await generateDV109PDF(dv109Payload);
 
       const dv110Payload: Dv110PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
-        fullName: personInfoToDisplayName(respondent),
-        gender: respondent.gender,
-        race: respondent.race,
-        age: respondent.age,
-        dateOfBirth: respondent.dateOfBirth,
-        height: respondent.height,
-        weight: respondent.weight,
-        hairColor: respondent.hairColor,
-        eyeColor: respondent.eyeColor,
+        fullName: personInfoToDisplayName(respondentPerson),
+        gender: respondentPerson.gender,
+        race: respondentPerson.race,
+        age: respondentPerson.age,
+        dateOfBirth: respondentPerson.dateOfBirth,
+        height: respondentPerson.height,
+        weight: respondentPerson.weight,
+        hairColor: respondentPerson.hairColor,
+        eyeColor: respondentPerson.eyeColor,
         relationship: relationshipChecksToDv110Relationship(form.relationshipChecks),
-        address: respondent.address.street,
-        city: respondent.address.city,
-        state: respondent.address.state,
-        zip: respondent.address.zip,
+        address: respondentPerson.address.street,
+        city: respondentPerson.address.city,
+        state: respondentPerson.address.state,
+        zip: respondentPerson.address.zip,
         protectedPeople: form.protectedPeople.map((p) => ({
           name: p.name,
           relationship: p.relationship,
@@ -1656,7 +1654,7 @@ export default function FormWizardPage() {
                       onChange={(e) => {
                         const v = e.target.value;
                         setRespondentFullName(v);
-                        setRespondent(parseDisplayNameToPersonInfo(v));
+                        setRespondentPerson(parseDisplayNameToPersonInfo(v));
                       }}
                       className={inputClass}
                     />
@@ -1673,9 +1671,9 @@ export default function FormWizardPage() {
                       name="respondentAge"
                       type="text"
                       inputMode="numeric"
-                      value={respondent.age}
+                      value={respondentPerson.age}
                       onChange={(e) =>
-                        setRespondent({ age: e.target.value })
+                        setRespondentPerson({ age: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -1693,9 +1691,9 @@ export default function FormWizardPage() {
                       type="text"
                       placeholder="MM / DD / YYYY"
                       autoComplete="off"
-                      value={respondent.dateOfBirth}
+                      value={respondentPerson.dateOfBirth}
                       onChange={(e) =>
-                        setRespondent({ dateOfBirth: e.target.value })
+                        setRespondentPerson({ dateOfBirth: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -1714,9 +1712,9 @@ export default function FormWizardPage() {
                             type="radio"
                             name="respondentGender"
                             value={option}
-                            checked={respondent.gender === option}
+                            checked={respondentPerson.gender === option}
                             onChange={() =>
-                              setRespondent({ gender: option })
+                              setRespondentPerson({ gender: option })
                             }
                             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
                           />
@@ -1739,9 +1737,9 @@ export default function FormWizardPage() {
                       name="respondentRace"
                       type="text"
                       autoComplete="off"
-                      value={respondent.race}
+                      value={respondentPerson.race}
                       onChange={(e) =>
-                        setRespondent({ race: e.target.value })
+                        setRespondentPerson({ race: e.target.value })
                       }
                       className={inputClass}
                     />
@@ -1758,9 +1756,9 @@ export default function FormWizardPage() {
                       name="respondentHeight"
                       type="text"
                       autoComplete="off"
-                      value={respondent.height}
+                      value={respondentPerson.height}
                       onChange={(e) =>
-                        setRespondent({ height: e.target.value })
+                        setRespondentPerson({ height: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -1777,9 +1775,9 @@ export default function FormWizardPage() {
                       name="respondentWeight"
                       type="text"
                       autoComplete="off"
-                      value={respondent.weight}
+                      value={respondentPerson.weight}
                       onChange={(e) =>
-                        setRespondent({ weight: e.target.value })
+                        setRespondentPerson({ weight: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -1796,9 +1794,9 @@ export default function FormWizardPage() {
                       name="respondentHairColor"
                       type="text"
                       autoComplete="off"
-                      value={respondent.hairColor}
+                      value={respondentPerson.hairColor}
                       onChange={(e) =>
-                        setRespondent({ hairColor: e.target.value })
+                        setRespondentPerson({ hairColor: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -1815,9 +1813,9 @@ export default function FormWizardPage() {
                       name="respondentEyeColor"
                       type="text"
                       autoComplete="off"
-                      value={respondent.eyeColor}
+                      value={respondentPerson.eyeColor}
                       onChange={(e) =>
-                        setRespondent({ eyeColor: e.target.value })
+                        setRespondentPerson({ eyeColor: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -1834,9 +1832,9 @@ export default function FormWizardPage() {
                       name="respondentTelephone"
                       type="tel"
                       autoComplete="tel"
-                      value={respondent.telephone}
+                      value={respondentPerson.telephone}
                       onChange={(e) =>
-                        setRespondent({ telephone: e.target.value })
+                        setRespondentPerson({ telephone: e.target.value })
                       }
                       className={invoiceFieldInputClassName}
                     />
@@ -1860,12 +1858,12 @@ export default function FormWizardPage() {
                           <input
                             type="radio"
                             name="respondentSpeaksEnglish"
-                            checked={respondent.speaksEnglish === value}
+                            checked={respondentPerson.speaksEnglish === value}
                             onChange={() =>
-                              setRespondent({
+                              setRespondentPerson({
                                 speaksEnglish: value,
                                 language:
-                                  value === "no" ? respondent.language : "",
+                                  value === "no" ? respondentPerson.language : "",
                               })
                             }
                             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
@@ -1877,7 +1875,7 @@ export default function FormWizardPage() {
                       ))}
                     </div>
                   </fieldset>
-                  {respondent.speaksEnglish === "no" && (
+                  {respondentPerson.speaksEnglish === "no" && (
                     <div>
                       <label
                         htmlFor="respondentLanguage"
@@ -1890,9 +1888,9 @@ export default function FormWizardPage() {
                         name="respondentLanguage"
                         type="text"
                         autoComplete="language"
-                        value={respondent.language}
+                        value={respondentPerson.language}
                         onChange={(e) =>
-                          setRespondent({ language: e.target.value })
+                          setRespondentPerson({ language: e.target.value })
                         }
                         className={invoiceFieldInputClassName}
                       />
@@ -5753,43 +5751,43 @@ export default function FormWizardPage() {
                       <dd className="mt-2 space-y-1 text-slate-800">
                         <p>
                           <span className="text-slate-500">Name:</span>{" "}
-                          {display(personInfoToDisplayName(respondent))}
+                          {display(personInfoToDisplayName(respondentPerson))}
                         </p>
                         <p>
                           <span className="text-slate-500">Age:</span>{" "}
-                          {display(respondent.age)}
+                          {display(respondentPerson.age)}
                         </p>
                         <p>
                           <span className="text-slate-500">Date of birth:</span>{" "}
-                          {display(respondent.dateOfBirth)}
+                          {display(respondentPerson.dateOfBirth)}
                         </p>
                         <p>
                           <span className="text-slate-500">Gender:</span>{" "}
-                          {display(respondent.gender)}
+                          {display(respondentPerson.gender)}
                         </p>
                         <p>
                           <span className="text-slate-500">Race:</span>{" "}
-                          {display(respondent.race)}
+                          {display(respondentPerson.race)}
                         </p>
                         <p>
                           <span className="text-slate-500">Height:</span>{" "}
-                          {display(respondent.height)}
+                          {display(respondentPerson.height)}
                         </p>
                         <p>
                           <span className="text-slate-500">Weight:</span>{" "}
-                          {display(respondent.weight)}
+                          {display(respondentPerson.weight)}
                         </p>
                         <p>
                           <span className="text-slate-500">Hair color:</span>{" "}
-                          {display(respondent.hairColor)}
+                          {display(respondentPerson.hairColor)}
                         </p>
                         <p>
                           <span className="text-slate-500">Eye color:</span>{" "}
-                          {display(respondent.eyeColor)}
+                          {display(respondentPerson.eyeColor)}
                         </p>
                         <p>
                           <span className="text-slate-500">Telephone:</span>{" "}
-                          {display(respondent.telephone)}
+                          {display(respondentPerson.telephone)}
                         </p>
                       </dd>
                     </div>
