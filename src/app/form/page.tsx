@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import JSZip from "jszip";
 import { useMemo, useState } from "react";
 
 import { generateDV100PDF, triggerPdfDownload } from "@/lib/dv100-pdf";
+import { generateTier2PDF } from "@/lib/tier2-pdf";
 import { generateCLETS001PDF } from "@/lib/clets001-pdf";
 import { generateDV109PDF, type Dv109PdfData } from "@/lib/dv109-pdf";
 import { generateDV110PDF } from "@/lib/dv110-pdf";
@@ -138,7 +140,20 @@ export default function FormWizardPage() {
     setPdfInfo(null);
     try {
       const { bytes, filled, missing } = await generateDV100PDF();
-      triggerPdfDownload(bytes, "filled_dv100.pdf");
+
+      const zip = new JSZip();
+      zip.file("filled_dv100.pdf", bytes);
+
+      if (useFormStore.getState().relationship.childrenTogether) {
+        const tier2 = await generateTier2PDF();
+        if (tier2) {
+          zip.file("Custody_Request_Tier2.pdf", tier2);
+        }
+      }
+
+      const zipBytes = await zip.generateAsync({ type: "uint8array" });
+      triggerPdfDownload(zipBytes, "filled_forms.zip", "application/zip");
+
       setPdfInfo({ filled, missing });
     } catch (e) {
       setPdfError(e instanceof Error ? e.message : String(e));

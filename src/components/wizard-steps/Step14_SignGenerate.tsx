@@ -101,8 +101,13 @@ function ReviewGeneratePanel({
         >
           <p>
             Download started as{" "}
-            <code className="rounded bg-white/80 px-1">filled_dv100.pdf</code>.
-            Filled AcroForm fields:
+            <code className="rounded bg-white/80 px-1">filled_forms.zip</code>
+            {" — "}
+            <code className="rounded bg-white/80 px-1">filled_dv100.pdf</code>
+            {" plus "}
+            <code className="rounded bg-white/80 px-1">Custody_Request_Tier2.pdf</code>
+            {" when you have children together with the other party. Filled DV-100 "}
+            AcroForm fields:
           </p>
           {pdfInfo.filled.length === 0 ? (
             <p className="text-purple-950/80">

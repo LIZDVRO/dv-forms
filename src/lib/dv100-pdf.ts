@@ -5567,10 +5567,14 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   return { bytes, filled, missing };
 }
 
-export function triggerPdfDownload(bytes: Uint8Array, filename: string) {
+export function triggerPdfDownload(
+  bytes: Uint8Array,
+  filename: string,
+  mimeType: string = "application/pdf",
+) {
   const copy = new Uint8Array(bytes.length);
   copy.set(bytes);
-  const blob = new Blob([copy], { type: "application/pdf" });
+  const blob = new Blob([copy], { type: mimeType });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
