@@ -23,7 +23,7 @@ import {
   isCleanSnake,
   dedupeProposedNames,
   type MappingEntry,
-} from './lib.ts';
+} from './lib';
 
 async function main() {
   const [, , inputArg, outputArg] = process.argv;

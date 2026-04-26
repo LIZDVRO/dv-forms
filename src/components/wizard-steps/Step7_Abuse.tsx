@@ -433,7 +433,7 @@ function AbuseIncidentBlock({
   );
 }
 
-export default function Step3_DescribeAbuse({
+export default function Step7_Abuse({
   showAbuseIncident2,
   setShowAbuseIncident2,
   showAbuseIncident3,

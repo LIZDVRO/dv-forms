@@ -16,20 +16,21 @@ import { formFieldInputClassName } from "@/components/ui/input";
 import { formFieldTextareaClassName } from "@/components/ui/textarea";
 import Step0_Venue from "@/components/wizard-steps/Step0_Venue";
 import Step1_LegalRep from "@/components/wizard-steps/Step1_LegalRep";
-import Step1_ProtectedPeople from "@/components/wizard-steps/Step1_ProtectedPeople";
-import Step2_PersonCausingHarm from "@/components/wizard-steps/Step2_PersonCausingHarm";
-import Step3_DescribeAbuse from "@/components/wizard-steps/Step3_DescribeAbuse";
-import Step4_OtherCourtCases from "@/components/wizard-steps/Step4_OtherCourtCases";
-import Step5_OrdersRequested from "@/components/wizard-steps/Step5_OrdersRequested";
-import Step6_MoveOutCustody from "@/components/wizard-steps/Step6_MoveOutCustody";
-import Step7_PropertyAnimals from "@/components/wizard-steps/Step7_PropertyAnimals";
-import Step8_PropertyNoticeDebts from "@/components/wizard-steps/Step8_PropertyNoticeDebts";
-import Step9_SupportFees from "@/components/wizard-steps/Step9_SupportFees";
-import Step10_InterventionWireless from "@/components/wizard-steps/Step10_InterventionWireless";
-import Step11_Signature from "@/components/wizard-steps/Step11_Signature";
-import Step12_ReviewGenerate, {
-  type Step12PdfInfo,
-} from "@/components/wizard-steps/Step12_ReviewGenerate";
+import Step2_Survivor from "@/components/wizard-steps/Step2_Survivor";
+import Step3_Respondent from "@/components/wizard-steps/Step3_Respondent";
+import Step4_Children from "@/components/wizard-steps/Step4_Children";
+import Step5_OtherProtected from "@/components/wizard-steps/Step5_OtherProtected";
+import Step6_CourtHistory from "@/components/wizard-steps/Step6_CourtHistory";
+import Step7_Abuse from "@/components/wizard-steps/Step7_Abuse";
+import Step8_Firearms from "@/components/wizard-steps/Step8_Firearms";
+import Step9_ProtectionOrders from "@/components/wizard-steps/Step9_ProtectionOrders";
+import Step10_Custody from "@/components/wizard-steps/Step10_Custody";
+import Step11_PropertyAnimals from "@/components/wizard-steps/Step11_PropertyAnimals";
+import Step12_Financials from "@/components/wizard-steps/Step12_Financials";
+import Step13_Interventions from "@/components/wizard-steps/Step13_Interventions";
+import Step14_SignGenerate, {
+  type Step14PdfInfo,
+} from "@/components/wizard-steps/Step14_SignGenerate";
 import {
   personInfoToDisplayName,
   STEP_TITLES,
@@ -38,18 +39,19 @@ import {
 const STEP_BLURBS = [
   "California domestic violence restraining orders are filed in Superior Court by county. Pick the location that matches where you live or where the abuse occurred.",
   "If a licensed attorney is helping you complete or file these forms, answer Yes and provide their details. Otherwise, choose No.",
-  "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
-  "Now, tell us about the person causing harm. We need their basic information, how you know them, and whether they have access to firearms.",
-  "Describe incidents of abuse (DV-100 Sections 5–7, Pages 3–5). You will start with the most recent incident; you can choose to add up to two more separate incidents when you feel ready.",
-  "Answer questions about other restraining orders and other court cases involving you and this person (DV-100 Section 4).",
-  "Choose the orders you want a judge to make (DV-100 Sections 10-12, Page 7). Every situation is different. Choose the orders that fit your situation.",
-  "Ask the court to order the other person to move out, describe any other orders, and indicate if you need custody orders (DV-100 Sections 13-15, Page 8).",
-  "Property, animals, insurance, and communications orders (DV-100 Sections 16-19, Page 9).",
-  "Property restraint, extended notice deadline, and pay-debts orders (DV-100 Sections 20-22, Page 10).",
-  "Request restitution for document preparation, and indicate child support, spousal support, and lawyer-fee orders (DV-100 Sections 23-26, Page 11).",
-  "Batterer intervention and wireless phone account transfer requests (DV-100 Sections 27-28, Page 12). Sections 29-31 are automatic if the order is granted.",
-  "Declare that your answers are true, then sign. Your signature is stored with your answers for PDF generation.",
-  "Confirm everything below, then generate your filled PDF.",
+  "Tell us about you—the survivor seeking protection: your name, date of birth, address, and how the court can reach you.",
+  "Tell us about the person causing harm: their identity, optional law-enforcement (CLETS) details, and how you are connected.",
+  "Children you share with that person: names, living arrangements, and—if it applies—where the children have lived over the last five years.",
+  "Anyone besides you who also needs protection from the same person (for example household or family members).",
+  "Other restraining orders and court cases involving you and this person (DV-100 Section 4).",
+  "Describe incidents of abuse (DV-100 Sections 5–7). Start with the most recent incident; you can add up to two more when you feel ready.",
+  "Whether they have firearms or other weapons, and any details you can safely provide.",
+  "Protection orders you want: no abuse, no contact, stay-away, move-out, and other orders (DV-100 Sections 10–14).",
+  "If you have minor children together, outline custody and visitation requests. A full DV-105 schedule can be added later.",
+  "Pets, property, insurance, and orders about communications (DV-100 Sections 16–19).",
+  "Property restraint, notice deadlines, debts, restitution, child support, spousal support, and lawyer fees (DV-100 Sections 20–26).",
+  "Batterer intervention programs and wireless account transfer requests (DV-100 Sections 27–28).",
+  "Sign under penalty of perjury, review your answers, then generate and download your packet.",
 ] as const;
 
 const TOTAL_STEPS = STEP_TITLES.length;
@@ -96,7 +98,7 @@ export default function FormWizardPage() {
   const [dv109PdfGenerating, setDv109PdfGenerating] = useState(false);
   const [dv110PdfGenerating, setDv110PdfGenerating] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
-  const [pdfInfo, setPdfInfo] = useState<Step12PdfInfo | null>(null);
+  const [pdfInfo, setPdfInfo] = useState<Step14PdfInfo | null>(null);
   const [efileStatus, setEfileStatus] = useState<
     "idle" | "confirming" | "sending" | "success" | "error"
   >("idle");
@@ -105,16 +107,29 @@ export default function FormWizardPage() {
   const petitioner = useFormStore((s) => s.petitioner);
   const petitionerExtras = useFormStore((s) => s.petitionerExtras);
   const respondentPerson = useFormStore((s) => s.respondent.person);
+  const childrenTogether = useFormStore((s) => s.relationship.childrenTogether);
 
   const canGoBack = step > 0;
   const isLastStep = step === TOTAL_STEPS - 1;
 
   const goBack = () => {
-    if (canGoBack) setStep((s) => s - 1);
+    if (!canGoBack) return;
+    const skipCustody =
+      step === 11 && !useFormStore.getState().relationship.childrenTogether;
+    setStep((s) => {
+      if (skipCustody && s === 11) return 9;
+      return s - 1;
+    });
   };
 
   const goNext = () => {
-    if (!isLastStep) setStep((s) => s + 1);
+    if (isLastStep) return;
+    const skipCustody =
+      step === 9 && !useFormStore.getState().relationship.childrenTogether;
+    setStep((s) => {
+      if (skipCustody && s === 9) return 11;
+      return s + 1;
+    });
   };
 
   const handleGenerateForms = async () => {
@@ -262,16 +277,20 @@ export default function FormWizardPage() {
 
               {step === 1 && <Step1_LegalRep inputClass={inputClass} />}
 
-              {step === 2 && <Step1_ProtectedPeople inputClass={inputClass} />}
+              {step === 2 && <Step2_Survivor inputClass={inputClass} />}
 
-              {step === 3 && (
-                <Step2_PersonCausingHarm
-                  inputClass={inputClass}
-                />
+              {step === 3 && <Step3_Respondent inputClass={inputClass} />}
+
+              {step === 4 && <Step4_Children inputClass={inputClass} />}
+
+              {step === 5 && <Step5_OtherProtected inputClass={inputClass} />}
+
+              {step === 6 && (
+                <Step6_CourtHistory inputClass={inputClass} />
               )}
 
-              {step === 4 && (
-                <Step3_DescribeAbuse
+              {step === 7 && (
+                <Step7_Abuse
                   showAbuseIncident2={showAbuseIncident2}
                   setShowAbuseIncident2={setShowAbuseIncident2}
                   showAbuseIncident3={showAbuseIncident3}
@@ -280,45 +299,39 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 5 && (
-                <Step4_OtherCourtCases inputClass={inputClass} />
-              )}
-
-              {step === 6 && (
-                <Step5_OrdersRequested inputClass={inputClass} />
-              )}
-
-              {step === 7 && (
-                <Step6_MoveOutCustody
-                  inputClass={inputClass}
-                  textareaClass={textareaClass}
-                />
-              )}
-
-              {step === 8 && (
-                <Step7_PropertyAnimals
-                  inputClass={inputClass}
-                  textareaClass={textareaClass}
-                />
-              )}
+              {step === 8 && <Step8_Firearms inputClass={inputClass} />}
 
               {step === 9 && (
-                <Step8_PropertyNoticeDebts
+                <Step9_ProtectionOrders
                   inputClass={inputClass}
                   textareaClass={textareaClass}
                 />
               )}
 
-              {step === 10 && <Step9_SupportFees />}
-
-              {step === 11 && (
-                <Step10_InterventionWireless inputClass={inputClass} />
+              {step === 10 && childrenTogether && (
+                <Step10_Custody inputClass={inputClass} />
               )}
 
-              {step === 12 && <Step11_Signature />}
+              {step === 11 && (
+                <Step11_PropertyAnimals
+                  inputClass={inputClass}
+                  textareaClass={textareaClass}
+                />
+              )}
+
+              {step === 12 && (
+                <Step12_Financials
+                  inputClass={inputClass}
+                  textareaClass={textareaClass}
+                />
+              )}
 
               {step === 13 && (
-                <Step12_ReviewGenerate
+                <Step13_Interventions inputClass={inputClass} />
+              )}
+
+              {step === 14 && (
+                <Step14_SignGenerate
                   petitioner={petitioner}
                   respondentPerson={respondentPerson}
                   pdfError={pdfError}

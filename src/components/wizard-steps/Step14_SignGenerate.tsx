@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import SignatureStep from "@/components/SignatureStep";
 import {
   getAbuseIncidentsPdfFieldsFromFormStore,
   getCourtHistoryPdfFieldsFromFormStore,
@@ -23,16 +24,16 @@ import {
   RELATIONSHIP_OPTIONS,
 } from "@/components/wizard-steps/wizardShared";
 
-export type Step12PdfInfo = {
+export type Step14PdfInfo = {
   filled: Dv100PdfFillRow[];
   missing: Dv100PdfFillRow[];
 };
 
-type Step12Props = {
+type Step14SignGenerateProps = {
   petitioner: PersonInfo;
   respondentPerson: PersonInfo;
   pdfError: string | null;
-  pdfInfo: Step12PdfInfo | null;
+  pdfInfo: Step14PdfInfo | null;
 };
 
 function display(v: string): string {
@@ -65,12 +66,12 @@ function frequencyReviewLabel(v: string): string {
           : "—";
 }
 
-export default function Step12_ReviewGenerate({
+function ReviewGeneratePanel({
   petitioner,
   respondentPerson,
   pdfError,
   pdfInfo,
-}: Step12Props) {
+}: Step14SignGenerateProps) {
   const attorney = useFormStore((s) => s.attorney);
   const otherProtectedPeople = useFormStore((s) => s.otherProtectedPeople);
   const relR = getRelationshipPdfFieldsFromFormStore();
@@ -1139,6 +1140,15 @@ export default function Step12_ReviewGenerate({
           </dd>
         </div>
       </dl>
+    </div>
+  );
+}
+
+export default function Step14_SignGenerate(props: Step14SignGenerateProps) {
+  return (
+    <div className="space-y-12">
+      <SignatureStep />
+      <ReviewGeneratePanel {...props} />
     </div>
   );
 }

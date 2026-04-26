@@ -143,6 +143,8 @@ export interface ChildInfo {
   age: string; // auto-calculated or entered
   gender: string; // for CLETS-001
   race: string; // for CLETS-001
+  /** Free text: who the child lives with (e.g. me, both parents, other caregiver). */
+  livesWithWhom: string;
   livesWithPetitioner: "" | "yes" | "no";
 }
 
@@ -815,7 +817,13 @@ const initialRelationship: RelationshipInfo = {
 };
 
 const blankChild = (): ChildInfo => ({
-  fullName: "", dateOfBirth: "", age: "", gender: "", race: "", livesWithPetitioner: "",
+  fullName: "",
+  dateOfBirth: "",
+  age: "",
+  gender: "",
+  race: "",
+  livesWithWhom: "",
+  livesWithPetitioner: "",
 });
 
 const blankResidenceRow = (): ResidenceHistoryRow => ({

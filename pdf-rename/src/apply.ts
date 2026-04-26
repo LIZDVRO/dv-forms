@@ -19,8 +19,8 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { PDFDocument, PDFName, PDFRef, PDFArray, PDFDict, PDFString, PDFHexString } from 'pdf-lib';
-import type { MappingEntry } from './lib.ts';
-import { isCleanSnake } from './lib.ts';
+import type { MappingEntry } from './lib';
+import { isCleanSnake } from './lib';
 
 async function main() {
   const [, , inputArg, mappingArg, outputArg] = process.argv;

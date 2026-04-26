@@ -17,7 +17,7 @@ type Step4Props = {
   inputClass: string;
 };
 
-export default function Step4_OtherCourtCases({ inputClass }: Step4Props) {
+export default function Step6_CourtHistory({ inputClass }: Step4Props) {
   const courtHistory = useFormStore((s) => s.courtHistory);
   const setCourtHistory = useFormStore((s) => s.setCourtHistory);
 

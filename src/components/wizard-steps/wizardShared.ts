@@ -6,22 +6,23 @@ import {
 } from "@/lib/dv100-pdf";
 import type { PersonInfo } from "@/store/useFormStore";
 
-/** Wizard step headings (14 steps), index-aligned with `form/page.tsx` step state. */
+/** Wizard step headings (15 steps), index-aligned with `form/page.tsx` step state. */
 export const STEP_TITLES = [
   "Venue",
   "Legal Representation",
-  "Who Needs Protection?",
-  "Person Causing Harm",
-  "Describe Abuse",
-  "Other Court Cases",
-  "Orders You Want the Judge to Make",
-  "Move Out, Other Orders, Custody",
-  "Property, Animals & Other Orders",
-  "Property, Notice & Debts",
-  "Support, Fees & Restitution",
-  "Intervention & Wireless Accounts",
-  "Sign your document",
-  "Review & Generate",
+  "You (The Survivor)",
+  "The Person Causing Harm",
+  "The Children",
+  "Other Protected People",
+  "Existing Court Cases",
+  "Describe the Abuse",
+  "Firearms & Weapons",
+  "Stay-Away & Move-Out",
+  "Child Custody & Visitation",
+  "Pets & Property",
+  "Debts, Support & Fees",
+  "Interventions & Cell Phones",
+  "Sign & Generate",
 ] as const;
 
 export const GENDER_OPTIONS = DV100_GENDER_OPTIONS;

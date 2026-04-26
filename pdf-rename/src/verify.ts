@@ -9,7 +9,7 @@
 
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { extractWidgets, type MappingEntry } from './lib.ts';
+import { extractWidgets, type MappingEntry } from './lib';
 
 async function main() {
   const [, , pdfArg, mappingArg] = process.argv;

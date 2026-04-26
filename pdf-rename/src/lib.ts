@@ -145,7 +145,10 @@ export async function extractWidgets(pdfBytes: Uint8Array): Promise<Widget[]> {
         if (ff && typeof (ff as any).asNumber === 'function') {
           flags = (ff as any).asNumber();
         }
-        const parentRef = node.get(PDFName.of('Parent'));
+        const parentRef = node.get(PDFName.of('Parent')) as
+          | PDFRef
+          | PDFDict
+          | undefined;
         if (!parentRef) break;
         const parent = parentRef instanceof PDFDict
           ? parentRef

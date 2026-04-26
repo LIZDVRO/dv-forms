@@ -23,7 +23,7 @@ const emptySoleReasons = () => ({
   otherDescription: "",
 });
 
-export default function Step7_PropertyAnimals({
+export default function Step11_PropertyAnimals({
   inputClass,
   textareaClass,
 }: Step7Props) {

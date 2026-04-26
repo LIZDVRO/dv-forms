@@ -27,7 +27,7 @@ function mapWirelessTuple(
 
 const ROW_LABELS = ["a", "b", "c", "d"] as const;
 
-export default function Step10_InterventionWireless({ inputClass }: Step10Props) {
+export default function Step13_Interventions({ inputClass }: Step10Props) {
   const fr = useFormStore((s) => s.financial.requests);
   const setFinancialRequests = useFormStore((s) => s.setFinancialRequests);
 
