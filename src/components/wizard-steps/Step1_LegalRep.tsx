@@ -1,62 +1,18 @@
 "use client";
 
-import { COURT_ADDRESSES, WIZARD_COUNTY_OPTIONS } from "@/lib/courtAddresses";
 import { useFormStore } from "@/store/useFormStore";
 
-type Step0Props = {
+type Step1LegalRepProps = {
   inputClass: string;
 };
 
-export default function Step0_LegalRep({ inputClass }: Step0Props) {
+export default function Step1_LegalRep({ inputClass }: Step1LegalRepProps) {
   const attorney = useFormStore((s) => s.attorney);
   const setAttorney = useFormStore((s) => s.setAttorney);
-  const petitionerExtras = useFormStore((s) => s.petitionerExtras);
-  const setPetitionerExtras = useFormStore((s) => s.setPetitionerExtras);
 
   return (
     <div>
-      <section aria-labelledby="filing-location-heading">
-        <h2
-          id="filing-location-heading"
-          className="text-sm font-semibold text-slate-900"
-        >
-          Filing Location
-        </h2>
-        <div className="mt-4">
-          <label
-            htmlFor="county"
-            className="text-sm font-medium text-slate-800"
-          >
-            County (Superior Court)
-          </label>
-          <p className="mb-2 text-xs text-slate-600">
-            Used for the court name and address on the petition and restraining
-            order forms.{" "}
-            {petitionerExtras.county
-              ? COURT_ADDRESSES[petitionerExtras.county]?.split("\n").join(" · ")
-              : null}
-          </p>
-          <select
-            id="county"
-            name="county"
-            value={petitionerExtras.county}
-            onChange={(e) => setPetitionerExtras({ county: e.target.value })}
-            className={inputClass}
-          >
-            <option value="">Select a county</option>
-            {WIZARD_COUNTY_OPTIONS.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
-        </div>
-      </section>
-
-      <section
-        className="mt-12"
-        aria-labelledby="legal-representation-heading"
-      >
+      <section aria-labelledby="legal-representation-heading">
         <h2
           id="legal-representation-heading"
           className="text-sm font-semibold text-slate-900"

@@ -14,7 +14,8 @@ import { useFormStore } from "@/store/useFormStore";
 
 import { formFieldInputClassName } from "@/components/ui/input";
 import { formFieldTextareaClassName } from "@/components/ui/textarea";
-import Step0_LegalRep from "@/components/wizard-steps/Step0_LegalRep";
+import Step0_Venue from "@/components/wizard-steps/Step0_Venue";
+import Step1_LegalRep from "@/components/wizard-steps/Step1_LegalRep";
 import Step1_ProtectedPeople from "@/components/wizard-steps/Step1_ProtectedPeople";
 import Step2_PersonCausingHarm from "@/components/wizard-steps/Step2_PersonCausingHarm";
 import Step3_DescribeAbuse from "@/components/wizard-steps/Step3_DescribeAbuse";
@@ -29,26 +30,14 @@ import Step11_Signature from "@/components/wizard-steps/Step11_Signature";
 import Step12_ReviewGenerate, {
   type Step12PdfInfo,
 } from "@/components/wizard-steps/Step12_ReviewGenerate";
-import { personInfoToDisplayName } from "@/components/wizard-steps/wizardShared";
-
-const STEP_TITLES = [
-  "Filing & Representation",
-  "Who Needs Protection?",
-  "Person Causing Harm",
-  "Describe Abuse",
-  "Other Court Cases",
-  "Orders You Want the Judge to Make",
-  "Move Out, Other Orders, Custody",
-  "Property, Animals & Other Orders",
-  "Property, Notice & Debts",
-  "Support, Fees & Restitution",
-  "Intervention & Wireless Accounts",
-  "Sign your document",
-  "Review & Generate",
-] as const;
+import {
+  personInfoToDisplayName,
+  STEP_TITLES,
+} from "@/components/wizard-steps/wizardShared";
 
 const STEP_BLURBS = [
-  "Are you an attorney preparing this on behalf of the petitioner, or are you a petitioner who is represented by an attorney?",
+  "California domestic violence restraining orders are filed in Superior Court by county. Pick the location that matches where you live or where the abuse occurred.",
+  "If a licensed attorney is helping you complete or file these forms, answer Yes and provide their details. Otherwise, choose No.",
   "First, let's get your information. Then, you can add any children, family members, or household members who also need protection.",
   "Now, tell us about the person causing harm. We need their basic information, how you know them, and whether they have access to firearms.",
   "Describe incidents of abuse (DV-100 Sections 5–7, Pages 3–5). You will start with the most recent incident; you can choose to add up to two more separate incidents when you feel ready.",
@@ -269,17 +258,19 @@ export default function FormWizardPage() {
             </p>
 
             <div className="mt-8 flex flex-1 flex-col">
-              {step === 0 && <Step0_LegalRep inputClass={inputClass} />}
+              {step === 0 && <Step0_Venue inputClass={inputClass} />}
 
-              {step === 1 && <Step1_ProtectedPeople inputClass={inputClass} />}
+              {step === 1 && <Step1_LegalRep inputClass={inputClass} />}
 
-              {step === 2 && (
+              {step === 2 && <Step1_ProtectedPeople inputClass={inputClass} />}
+
+              {step === 3 && (
                 <Step2_PersonCausingHarm
                   inputClass={inputClass}
                 />
               )}
 
-              {step === 3 && (
+              {step === 4 && (
                 <Step3_DescribeAbuse
                   showAbuseIncident2={showAbuseIncident2}
                   setShowAbuseIncident2={setShowAbuseIncident2}
@@ -289,44 +280,44 @@ export default function FormWizardPage() {
                 />
               )}
 
-              {step === 4 && (
+              {step === 5 && (
                 <Step4_OtherCourtCases inputClass={inputClass} />
               )}
 
-              {step === 5 && (
+              {step === 6 && (
                 <Step5_OrdersRequested inputClass={inputClass} />
               )}
 
-              {step === 6 && (
+              {step === 7 && (
                 <Step6_MoveOutCustody
                   inputClass={inputClass}
                   textareaClass={textareaClass}
                 />
               )}
 
-              {step === 7 && (
+              {step === 8 && (
                 <Step7_PropertyAnimals
                   inputClass={inputClass}
                   textareaClass={textareaClass}
                 />
               )}
 
-              {step === 8 && (
+              {step === 9 && (
                 <Step8_PropertyNoticeDebts
                   inputClass={inputClass}
                   textareaClass={textareaClass}
                 />
               )}
 
-              {step === 9 && <Step9_SupportFees />}
+              {step === 10 && <Step9_SupportFees />}
 
-              {step === 10 && (
+              {step === 11 && (
                 <Step10_InterventionWireless inputClass={inputClass} />
               )}
 
-              {step === 11 && <Step11_Signature />}
+              {step === 12 && <Step11_Signature />}
 
-              {step === 12 && (
+              {step === 13 && (
                 <Step12_ReviewGenerate
                   petitioner={petitioner}
                   respondentPerson={respondentPerson}
