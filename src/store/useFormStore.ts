@@ -88,6 +88,8 @@ export interface AttorneyInfo {
 
 export interface PetitionerExtras {
   fax: string;
+  /** Selected Superior Court county (Fresno, Kings, Tulare) for PDF captions. */
+  county: string;
 }
 
 export type PetitionerInfo = PersonInfo & PetitionerExtras;
@@ -1053,7 +1055,7 @@ function blankPerson(): PersonInfo {
 }
 
 function blankPetitioner(): PetitionerInfo {
-  return { ...blankPerson(), fax: "" };
+  return { ...blankPerson(), fax: "", county: "" };
 }
 
 function deepMerge<T extends object>(target: T, source: Partial<T>): T {

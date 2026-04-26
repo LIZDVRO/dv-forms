@@ -14,6 +14,7 @@ import {
   StandardFonts,
 } from "pdf-lib";
 
+import { applyCourtCaptionFromCounty } from "@/lib/courtCaption";
 import { fillLizInvoiceFromTemplate } from "@/utils/fillInvoice";
 import {
   useFormStore,
@@ -604,7 +605,8 @@ const PDF_PAGE3_WITNESSES_RADIO =
   "b Did anyone else hear or see what happened on this day";
 const PDF_PAGE3_WITNESS_DETAIL = "b anyone else see what happened";
 const PDF_PAGE3_WEAPON_RADIO = "c Did the person in";
-const PDF_PAGE3_WEAPON_DETAIL = "c use or threaten to use a gun or other weapon";
+/** Section 5 — first abuse incident; matches Acrobat field (leading “2”, not “c”). */
+const PDF_PAGE3_WEAPON_DETAIL = "2 use or threaten to use a gun or other weapon";
 const PDF_PAGE3_HARM_NO = "No_6";
 const PDF_PAGE3_HARM_YES = "Yes If yes describe harm";
 const PDF_PAGE3_HARM_DETAIL = "d cause you any emotional or physical harm";
@@ -613,9 +615,10 @@ const PDF_PAGE3_FREQ_OTHER_TEXT = "undefined_6";
 const PDF_PAGE3_FREQ_DATES = "5g dates when it happened";
 const PDF_PAGE3_POLICE_IDK = "I dont know_2";
 const PDF_PAGE3_POLICE_NO = "No_7";
-const PDF_PAGE3_POLICE_YES_NAMES = [
-  "Yes If the police gave you a restraining order list it in 4",
+/** “Yes” = police came; form uses `in␣␣4` (two spaces) before the section number. */
+const PDF_PAGE3_POLICE_YES_CANDIDATES = [
   "Yes If the police gave you a restraining order list it in  4",
+  "Yes If the police gave you a restraining order list it in 4",
 ] as const;
 
 /** Section 6 — DV-100 Page 4 (exact AcroForm names) */
@@ -627,7 +630,9 @@ const PDF_PAGE4_WITNESS_YES = "Yes If yes give names";
 const PDF_PAGE4_WITNESS_DETAIL = "undefined_7";
 const PDF_PAGE4_WEAPON_NO = "No_9";
 const PDF_PAGE4_WEAPON_YES = "Yes If yes describe gun or weapon";
-const PDF_PAGE4_WEAPON_DETAIL = "2 use or threaten to use a gun or other weapon_2";
+/** Section 6 — second incident; PDF uses two spaces after the leading “2”. */
+const PDF_PAGE4_WEAPON_DETAIL = "2  use or threaten to use a gun or other weapon_2";
+const PDF_PAGE4_WEAPON_DETAIL_FALLBACK = "2 use or threaten to use a gun or other weapon_2";
 const PDF_PAGE4_HARM_RADIO = "d Did the person in";
 const PDF_PAGE4_HARM_NO_OPT = "No_10";
 const PDF_PAGE4_HARM_YES_OPT = "Yes_4";
@@ -655,7 +660,8 @@ const PDF_PAGE5_WITNESS_YES_OPT = "Yes_5";
 const PDF_PAGE5_WITNESS_DETAIL = "If yes give names";
 const PDF_PAGE5_WEAPON_NO = "No_13";
 const PDF_PAGE5_WEAPON_YES = "Yes If yes describe gun or weapon_2";
-const PDF_PAGE5_WEAPON_DETAIL = "2 use or threaten to use a gun or other weapon";
+/** Section 7 — third incident. */
+const PDF_PAGE5_WEAPON_DETAIL = "c use or threaten to use a gun or other weapon";
 const PDF_PAGE5_HARM_NO = "No_14";
 const PDF_PAGE5_HARM_YES = "Yes If yes describe harm_2";
 const PDF_PAGE5_HARM_DETAIL = "7d emotional or physical harm";
@@ -1705,6 +1711,11 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   };
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
+  try {
+    applyCourtCaptionFromCounty(pdfForm, useFormStore.getState().petitioner.county ?? "");
+  } catch (err) {
+    console.warn("DV-100: court caption fields", err);
+  }
   const attorneyPdf = getAttorneyPdfFieldsFromFormStore();
   const protectedPdf = getProtectedPeoplePdfFieldsFromFormStore();
   const narrativeFont = await doc.embedFont(StandardFonts.Helvetica);
@@ -2510,7 +2521,7 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   } catch {
     /* ignore */
   }
-  for (const name of PDF_PAGE3_POLICE_YES_NAMES) {
+  for (const name of PDF_PAGE3_POLICE_YES_CANDIDATES) {
     try {
       pdfForm.getCheckBox(name).uncheck();
     } catch {
@@ -2542,32 +2553,24 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
     }
   }
 
-  try {
-    if (data.recentAbusePolice === "yes") {
-      pdfForm.getCheckBox(PDF_PAGE3_POLICE_YES_NAMES[0]).check();
-      filled.push({
-        label: "Police (yes)",
-        pdfFieldName: PDF_PAGE3_POLICE_YES_NAMES[0],
-      });
+  if (data.recentAbusePolice === "yes") {
+    let policeYesSet = false;
+    for (const name of PDF_PAGE3_POLICE_YES_CANDIDATES) {
+      try {
+        pdfForm.getCheckBox(name).check();
+        filled.push({ label: "Police (yes)", pdfFieldName: name });
+        policeYesSet = true;
+        break;
+      } catch (err) {
+        console.warn(`Failed to check police Yes checkbox ${JSON.stringify(name)}`, err);
+      }
     }
-  } catch (err) {
-    console.warn("Failed to map police Yes (primary name)", err);
-    try {
-      if (data.recentAbusePolice === "yes") {
-        pdfForm.getCheckBox(PDF_PAGE3_POLICE_YES_NAMES[1]).check();
-        filled.push({
-          label: "Police (yes)",
-          pdfFieldName: PDF_PAGE3_POLICE_YES_NAMES[1],
-        });
-      }
-    } catch (err2) {
-      console.warn("Failed to map police Yes (alternate spacing)", err2);
-      if (data.recentAbusePolice === "yes") {
-        missing.push({
-          label: "Police (yes)",
-          pdfFieldName: PDF_PAGE3_POLICE_YES_NAMES[0],
-        });
-      }
+    if (!policeYesSet) {
+      console.warn("Failed to map police Yes: no candidate checkbox name matched the PDF");
+      missing.push({
+        label: "Police (yes)",
+        pdfFieldName: PDF_PAGE3_POLICE_YES_CANDIDATES[0],
+      });
     }
   }
 
@@ -2900,26 +2903,36 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
 
   try {
     if (sec6Weapon !== "yes") {
-      const field = pdfForm.getTextField(PDF_PAGE4_WEAPON_DETAIL);
-      field.setText("");
+      try {
+        pdfForm.getTextField(PDF_PAGE4_WEAPON_DETAIL).setText("");
+      } catch {
+        /* ignore */
+      }
+      try {
+        pdfForm.getTextField(PDF_PAGE4_WEAPON_DETAIL_FALLBACK).setText("");
+      } catch {
+        /* ignore */
+      }
     }
   } catch (err) {
     console.warn("Failed to clear 6c weapon detail", err);
   }
 
-  try {
-    const field = pdfForm.getTextField(PDF_PAGE4_WEAPON_DETAIL);
+  if (sec6Weapon === "yes" && (data.secondAbuseWeaponDetail ?? "").trim()) {
     const v = (data.secondAbuseWeaponDetail ?? "").trim();
-    if (sec6Weapon === "yes" && field && v) {
-      field.setText(v);
-      filled.push({
-        label: "6c. Weapon description",
-        pdfFieldName: PDF_PAGE4_WEAPON_DETAIL,
-      });
+    const names = [PDF_PAGE4_WEAPON_DETAIL, PDF_PAGE4_WEAPON_DETAIL_FALLBACK] as const;
+    let setOk = false;
+    for (const n of names) {
+      try {
+        pdfForm.getTextField(n).setText(v);
+        filled.push({ label: "6c. Weapon description", pdfFieldName: n });
+        setOk = true;
+        break;
+      } catch (err) {
+        console.warn(`Failed to set 6c weapon detail on ${JSON.stringify(n)}`, err);
+      }
     }
-  } catch (err) {
-    console.warn("Failed to map secondAbuseWeaponDetail", err);
-    if (sec6Weapon === "yes" && (data.secondAbuseWeaponDetail ?? "").trim()) {
+    if (!setOk) {
       missing.push({
         label: "6c. Weapon description",
         pdfFieldName: PDF_PAGE4_WEAPON_DETAIL,

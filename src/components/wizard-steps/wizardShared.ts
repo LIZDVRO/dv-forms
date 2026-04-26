@@ -8,6 +8,12 @@ import type { PersonInfo } from "@/store/useFormStore";
 
 export const GENDER_OPTIONS = DV100_GENDER_OPTIONS;
 
+export {
+  COURT_ADDRESSES,
+  WIZARD_COUNTY_OPTIONS,
+  type WizardCountyOption,
+} from "@/lib/courtAddresses";
+
 export const PROTECTED_PEOPLE_WHY_MAX_LENGTH = 400;
 export const HARM_DETAIL_MAX_LENGTH = 85;
 

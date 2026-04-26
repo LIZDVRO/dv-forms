@@ -1,5 +1,6 @@
 "use client";
 
+import { COURT_ADDRESSES, WIZARD_COUNTY_OPTIONS } from "@/lib/courtAddresses";
 import { useFormStore } from "@/store/useFormStore";
 
 type Step0Props = {
@@ -9,9 +10,41 @@ type Step0Props = {
 export default function Step0_LegalRep({ inputClass }: Step0Props) {
   const attorney = useFormStore((s) => s.attorney);
   const setAttorney = useFormStore((s) => s.setAttorney);
+  const petitioner = useFormStore((s) => s.petitioner);
+  const setPetitioner = useFormStore((s) => s.setPetitioner);
 
   return (
     <div className="space-y-6">
+      <div>
+        <label
+          htmlFor="county"
+          className="text-sm font-medium text-slate-800"
+        >
+          County (Superior Court)
+        </label>
+        <p className="mb-2 text-xs text-slate-600">
+          Used for the court name and address on the petition and restraining
+          order forms.{" "}
+          {petitioner.county
+            ? COURT_ADDRESSES[petitioner.county]?.split("\n").join(" · ")
+            : null}
+        </p>
+        <select
+          id="county"
+          name="county"
+          value={petitioner.county}
+          onChange={(e) => setPetitioner({ county: e.target.value })}
+          className={inputClass}
+        >
+          <option value="">Select a county</option>
+          {WIZARD_COUNTY_OPTIONS.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <fieldset className="space-y-4">
         <legend className="text-sm font-medium text-slate-800">
           Is an attorney preparing or assisting with this form?

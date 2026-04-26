@@ -1,36 +1,33 @@
-import { PDFDocument, PDFForm } from "pdf-lib";
+import { PDFDocument, type PDFForm } from "pdf-lib";
 
-import {
-  getDv110RelationshipLabelFromFormStore,
-  getProtectedPeoplePdfFieldsFromFormStore,
-} from "@/lib/dv100-pdf";
-import type { PersonInfo } from "@/store/useFormStore";
-import { useFormStore } from "@/store/useFormStore";
+import { applyCourtCaptionFromCounty } from "@/lib/courtCaption";
+import { getDv110RelationshipLabelFromFormStore } from "@/lib/dv100-pdf";
+import { useFormStore, type PersonInfo, type ProtectedPerson } from "@/store/useFormStore";
 
 export const DV110_PDF_URL = "/dv110.pdf";
 
-export type Dv110PdfData = {
-  protectedPersonName: string;
-  fullName: string;
-  gender: string;
-  race: string;
-  age: string;
-  dateOfBirth: string;
-  height: string;
-  weight: string;
-  hairColor: string;
-  eyeColor: string;
-  relationship: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-  protectedPeople: Array<{ name: string; relationship: string; age: string }>;
-};
+const RELATIONSHIP_TO_PERSON_IN_1 =
+  "Relationship to person in  1" as const;
 
 function safeSetText(form: PDFForm, name: string, text: string): void {
   const field = form.getTextField(name);
   field.setText(text);
+}
+
+function trySetText(form: PDFForm, name: string, text: string, warn: string): void {
+  try {
+    safeSetText(form, name, String(text ?? "").trim());
+  } catch (err) {
+    console.warn(warn, err);
+  }
+}
+
+function trySetTextSilent(form: PDFForm, name: string, text: string): void {
+  try {
+    safeSetText(form, name, String(text ?? "").trim());
+  } catch {
+    /* field may be absent in this template revision */
+  }
 }
 
 function dv110GenderRadioOption(gender: string): "M" | "F" | "Nonbinary" | null {
@@ -39,6 +36,23 @@ function dv110GenderRadioOption(gender: string): "M" | "F" | "Nonbinary" | null 
   if (v === "Female") return "F";
   if (v === "Nonbinary") return "Nonbinary";
   return null;
+}
+
+function personFullName(p: PersonInfo): string {
+  return [p.firstName, p.middleName, p.lastName]
+    .map((s) => String(s ?? "").trim())
+    .filter(Boolean)
+    .join(" ");
+}
+
+function protectedRowToDv110Fields(
+  p: ProtectedPerson,
+): { name: string; relationship: string; age: string } {
+  return {
+    name: p.fullName ?? "",
+    relationship: p.relationship ?? "",
+    age: p.age ?? "",
+  };
 }
 
 function rowHasData(row: { name: string; relationship: string; age: string } | undefined): boolean {
@@ -50,43 +64,30 @@ function rowHasData(row: { name: string; relationship: string; age: string } | u
   );
 }
 
-function personFullName(p: PersonInfo): string {
-  return [p.firstName, p.middleName, p.lastName]
-    .map((s) => String(s ?? "").trim())
-    .filter(Boolean)
-    .join(" ");
+function formatFirearmLine(row: { description: string; numberOrAmount: string; location: string }): string {
+  const a = [row.description, row.numberOrAmount].map((s) => String(s ?? "").trim()).filter(Boolean);
+  const line = a.join(" ");
+  const loc = String(row.location ?? "").trim();
+  if (line && loc) return `${line} (location: ${loc})`;
+  if (line) return line;
+  if (loc) return loc;
+  return "";
 }
 
 /**
- * Loads `/dv110.pdf`, fills items 1–3 on page 1 only. Items 4–24 are court-filled.
- * Reads all field values from Zustand (`useFormStore.getState()`).
+ * Loads `/dv110.pdf` and reads all mapped fields from `useFormStore.getState()`.
+ * Items 4–24 and many caption lines are court-filled; we fill 1–3, respondent block,
+ * protected people, and firearms.
  */
 export async function generateDV110PDF(): Promise<Uint8Array> {
-  const petitioner = useFormStore.getState().petitioner;
-  const respondent = useFormStore.getState().respondent.person;
-  const pp = getProtectedPeoplePdfFieldsFromFormStore();
-  const data: Dv110PdfData = {
-    protectedPersonName: personFullName(petitioner),
-    fullName: personFullName(respondent),
-    gender: respondent.gender,
-    race: respondent.race,
-    age: respondent.age,
-    dateOfBirth: respondent.dateOfBirth,
-    height: respondent.height,
-    weight: respondent.weight,
-    hairColor: respondent.hairColor,
-    eyeColor: respondent.eyeColor,
-    relationship: "",
-    address: respondent.address.street,
-    city: respondent.address.city,
-    state: respondent.address.state,
-    zip: respondent.address.zip,
-    protectedPeople: pp.protectedPeople.map((p) => ({
-      name: p.name,
-      relationship: p.relationship,
-      age: p.age,
-    })),
-  };
+  const state = useFormStore.getState();
+  const petitioner = state.petitioner;
+  const respondent = state.respondent.person;
+  const otherP = state.otherProtectedPeople;
+  const firearms = state.firearms;
+  const relLabel = getDv110RelationshipLabelFromFormStore().trim();
+
+  const protectedRows = (otherP.people ?? []).map(protectedRowToDv110Fields);
 
   const res = await fetch(DV110_PDF_URL);
   if (!res.ok) {
@@ -94,21 +95,33 @@ export async function generateDV110PDF(): Promise<Uint8Array> {
   }
   const doc = await PDFDocument.load(await res.arrayBuffer(), { ignoreEncryption: true });
   const form = doc.getForm();
-
   try {
-    safeSetText(form, "Protected Person name", String(data.protectedPersonName ?? "").trim());
+    applyCourtCaptionFromCounty(form, petitioner.county ?? "");
   } catch (err) {
-    console.warn('DV-110: failed to set "Protected Person name"', err);
+    console.warn("DV-110: court caption", err);
   }
 
-  try {
-    safeSetText(form, "Full Name", String(data.fullName ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Full Name"', err);
-  }
+  const firearmRows = (firearms.firearms ?? [])
+    .map((r) => ({
+      description: r.description,
+      numberOrAmount: r.numberOrAmount,
+      location: r.location,
+    }))
+    .filter(
+      (r) =>
+        String(r.description ?? "").trim() !== "" ||
+        String(r.location ?? "").trim() !== "" ||
+        String(r.numberOrAmount ?? "").trim() !== "",
+    );
+
+  const firearmsSummary = firearmRows.map(formatFirearmLine).filter(Boolean).join("; ");
+
+  trySetText(form, "Protected Person name", personFullName(petitioner), 'DV-110: "Protected Person name"');
+
+  trySetText(form, "Full Name", personFullName(respondent), 'DV-110: "Full Name"');
 
   try {
-    const opt = dv110GenderRadioOption(String(data.gender ?? ""));
+    const opt = dv110GenderRadioOption(String(respondent.gender ?? ""));
     if (opt) {
       form.getRadioGroup("Gender").select(opt);
     }
@@ -116,108 +129,60 @@ export async function generateDV110PDF(): Promise<Uint8Array> {
     console.warn("DV-110: failed to set Gender radio", err);
   }
 
-  try {
-    safeSetText(form, "Race", String(data.race ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Race"', err);
-  }
+  trySetText(form, "Race", String(respondent.race ?? ""), 'DV-110: "Race"');
 
-  try {
-    safeSetText(form, "Age", String(data.age ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Age"', err);
-  }
+  trySetText(form, "Age", String(respondent.age ?? ""), 'DV-110: "Age"');
 
-  try {
-    safeSetText(
-      form,
-      "estimate if age unknown Date of Birth",
-      String(data.dateOfBirth ?? "").trim(),
-    );
-  } catch (err) {
-    console.warn('DV-110: failed to set "estimate if age unknown Date of Birth"', err);
-  }
+  trySetText(
+    form,
+    "estimate if age unknown Date of Birth",
+    String(respondent.dateOfBirth ?? ""),
+    'DV-110: "estimate if age unknown Date of Birth"',
+  );
 
-  try {
-    safeSetText(form, "Height", String(data.height ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Height"', err);
-  }
+  trySetText(form, "Height", String(respondent.height ?? ""), 'DV-110: "Height"');
 
-  try {
-    safeSetText(form, "Weight", String(data.weight ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Weight"', err);
-  }
+  trySetText(form, "Weight", String(respondent.weight ?? ""), 'DV-110: "Weight"');
 
-  try {
-    safeSetText(form, "Hair Color", String(data.hairColor ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Hair Color"', err);
-  }
+  trySetText(form, "Hair Color", String(respondent.hairColor ?? ""), 'DV-110: "Hair Color"');
 
-  try {
-    safeSetText(form, "Eye Color", String(data.eyeColor ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Eye Color"', err);
-  }
+  trySetText(form, "Eye Color", String(respondent.eyeColor ?? ""), 'DV-110: "Eye Color"');
 
-  try {
-    const rel =
-      getDv110RelationshipLabelFromFormStore() || String(data.relationship ?? "");
-    safeSetText(form, "Relationship to person in 1", rel.trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Relationship to person in 1"', err);
-  }
+  trySetText(form, RELATIONSHIP_TO_PERSON_IN_1, relLabel, "DV-110: relationship to person 1 (double space)");
 
-  try {
-    safeSetText(form, "Address of restrained person", String(data.address ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Address of restrained person"', err);
-  }
+  trySetText(
+    form,
+    "Address of restrained person",
+    String(respondent.address.street ?? ""),
+    'DV-110: "Address of restrained person"',
+  );
 
-  try {
-    safeSetText(form, "City", String(data.city ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "City"', err);
-  }
+  trySetText(form, "City", String(respondent.address.city ?? ""), 'DV-110: "City"');
 
-  try {
-    safeSetText(form, "State", String(data.state ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "State"', err);
-  }
+  trySetText(form, "State", String(respondent.address.state ?? ""), 'DV-110: "State"');
 
-  try {
-    safeSetText(form, "Zip", String(data.zip ?? "").trim());
-  } catch (err) {
-    console.warn('DV-110: failed to set "Zip"', err);
-  }
+  trySetText(form, "Zip", String(respondent.address.zip ?? ""), 'DV-110: "Zip"');
 
-  const people = Array.isArray(data.protectedPeople) ? data.protectedPeople : [];
+  trySetText(form, "Firearms", firearmsSummary, 'DV-110: "Firearms"');
+
+  const people = protectedRows;
   for (let i = 0; i < 4; i++) {
     const person = people[i];
     if (!rowHasData(person)) continue;
     const n = i + 1;
-    try {
-      safeSetText(form, `Full name ${n}`, String(person!.name ?? "").trim());
-    } catch (err) {
-      console.warn(`DV-110: failed to set Full name ${n}`, err);
-    }
-    try {
-      safeSetText(
-        form,
-        `Relationship to person in 1 ${n}`,
-        String(person!.relationship ?? "").trim(),
-      );
-    } catch (err) {
-      console.warn(`DV-110: failed to set Relationship to person in 1 ${n}`, err);
-    }
-    try {
-      safeSetText(form, `Age ${n}`, String(person!.age ?? "").trim());
-    } catch (err) {
-      console.warn(`DV-110: failed to set Age ${n}`, err);
-    }
+    trySetText(
+      form,
+      `Full name ${n}`,
+      String(person?.name ?? "").trim(),
+      `DV-110: Full name ${n}`,
+    );
+    trySetText(
+      form,
+      `Relationship to person in 1 ${n}`,
+      String(person?.relationship ?? "").trim(),
+      `DV-110: relationship row ${n}`,
+    );
+    trySetText(form, `Age ${n}`, String(person?.age ?? "").trim(), `DV-110: Age ${n}`);
   }
 
   try {
@@ -229,6 +194,27 @@ export async function generateDV110PDF(): Promise<Uint8Array> {
     }
   } catch (err) {
     console.warn('DV-110: "Check more people" checkbox', err);
+  }
+
+  for (let i = 0; i < 4; i++) {
+    const r = firearmRows[i];
+    const n = i + 1;
+    if (!r) {
+      trySetTextSilent(form, `firearms_${n}`, "");
+      trySetTextSilent(form, `Location if known ${n}`, "");
+      continue;
+    }
+    const desc = [r.description, r.numberOrAmount]
+      .map((s) => String(s ?? "").trim())
+      .filter(Boolean)
+      .join(" ");
+    trySetText(form, `firearms_${n}`, desc, `DV-110: firearms_${n}`);
+    trySetText(
+      form,
+      `Location if known ${n}`,
+      String(r.location ?? "").trim(),
+      `DV-110: Location if known ${n}`,
+    );
   }
 
   form.updateFieldAppearances();
