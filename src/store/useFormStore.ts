@@ -834,10 +834,6 @@ const initialOtherProtectedPeople: OtherProtectedPeopleInfo = {
   wantsProtectionForOthers: "",
   people: [
     { fullName: "", age: "", gender: "", race: "", dateOfBirth: "", relationship: "", livesWithPetitioner: "" },
-    { fullName: "", age: "", gender: "", race: "", dateOfBirth: "", relationship: "", livesWithPetitioner: "" },
-    { fullName: "", age: "", gender: "", race: "", dateOfBirth: "", relationship: "", livesWithPetitioner: "" },
-    { fullName: "", age: "", gender: "", race: "", dateOfBirth: "", relationship: "", livesWithPetitioner: "" },
-    { fullName: "", age: "", gender: "", race: "", dateOfBirth: "", relationship: "", livesWithPetitioner: "" },
   ],
   whyProtectionNeeded: "",
 };
@@ -862,14 +858,7 @@ const blankAbuseIncident = (): AbuseIncident => ({
 
 const initialFirearms: FirearmsInfo = {
   hasFirearms: "",
-  firearms: [
-    { description: "", numberOrAmount: "", location: "" },
-    { description: "", numberOrAmount: "", location: "" },
-    { description: "", numberOrAmount: "", location: "" },
-    { description: "", numberOrAmount: "", location: "" },
-    { description: "", numberOrAmount: "", location: "" },
-    { description: "", numberOrAmount: "", location: "" },
-  ],
+  firearms: [{ description: "", numberOrAmount: "", location: "" }],
 };
 
 const initialProtectionOrders: ProtectionOrdersInfo = {
@@ -960,12 +949,7 @@ const initialChildSafety: ChildSafetyInfo = {
 
 const initialPropertyAnimals: PropertyAnimalsInfo = {
   wantsAnimalProtection: false,
-  animals: [
-    { name: "", type: "", breed: "", color: "" },
-    { name: "", type: "", breed: "", color: "" },
-    { name: "", type: "", breed: "", color: "" },
-    { name: "", type: "", breed: "", color: "" },
-  ],
+  animals: [{ name: "", type: "", breed: "", color: "" }],
   animalStayAwayDistance: "", animalStayAwayDistanceOther: "",
   animalNoHarm: false, animalSolePossession: false,
   animalSolePossessionReasons: {

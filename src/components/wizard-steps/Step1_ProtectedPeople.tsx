@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useFormStore, type ProtectedPerson } from "@/store/useFormStore";
 import { formFieldTextareaClassName } from "@/components/ui/textarea";
@@ -31,6 +31,19 @@ function blankProtectedPerson(): ProtectedPerson {
   };
 }
 
+const MAX_OTHER_PROTECTED = 5;
+
+function otherProtectedRowHasData(p: ProtectedPerson): boolean {
+  return [
+    p.fullName,
+    p.age,
+    p.gender,
+    p.race,
+    p.dateOfBirth,
+    p.relationship,
+  ].some((s) => String(s ?? "").trim() !== "");
+}
+
 export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
   const petitioner = useFormStore((s) => s.petitioner);
   const setPetitioner = useFormStore((s) => s.setPetitioner);
@@ -41,6 +54,31 @@ export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
   const [petitionerFullName, setPetitionerFullName] = useState(() =>
     personInfoToDisplayName(petitioner),
   );
+
+  const [visibleOtherProtected, setVisibleOtherProtected] = useState(1);
+
+  useEffect(() => {
+    if (otherProtectedPeople.wantsProtectionForOthers !== "yes") {
+      setVisibleOtherProtected(1);
+      return;
+    }
+    const n = otherProtectedPeople.people.length;
+    if (n === 0) {
+      return;
+    }
+    setVisibleOtherProtected((v) => Math.max(v, Math.min(MAX_OTHER_PROTECTED, n)));
+  }, [
+    otherProtectedPeople.people.length,
+    otherProtectedPeople.wantsProtectionForOthers,
+  ]);
+
+  const visibleOtherProtectedPeople = otherProtectedPeople.people.slice(
+    0,
+    Math.min(MAX_OTHER_PROTECTED, Math.max(1, visibleOtherProtected)),
+  );
+  const filledOtherProtectedCount = otherProtectedPeople.people.filter(
+    otherProtectedRowHasData,
+  ).length;
 
   return (
     <>
@@ -377,7 +415,7 @@ export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
 
         {otherProtectedPeople.wantsProtectionForOthers === "yes" && (
           <>
-            {otherProtectedPeople.people.length > 4 && (
+            {filledOtherProtectedCount > 4 && (
               <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-bold text-amber-950">
                 Note: You have listed more than 4 people. An extra page titled
                 &apos;DV-100, Other Protected People&apos; will automatically be
@@ -386,7 +424,7 @@ export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
             )}
 
             <div className="space-y-6">
-              {otherProtectedPeople.people.map((person, index) => (
+              {visibleOtherProtectedPeople.map((person, index) => (
                 <div
                   key={index}
                   className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
@@ -551,17 +589,29 @@ export default function Step1_ProtectedPeople({ inputClass }: Step1Props) {
               ))}
             </div>
 
-            <button
-              type="button"
-              onClick={() =>
-                setOtherProtectedPeople({
-                  people: [...otherProtectedPeople.people, blankProtectedPerson()],
-                })
-              }
-              className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
-            >
-              Add Another Person
-            </button>
+            {visibleOtherProtected < MAX_OTHER_PROTECTED && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const countAfter = Math.min(
+                      MAX_OTHER_PROTECTED,
+                      visibleOtherProtected + 1,
+                    );
+                    if (otherProtectedPeople.people.length < countAfter) {
+                      setOtherProtectedPeople({
+                        people: [
+                          ...otherProtectedPeople.people,
+                          blankProtectedPerson(),
+                        ],
+                      });
+                    }
+                    setVisibleOtherProtected(countAfter);
+                  }}
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
+                >
+                  Add Another Person
+                </button>
+            )}
 
             <div>
               <label

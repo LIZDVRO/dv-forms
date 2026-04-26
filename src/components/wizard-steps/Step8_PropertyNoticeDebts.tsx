@@ -23,6 +23,9 @@ export default function Step8_PropertyNoticeDebts({
 }: Step8Props) {
   const fr = useFormStore((s) => s.financial.requests);
   const setFinancialRequests = useFormStore((s) => s.setFinancialRequests);
+  const relationship = useFormStore((s) => s.relationship);
+  const showPropertyRestraintSection =
+    relationship.marriedOrRDP || relationship.formerlyMarriedOrRDP;
 
   const resetPayDebts = () => {
     setFinancialRequests({
@@ -42,26 +45,36 @@ export default function Step8_PropertyNoticeDebts({
 
   return (
     <div className="space-y-10">
-      <section className="space-y-4">
-        <h2 className="text-sm font-semibold text-slate-900">
-          Section 20. Property restraint
-        </h2>
-        <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
-          <input
-            type="checkbox"
-            checked={fr.wantsPropertyRestraint}
-            onChange={(e) =>
-              setFinancialRequests({ wantsPropertyRestraint: e.target.checked })
-            }
-            className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
-          />
-          <span className="text-sm font-medium text-slate-800">Property Restraint</span>
-        </label>
-        <p className="text-xs leading-relaxed text-slate-500">
-          Only check this if you are married or a registered domestic partner with
-          the person you want protection from.
-        </p>
-      </section>
+      {showPropertyRestraintSection && (
+        <section className="space-y-4">
+          <h2 className="text-sm font-semibold text-slate-900">
+            Section 20. Property restraint
+          </h2>
+          <label className="flex cursor-pointer items-start gap-3 py-3 pr-2 pl-0.5 transition">
+            <input
+              type="checkbox"
+              checked={fr.wantsPropertyRestraint}
+              onChange={(e) =>
+                setFinancialRequests({ wantsPropertyRestraint: e.target.checked })
+              }
+              className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
+            />
+            <div className="min-w-0">
+              <span className="text-sm font-medium text-slate-800">
+                Property restraint
+              </span>
+              <p className="mt-2 text-sm leading-relaxed text-slate-600">
+                I ask the judge to order the person in Item 2 not to borrow
+                against, sell, hide, or get rid of or destroy any possessions or
+                property, except in the usual course of business or for
+                necessities of life. I also ask the judge to order the person in
+                Item 2 to notify me of any new or big expenses and to explain them
+                to the court.
+              </p>
+            </div>
+          </label>
+        </section>
+      )}
 
       <section className="space-y-4 border-t border-purple-100/90 pt-8">
         <h2 className="text-sm font-semibold text-slate-900">

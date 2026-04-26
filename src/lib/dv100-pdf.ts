@@ -863,7 +863,7 @@ const PDF_22B_EXPLAIN_HOW = "22b2 Explain how 2 made debts";
  * | 23_amount_1 … 23_amount_4 | Amount_1 … Amount_4 |
  * | 23_master_checkbox | Pay Expenses Caused by the Abuse |
  * | 24_child_support | Child Support |
- * | 24a_checkbox, 24b_checkbox, 24c_checkbox | Section 24 sub-options (verify names in Acrobat) |
+ * | 24a–24c | I do not have a child support order; I have a child support order; I now receive TANF or CalWORKS |
  * | 25_spousal_support | Spousal Support |
  * | 26_lawyer_fees | Lawyers Fees and Costs |
  *
@@ -884,10 +884,9 @@ const PDF_23_EXPENSE_PAY_TO_4 = "Pay to_4";
 const PDF_23_EXPENSE_FOR_4 = "For_4";
 const PDF_23_EXPENSE_AMOUNT_4 = "Amount_4";
 const PDF_24_CHILD_SUPPORT_MASTER = "Child Support";
-// TODO: Verify exact Acrobat field names for Section 24 sub-checkboxes
-const PDF_24_CHILD_SUPPORT_SUB_A = "24a_checkbox";
-const PDF_24_CHILD_SUPPORT_SUB_B = "24b_checkbox";
-const PDF_24_CHILD_SUPPORT_SUB_C = "24c_checkbox";
+const PDF_24_CHILD_SUPPORT_SUB_A = "I do not have a child support order";
+const PDF_24_CHILD_SUPPORT_SUB_B = "I have a child support order";
+const PDF_24_CHILD_SUPPORT_SUB_C = "I now receive TANF or CalWORKS";
 const PDF_25_SPOUSAL_SUPPORT = "Spousal Support";
 const PDF_26_LAWYER_FEES = "Lawyers Fees and Costs";
 
@@ -1061,6 +1060,17 @@ export function getProtectedPeoplePdfFieldsFromFormStore(): {
     protectedPeople,
     protectedPeopleWhy: opp.whyProtectionNeeded ?? "",
   };
+}
+
+function dv100ProtectedEntryHasData(p: Dv100ProtectedPerson | undefined): boolean {
+  if (!p) {
+    return false;
+  }
+  if (p.livesWithYou === "Yes" || p.livesWithYou === "No") {
+    return true;
+  }
+  return [p.name, p.age, p.relationship, p.race, p.gender, p.dateOfBirth]
+    .some((s) => String(s ?? "").trim() !== "");
 }
 
 function respondentDisplayName(p: PersonInfo): string {
@@ -1564,6 +1574,8 @@ type FinancialPdfSlice = Pick<
  */
 export function getFinancialRequestsPdfFieldsFromFormStore(): FinancialPdfSlice {
   const f = useFormStore.getState().financial.requests;
+  const rel = useFormStore.getState().relationship;
+  const canPropertyRestraint = rel.marriedOrRDP || rel.formerlyMarriedOrRDP;
   const which = f.debtSpecialFindingWhich;
 
   const d = (i: 0 | 1 | 2) => f.debts[i] ?? { payTo: "", forWhat: "", amount: "", dueDate: "" };
@@ -1630,7 +1642,7 @@ export function getFinancialRequestsPdfFieldsFromFormStore(): FinancialPdfSlice 
   ];
 
   return {
-    propertyRestraint: f.wantsPropertyRestraint,
+    propertyRestraint: canPropertyRestraint && f.wantsPropertyRestraint,
     extendNoticeDeadline: f.wantsExtraServiceTime,
     extendNoticeExplain: f.extraServiceTimeExplanation,
     payDebtsForProperty: f.wantsDebtPayment,
@@ -3746,6 +3758,8 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   const people = Array.isArray(protectedPdf.protectedPeople)
     ? protectedPdf.protectedPeople
     : [];
+  const peopleWithData = people.filter(dv100ProtectedEntryHasData);
+  const peopleForFormSlots = peopleWithData.slice(0, 4);
   const sec8Why = (protectedPdf.protectedPeopleWhy ?? "").trim();
 
   try {
@@ -3791,7 +3805,7 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
     const relField = PDF_PAGE6_PROTECTED_REL[i];
     const yesCb = PDF_PAGE6_LIVES_YES[i];
     const noCb = PDF_PAGE6_LIVES_NO[i];
-    const person = people[i];
+    const person = peopleForFormSlots[i];
     const rowActive = protect === "yes";
 
     try {
@@ -3937,7 +3951,7 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
     }
   }
 
-  const overflowPeople = protect === "yes" && people.length > 4;
+  const overflowPeople = protect === "yes" && peopleWithData.length > 4;
   try {
     if (overflowPeople) {
       pdfForm.getCheckBox(PDF_PAGE6_MORE_PEOPLE_BOX).check();
@@ -3973,7 +3987,7 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
         color: black,
       });
       let y = 710;
-      const slice = people.slice(4);
+      const slice = peopleWithData.slice(4);
       for (let j = 0; j < slice.length; j++) {
         const p = slice[j];
         const n = (p?.name ?? "").trim() || "—";
@@ -5222,6 +5236,8 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   }
 
   // --- DV-100 Page 11: Sections 23–26 (see PDF_* constants and placeholder table above) ---
+  // `s22` (Pay debts) is already defined above for the Section 22 grid; Section 22 and 23 share
+  // some field names, so that flag is re-used in mapExpenseText.
   const s23 = data.requestRestitution === true;
 
   /** Section 23 “For” lines can be long; trim for Acrobat widget limits. */
@@ -5266,6 +5282,18 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
     },
   ] as const;
 
+  /**
+   * Section 23 and Section 22 share the same AcroForm names for "For" / "Amount" on rows
+   * 2 and 3 (`For_2`, `Amount_2`, `For_3`, `Amount_3`). When restitution (23) is off, we
+   * must not clear those or we wipe "Pay debts" (22) values written earlier.
+   */
+  const s23TextNotOwnedBySection23WhenOff = new Set<string>([
+    PDF_23_EXPENSE_FOR_2,
+    PDF_23_EXPENSE_AMOUNT_2,
+    PDF_23_EXPENSE_FOR_3,
+    PDF_23_EXPENSE_AMOUNT_3,
+  ]);
+
   const mapExpenseText = (
     pdfName: string,
     value: string,
@@ -5278,6 +5306,13 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
       if (s23 && value) {
         field.setText(value);
         filled.push({ label, pdfFieldName: pdfName });
+      } else if (
+        s23TextNotOwnedBySection23WhenOff.has(pdfName) &&
+        (!s23 || (s23 && s22 && !value))
+      ) {
+        // Do not clear: Section 22 “Pay debts” (fields For_2, Amount_2, For_3, Amount_3) is either
+        // the only use (!s23), or shares the widget with Section 23 when restitution row is blank.
+        return;
       } else {
         field.setText("");
       }
@@ -5337,7 +5372,6 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   });
 
   const mapPage11Check = (on: boolean, pdfName: string, label: string) => {
-    console.log("Attempting to map checkbox:", pdfName);
     try {
       if (on) {
         pdfForm.getCheckBox(pdfName).check();

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { RelationshipInfo } from "@/store/useFormStore";
 import { useFormStore, type FirearmRow } from "@/store/useFormStore";
@@ -41,6 +41,12 @@ type Step2Props = {
   inputClass: string;
 };
 
+const MAX_FIREARMS = 6;
+
+function blankFirearmRow(): FirearmRow {
+  return { description: "", numberOrAmount: "", location: "" };
+}
+
 export default function Step2_PersonCausingHarm({ inputClass }: Step2Props) {
   const respondentPerson = useFormStore((s) => s.respondent.person);
   const setRespondentPerson = useFormStore((s) => s.setRespondentPerson);
@@ -54,6 +60,19 @@ export default function Step2_PersonCausingHarm({ inputClass }: Step2Props) {
   const [respondentFullName, setRespondentFullName] = useState(() =>
     personInfoToDisplayName(respondentPerson),
   );
+  const [visibleFirearmRows, setVisibleFirearmRows] = useState(1);
+
+  useEffect(() => {
+    if (firearms.hasFirearms !== "yes") {
+      setVisibleFirearmRows(1);
+      return;
+    }
+    const n = firearms.firearms.length;
+    if (n === 0) {
+      return;
+    }
+    setVisibleFirearmRows((v) => Math.max(v, Math.min(MAX_FIREARMS, n)));
+  }, [firearms.firearms.length, firearms.hasFirearms]);
 
   const setFirearmRow = (index: number, patch: Partial<FirearmRow>) => {
     const rows = useFormStore.getState().firearms.firearms;
@@ -786,70 +805,95 @@ export default function Step2_PersonCausingHarm({ inputClass }: Step2Props) {
 
         {firearms.hasFirearms === "yes" && (
           <div className="space-y-6">
-            {firearms.firearms.map((row, index) => (
-              <div
-                key={index}
-                className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
+            {firearms.firearms
+              .slice(0, Math.min(MAX_FIREARMS, Math.max(1, visibleFirearmRows)))
+              .map((row, index) => (
+                <div
+                  key={index}
+                  className="space-y-4 rounded-xl border border-purple-100 bg-purple-50/30 px-4 py-4"
+                >
+                  <p className="text-sm font-medium text-slate-800">
+                    Firearm {index + 1}
+                  </p>
+                  <div>
+                    <label
+                      htmlFor={`firearm-desc-${index}`}
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Description (type, make, model)
+                    </label>
+                    <input
+                      id={`firearm-desc-${index}`}
+                      type="text"
+                      autoComplete="off"
+                      value={row.description}
+                      onChange={(e) =>
+                        setFirearmRow(index, { description: e.target.value })
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`firearm-amt-${index}`}
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Amount
+                    </label>
+                    <input
+                      id={`firearm-amt-${index}`}
+                      type="text"
+                      autoComplete="off"
+                      value={row.numberOrAmount}
+                      onChange={(e) =>
+                        setFirearmRow(index, { numberOrAmount: e.target.value })
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`firearm-loc-${index}`}
+                      className="text-sm font-medium text-slate-800"
+                    >
+                      Location (if known)
+                    </label>
+                    <input
+                      id={`firearm-loc-${index}`}
+                      type="text"
+                      autoComplete="off"
+                      value={row.location}
+                      onChange={(e) =>
+                        setFirearmRow(index, { location: e.target.value })
+                      }
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+              ))}
+            {visibleFirearmRows < MAX_FIREARMS && (
+              <button
+                type="button"
+                onClick={() => {
+                  const countAfter = Math.min(
+                    MAX_FIREARMS,
+                    visibleFirearmRows + 1,
+                  );
+                  if (firearms.firearms.length < countAfter) {
+                    setFirearms({
+                      firearms: [
+                        ...useFormStore.getState().firearms.firearms,
+                        blankFirearmRow(),
+                      ],
+                    });
+                  }
+                  setVisibleFirearmRows(countAfter);
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
               >
-                <p className="text-sm font-medium text-slate-800">
-                  Firearm {index + 1}
-                </p>
-                <div>
-                  <label
-                    htmlFor={`firearm-desc-${index}`}
-                    className="text-sm font-medium text-slate-800"
-                  >
-                    Description (type, make, model)
-                  </label>
-                  <input
-                    id={`firearm-desc-${index}`}
-                    type="text"
-                    autoComplete="off"
-                    value={row.description}
-                    onChange={(e) =>
-                      setFirearmRow(index, { description: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor={`firearm-amt-${index}`}
-                    className="text-sm font-medium text-slate-800"
-                  >
-                    Amount
-                  </label>
-                  <input
-                    id={`firearm-amt-${index}`}
-                    type="text"
-                    autoComplete="off"
-                    value={row.numberOrAmount}
-                    onChange={(e) =>
-                      setFirearmRow(index, { numberOrAmount: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor={`firearm-loc-${index}`}
-                    className="text-sm font-medium text-slate-800"
-                  >
-                    Location (if known)
-                  </label>
-                  <input
-                    id={`firearm-loc-${index}`}
-                    type="text"
-                    autoComplete="off"
-                    value={row.location}
-                    onChange={(e) =>
-                      setFirearmRow(index, { location: e.target.value })
-                    }
-                    className={inputClass}
-                  />
-                </div>
-              </div>
-            ))}
+                Add Another Firearm
+              </button>
+            )}
           </div>
         )}
       </div>

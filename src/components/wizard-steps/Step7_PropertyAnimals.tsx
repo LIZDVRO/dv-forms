@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { useFormStore } from "@/store/useFormStore";
 
 type Step7Props = {
@@ -7,10 +9,9 @@ type Step7Props = {
   textareaClass: string;
 };
 
+const MAX_ANIMALS = 4;
+
 const emptyAnimals = () => [
-  { name: "", type: "", breed: "", color: "" },
-  { name: "", type: "", breed: "", color: "" },
-  { name: "", type: "", breed: "", color: "" },
   { name: "", type: "", breed: "", color: "" },
 ];
 
@@ -29,6 +30,19 @@ export default function Step7_PropertyAnimals({
   const pa = useFormStore((s) => s.propertyAnimals);
   const setPropertyAnimals = useFormStore((s) => s.setPropertyAnimals);
   const reasons = pa.animalSolePossessionReasons;
+  const [visibleAnimalRows, setVisibleAnimalRows] = useState(1);
+
+  useEffect(() => {
+    if (!pa.wantsAnimalProtection) {
+      setVisibleAnimalRows(1);
+      return;
+    }
+    const n = pa.animals.length;
+    if (n === 0) {
+      return;
+    }
+    setVisibleAnimalRows((v) => Math.max(v, Math.min(MAX_ANIMALS, n)));
+  }, [pa.animals.length, pa.wantsAnimalProtection]);
 
   const resetAnimalProtection = () => {
     setPropertyAnimals({
@@ -80,7 +94,9 @@ export default function Step7_PropertyAnimals({
             <div>
               <h3 className="text-sm font-medium text-slate-800">Animals (up to four)</h3>
               <div className="mt-3 space-y-4">
-                {pa.animals.map((animal, idx) => (
+                {pa.animals
+                  .slice(0, Math.min(MAX_ANIMALS, Math.max(1, visibleAnimalRows)))
+                  .map((animal, idx) => (
                   <div
                     key={`animal-${idx}`}
                     className="rounded-xl border border-purple-100/80 bg-white p-4 shadow-sm"
@@ -172,6 +188,34 @@ export default function Step7_PropertyAnimals({
                     </div>
                   </div>
                 ))}
+                {visibleAnimalRows < MAX_ANIMALS && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const countAfter = Math.min(
+                        MAX_ANIMALS,
+                        visibleAnimalRows + 1,
+                      );
+                      if (pa.animals.length < countAfter) {
+                        setPropertyAnimals({
+                          animals: [
+                            ...useFormStore.getState().propertyAnimals.animals,
+                            {
+                              name: "",
+                              type: "",
+                              breed: "",
+                              color: "",
+                            },
+                          ],
+                        });
+                      }
+                      setVisibleAnimalRows(countAfter);
+                    }}
+                    className="inline-flex min-h-11 w-full max-w-sm items-center justify-center rounded-xl border border-purple-200 bg-white px-5 py-2.5 text-sm font-medium text-purple-800 shadow-sm transition hover:bg-purple-50"
+                  >
+                    Add Another Animal
+                  </button>
+                )}
               </div>
             </div>
 
@@ -446,9 +490,17 @@ export default function Step7_PropertyAnimals({
             }
             className="mt-1 size-4 shrink-0 rounded-sm border border-purple-300/80 text-purple-700 accent-purple-700 outline-none focus-visible:ring-2 focus-visible:ring-purple-700 focus-visible:ring-offset-1"
           />
-          <span className="text-sm font-medium text-slate-800">
-            Health and Other Insurance
-          </span>
+          <div className="min-w-0">
+            <span className="text-sm font-medium text-slate-800">
+              Health and other insurance
+            </span>
+            <p className="mt-2 text-sm leading-relaxed text-slate-600">
+              I ask the judge to order the person in Item 2 not to cash, borrow
+              against, cancel, transfer, dispose of, or change the beneficiaries
+              of any insurance or other coverage held for the benefit of the
+              parties, or their child(ren), for whom support may be ordered.
+            </p>
+          </div>
         </label>
       </section>
 
