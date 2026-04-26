@@ -1,0 +1,4226 @@
+[
+  {
+    "id": "p1_0000",
+    "page": 1,
+    "rect": [
+      36.0,
+      725.52,
+      576.12,
+      733.92
+    ],
+    "type": "text",
+    "current": "1",
+    "proposed": "which",
+    "rationale": "above box: \"Which\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0001",
+    "page": 1,
+    "rect": [
+      0.0,
+      229.92,
+      95.76,
+      238.32
+    ],
+    "type": "signature",
+    "current": "Attorney must sign above and type name below",
+    "proposed": "attorney_must_sign_type_name",
+    "rationale": "acrobat name: \"Attorney must sign above and type name below\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0002",
+    "page": 1,
+    "rect": [
+      36.0,
+      47.52,
+      489.48,
+      55.92
+    ],
+    "type": "text",
+    "current": "Judicial Council of California",
+    "proposed": "facsimile",
+    "rationale": "above box: \"Facsimile\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0003",
+    "page": 1,
+    "rect": [
+      494.28,
+      47.52,
+      576.12,
+      55.92
+    ],
+    "type": "text",
+    "current": "DV570 Page 1 of 1",
+    "proposed": "e_mail_address",
+    "rationale": "left of box: \"E-Mail Address:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0006",
+    "page": 2,
+    "rect": [
+      397.44,
+      548.64,
+      574.68,
+      734.52
+    ],
+    "type": "text",
+    "current": "FOR COURT USE ONLY",
+    "proposed": "county",
+    "rationale": "left of box: \"COUNTY OF\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0004",
+    "page": 2,
+    "rect": [
+      226.56,
+      591.6,
+      394.68,
+      648.6
+    ],
+    "type": "text",
+    "current": "SUPERIOR COURT OF CALIFORNIA COUNTY OF STREET ADDRESS MAILING ADDRESS CITY AND ZIP CODE BRANCH NAME",
+    "proposed": "mailing_address",
+    "rationale": "left of box: \"MAILING ADDRESS:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0005",
+    "page": 2,
+    "rect": [
+      181.08,
+      548.64,
+      394.68,
+      589.92
+    ],
+    "type": "text",
+    "current": "PETITIONER RESPONDENT OTHER PARTYPARENTCLAIMANT",
+    "proposed": "respondent",
+    "rationale": "left of box: \"RESPONDENT:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0008",
+    "page": 2,
+    "rect": [
+      396.96,
+      521.4,
+      575.16,
+      540.48
+    ],
+    "type": "text",
+    "current": "CASE NUMBER",
+    "proposed": "expense_declaration",
+    "rationale": "left of box: \"EXPENSE DECLARATION\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0007",
+    "page": 2,
+    "rect": [
+      36.72,
+      521.4,
+      395.4,
+      534.24
+    ],
+    "type": "text",
+    "current": "INCOME AND EXPENSE DECLARATION",
+    "proposed": "other",
+    "rationale": "above box: \"OTHER\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0009",
+    "page": 2,
+    "rect": [
+      313.56,
+      410.04,
+      330.6,
+      418.32
+    ],
+    "type": "text",
+    "current": "per month",
+    "proposed": "q1_gross_before_taxes",
+    "rationale": "left of box: \"gross (before taxes)\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0010",
+    "page": 2,
+    "rect": [
+      393.84,
+      410.04,
+      410.88,
+      418.32
+    ],
+    "type": "text",
+    "current": "per week",
+    "proposed": "q1_per_month",
+    "rationale": "left of box: \"per month\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0011",
+    "page": 2,
+    "rect": [
+      470.04,
+      409.68,
+      487.08,
+      417.96
+    ],
+    "type": "text",
+    "current": "per hour",
+    "proposed": "q1_per_week",
+    "rationale": "left of box: \"per week\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0012",
+    "page": 2,
+    "rect": [
+      267.24,
+      338.4,
+      284.28,
+      346.68
+    ],
+    "type": "text",
+    "current": "Yes",
+    "proposed": "q2_i_have_completed_high_school_equivalent",
+    "rationale": "left of box: \"I have completed high school or the equivalent:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0013",
+    "page": 2,
+    "rect": [
+      324.0,
+      338.4,
+      341.04,
+      346.68
+    ],
+    "type": "text",
+    "current": "No",
+    "proposed": "q2_yes",
+    "rationale": "left of box: \"Yes\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0014",
+    "page": 2,
+    "rect": [
+      305.28,
+      324.12,
+      322.32,
+      332.4
+    ],
+    "type": "text",
+    "current": "Degrees obtained specify",
+    "proposed": "q2_years_college_completed_specify",
+    "rationale": "left of box: \"of years of college completed (specify):\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0015",
+    "page": 2,
+    "rect": [
+      352.56,
+      310.44,
+      369.6,
+      318.72
+    ],
+    "type": "text",
+    "current": "Degrees obtained specify_2",
+    "proposed": "q2_graduate_school_completed_specify",
+    "rationale": "left of box: \"graduate school completed (specify):\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0016",
+    "page": 2,
+    "rect": [
+      106.32,
+      297.24,
+      123.36,
+      305.52
+    ],
+    "type": "text",
+    "current": "professionaloccupational licenses specify",
+    "proposed": "q2_e_i_have",
+    "rationale": "left of box: \"e. I have:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0017",
+    "page": 2,
+    "rect": [
+      106.32,
+      284.28,
+      123.36,
+      292.56
+    ],
+    "type": "text",
+    "current": "vocational training specify",
+    "proposed": "q2_of",
+    "rationale": "above box: \"of\" | section 2",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0018",
+    "page": 2,
+    "rect": [
+      66.48,
+      255.48,
+      83.52,
+      263.76
+    ],
+    "type": "text",
+    "current": "I last filed taxes for tax year specify year",
+    "proposed": "q3_a",
+    "rationale": "left of box: \"a.\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0019",
+    "page": 2,
+    "rect": [
+      165.72,
+      243.0,
+      182.76,
+      251.28
+    ],
+    "type": "text",
+    "current": "single",
+    "proposed": "single",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p2_0020",
+    "page": 2,
+    "rect": [
+      232.68,
+      243.0,
+      249.72,
+      251.28
+    ],
+    "type": "text",
+    "current": "head of household",
+    "proposed": "q3_single",
+    "rationale": "left of box: \"single\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0021",
+    "page": 2,
+    "rect": [
+      348.0,
+      243.0,
+      365.04,
+      251.28
+    ],
+    "type": "text",
+    "current": "married filing separately",
+    "proposed": "q3_head_household",
+    "rationale": "left of box: \"head of household\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0022",
+    "page": 2,
+    "rect": [
+      66.0,
+      229.68,
+      83.04,
+      237.96
+    ],
+    "type": "text",
+    "current": "married filing jointly with specify name",
+    "proposed": "q3_my",
+    "rationale": "above box: \"My\" | section 3",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0023",
+    "page": 2,
+    "rect": [
+      175.32,
+      215.76,
+      192.36,
+      224.04
+    ],
+    "type": "text",
+    "current": "California",
+    "proposed": "q3_c_i_file_state_tax_returns",
+    "rationale": "left of box: \"c. I file state tax returns in\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0024",
+    "page": 2,
+    "rect": [
+      255.96,
+      215.76,
+      273.0,
+      224.04
+    ],
+    "type": "text",
+    "current": "other specify state",
+    "proposed": "q3_california",
+    "rationale": "left of box: \"California\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0025",
+    "page": 2,
+    "rect": [
+      320.4,
+      143.28,
+      400.8,
+      155.88
+    ],
+    "type": "text",
+    "current": "I declare under penalty of perjury under the laws of the State of California that the information contained on all pages of this form and",
+    "proposed": "q4_before_your_answer_number_pages",
+    "rationale": "left of box: \"before your answer.) Number of pages attached:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0026",
+    "page": 2,
+    "rect": [
+      60.96,
+      99.84,
+      169.56,
+      112.44
+    ],
+    "type": "text",
+    "current": "Date 1",
+    "proposed": "q4_date",
+    "rationale": "left of box: \"Date:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0027",
+    "page": 2,
+    "rect": [
+      35.76,
+      82.56,
+      276.24,
+      95.16
+    ],
+    "type": "text",
+    "current": "Date 2",
+    "proposed": "date",
+    "rationale": "above box: \"Date:\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0028",
+    "page": 2,
+    "rect": [
+      315.24,
+      81.24,
+      576.0,
+      93.84
+    ],
+    "type": "signature",
+    "current": "SIGNATURE OF DECLARANT",
+    "proposed": "q4_signature_declarant",
+    "rationale": "acrobat name: \"SIGNATURE OF DECLARANT\" | section 4",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0029",
+    "page": 3,
+    "rect": [
+      178.08,
+      701.52,
+      394.68,
+      744.48
+    ],
+    "type": "text",
+    "current": "PETITIONER RESPONDENT OTHER PARTYPARENTCLAIMANT_2",
+    "proposed": "respondent_2",
+    "rationale": "left of box: \"RESPONDENT:\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0030",
+    "page": 3,
+    "rect": [
+      445.8,
+      701.52,
+      574.68,
+      744.48
+    ],
+    "type": "text",
+    "current": "CASE NUMBER_2",
+    "proposed": "case_number",
+    "rationale": "acrobat name: \"CASE NUMBER\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0031",
+    "page": 3,
+    "rect": [
+      214.8,
+      627.96,
+      467.52,
+      638.88
+    ],
+    "type": "text",
+    "current": "Salary or wages gross before taxes",
+    "proposed": "q5_salary_wages_gross_before",
+    "rationale": "left of box: \"a. Salary or wages (gross, before\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0035",
+    "page": 3,
+    "rect": [
+      529.8,
+      625.32,
+      575.64,
+      636.0
+    ],
+    "type": "text",
+    "current": "monthly 1",
+    "proposed": "q12_taxes_2",
+    "rationale": "left of box: \"taxes)..................................................................................................... $\" | section 12 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0032",
+    "page": 3,
+    "rect": [
+      481.56,
+      625.32,
+      527.76,
+      635.52
+    ],
+    "type": "text",
+    "current": "Last month",
+    "proposed": "q12_taxes",
+    "rationale": "left of box: \"taxes)..................................................................................................... $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0033",
+    "page": 3,
+    "rect": [
+      481.56,
+      613.8,
+      527.76,
+      624.72
+    ],
+    "type": "text",
+    "current": "undefined",
+    "proposed": "undefined",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0036",
+    "page": 3,
+    "rect": [
+      529.8,
+      613.8,
+      575.64,
+      624.72
+    ],
+    "type": "text",
+    "current": "monthly 2",
+    "proposed": "q12_taxes_3",
+    "rationale": "left of box: \"taxes)................................................................................................................ $\" | section 12 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0034",
+    "page": 3,
+    "rect": [
+      481.56,
+      601.92,
+      527.76,
+      612.84
+    ],
+    "type": "text",
+    "current": "undefined_2",
+    "proposed": "undefined_2",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0037",
+    "page": 3,
+    "rect": [
+      529.8,
+      601.92,
+      575.64,
+      612.84
+    ],
+    "type": "text",
+    "current": "monthly 3",
+    "proposed": "q12_bonuses",
+    "rationale": "left of box: \"bonuses......................................................................................................................... $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0039",
+    "page": 3,
+    "rect": [
+      382.8,
+      591.12,
+      467.88,
+      602.04
+    ],
+    "type": "text",
+    "current": "currently receiving",
+    "proposed": "q5_c_u_r_r_e_n",
+    "rationale": "left of box: \"c u r r e n t l y r e c e i v i n g\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0040",
+    "page": 3,
+    "rect": [
+      481.56,
+      588.72,
+      527.76,
+      599.64
+    ],
+    "type": "text",
+    "current": "undefined_4",
+    "proposed": "undefined_4",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0055",
+    "page": 3,
+    "rect": [
+      529.8,
+      588.72,
+      575.64,
+      599.64
+    ],
+    "type": "text",
+    "current": "1_2",
+    "proposed": "q12_n_t_l_y_r_e",
+    "rationale": "left of box: \"n t l y r e c e i v i n g .................................. $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0038",
+    "page": 3,
+    "rect": [
+      283.8,
+      589.44,
+      300.84,
+      597.72
+    ],
+    "type": "text",
+    "current": "undefined_3",
+    "proposed": "undefined_3",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0044",
+    "page": 3,
+    "rect": [
+      481.56,
+      577.08,
+      527.76,
+      588.0
+    ],
+    "type": "text",
+    "current": "undefined_5",
+    "proposed": "undefined_5",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0056",
+    "page": 3,
+    "rect": [
+      529.8,
+      577.08,
+      575.64,
+      588.0
+    ],
+    "type": "text",
+    "current": "2",
+    "proposed": "q12_federally_taxable",
+    "rationale": "left of box: \"federally taxable* $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0041",
+    "page": 3,
+    "rect": [
+      137.16,
+      577.2,
+      154.2,
+      585.48
+    ],
+    "type": "text",
+    "current": "from this marriage",
+    "proposed": "q5_e_spousal_support",
+    "rationale": "left of box: \"e. Spousal support\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0042",
+    "page": 3,
+    "rect": [
+      239.16,
+      577.2,
+      256.2,
+      585.48
+    ],
+    "type": "text",
+    "current": "from a different marriage",
+    "proposed": "q5_marriage",
+    "rationale": "left of box: \"from this marriage\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0043",
+    "page": 3,
+    "rect": [
+      369.0,
+      577.08,
+      386.04,
+      585.36
+    ],
+    "type": "text",
+    "current": "federally taxable",
+    "proposed": "q5_different_marriage",
+    "rationale": "left of box: \"from a different marriage\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0047",
+    "page": 3,
+    "rect": [
+      481.56,
+      564.72,
+      527.76,
+      575.64
+    ],
+    "type": "text",
+    "current": "undefined_6",
+    "proposed": "undefined_6",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0057",
+    "page": 3,
+    "rect": [
+      529.8,
+      564.72,
+      575.64,
+      575.64
+    ],
+    "type": "text",
+    "current": "3",
+    "proposed": "q12_different_domestic_partnership",
+    "rationale": "left of box: \"from a different domestic partnership $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0045",
+    "page": 3,
+    "rect": [
+      137.76,
+      564.72,
+      154.8,
+      573.0
+    ],
+    "type": "text",
+    "current": "from this domestic partnership",
+    "proposed": "q5_f_partner_support",
+    "rationale": "left of box: \"f. Partner support\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0046",
+    "page": 3,
+    "rect": [
+      297.36,
+      564.72,
+      314.4,
+      573.0
+    ],
+    "type": "text",
+    "current": "from a different domestic partnership",
+    "proposed": "q5_domestic_partnership",
+    "rationale": "left of box: \"from this domestic partnership\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0048",
+    "page": 3,
+    "rect": [
+      481.56,
+      551.64,
+      527.76,
+      562.56
+    ],
+    "type": "text",
+    "current": "undefined_7",
+    "proposed": "undefined_7",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0058",
+    "page": 3,
+    "rect": [
+      529.8,
+      551.64,
+      575.64,
+      562.56
+    ],
+    "type": "text",
+    "current": "4",
+    "proposed": "q12_payments",
+    "rationale": "left of box: \"payments.......................................................................................................... $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0049",
+    "page": 3,
+    "rect": [
+      481.56,
+      539.76,
+      527.76,
+      550.68
+    ],
+    "type": "text",
+    "current": "undefined_8",
+    "proposed": "undefined_8",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0059",
+    "page": 3,
+    "rect": [
+      529.8,
+      539.76,
+      575.64,
+      550.68
+    ],
+    "type": "text",
+    "current": "5",
+    "proposed": "q12_ssi",
+    "rationale": "left of box: \"SSI)......................................................................................................... $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0053",
+    "page": 3,
+    "rect": [
+      481.56,
+      527.52,
+      527.76,
+      538.44
+    ],
+    "type": "text",
+    "current": "undefined_9",
+    "proposed": "undefined_9",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0060",
+    "page": 3,
+    "rect": [
+      529.8,
+      527.52,
+      575.64,
+      538.44
+    ],
+    "type": "text",
+    "current": "6",
+    "proposed": "q12_private_insurance",
+    "rationale": "left of box: \"Private insurance $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0050",
+    "page": 3,
+    "rect": [
+      111.96,
+      527.64,
+      129.0,
+      535.92
+    ],
+    "type": "text",
+    "current": "Social Security not SSI",
+    "proposed": "q5_i_disability",
+    "rationale": "left of box: \"i. Disability:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0051",
+    "page": 3,
+    "rect": [
+      248.04,
+      527.64,
+      265.08,
+      535.92
+    ],
+    "type": "text",
+    "current": "State disability SDI",
+    "proposed": "q5_social_security_not_ssi",
+    "rationale": "left of box: \"Social Security (not SSI)\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0052",
+    "page": 3,
+    "rect": [
+      370.92,
+      527.64,
+      387.96,
+      535.92
+    ],
+    "type": "text",
+    "current": "Private insurance",
+    "proposed": "q5_state_disability_sdi",
+    "rationale": "left of box: \"State disability (SDI)\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0054",
+    "page": 3,
+    "rect": [
+      481.56,
+      514.32,
+      527.76,
+      525.24
+    ],
+    "type": "text",
+    "current": "undefined_10",
+    "proposed": "undefined_10",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0061",
+    "page": 3,
+    "rect": [
+      529.8,
+      514.32,
+      575.64,
+      525.24
+    ],
+    "type": "text",
+    "current": "7",
+    "proposed": "q12_compensation",
+    "rationale": "left of box: \"compensation................................................................................................................. $\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0062",
+    "page": 3,
+    "rect": [
+      481.56,
+      502.56,
+      527.76,
+      513.48
+    ],
+    "type": "text",
+    "current": "undefined_11",
+    "proposed": "undefined_11",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0064",
+    "page": 3,
+    "rect": [
+      529.8,
+      502.56,
+      575.64,
+      513.48
+    ],
+    "type": "text",
+    "current": "1_3",
+    "proposed": "q12_compensation_2",
+    "rationale": "left of box: \"compensation............................................................................................................................ $\" | section 12 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0063",
+    "page": 3,
+    "rect": [
+      481.56,
+      490.32,
+      527.76,
+      501.24
+    ],
+    "type": "text",
+    "current": "undefined_12",
+    "proposed": "undefined_12",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0065",
+    "page": 3,
+    "rect": [
+      529.8,
+      490.32,
+      575.64,
+      501.24
+    ],
+    "type": "text",
+    "current": "2_2",
+    "proposed": "q12_field",
+    "rationale": "left of box: \"$\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0066",
+    "page": 3,
+    "rect": [
+      137.16,
+      457.92,
+      467.4,
+      468.84
+    ],
+    "type": "text",
+    "current": "Dividendsinterest",
+    "proposed": "q6_a",
+    "rationale": "left of box: \"a.\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0067",
+    "page": 3,
+    "rect": [
+      482.64,
+      455.28,
+      528.84,
+      466.2
+    ],
+    "type": "text",
+    "current": "undefined_13",
+    "proposed": "undefined_13",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0073",
+    "page": 3,
+    "rect": [
+      530.64,
+      455.28,
+      576.36,
+      466.2
+    ],
+    "type": "text",
+    "current": "1_4",
+    "proposed": "q6_dividends_interest",
+    "rationale": "left of box: \"Dividends/interest.................................................................................................................................... $\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0068",
+    "page": 3,
+    "rect": [
+      159.0,
+      445.68,
+      466.68,
+      455.76
+    ],
+    "type": "text",
+    "current": "Rental property income",
+    "proposed": "q6_b_rental_property",
+    "rationale": "left of box: \"b. Rental property\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0069",
+    "page": 3,
+    "rect": [
+      482.64,
+      443.76,
+      528.84,
+      454.68
+    ],
+    "type": "text",
+    "current": "undefined_14",
+    "proposed": "undefined_14",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0074",
+    "page": 3,
+    "rect": [
+      530.64,
+      443.76,
+      576.36,
+      454.68
+    ],
+    "type": "text",
+    "current": "2_3",
+    "proposed": "q6_income",
+    "rationale": "left of box: \"income........................................................................................................................... $\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0070",
+    "page": 3,
+    "rect": [
+      117.36,
+      433.2,
+      467.64,
+      443.52
+    ],
+    "type": "text",
+    "current": "Trust income",
+    "proposed": "q6_c_trust",
+    "rationale": "left of box: \"c. Trust\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0071",
+    "page": 3,
+    "rect": [
+      482.64,
+      431.28,
+      528.84,
+      442.2
+    ],
+    "type": "text",
+    "current": "undefined_15",
+    "proposed": "undefined_15",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0075",
+    "page": 3,
+    "rect": [
+      530.64,
+      431.28,
+      576.36,
+      442.2
+    ],
+    "type": "text",
+    "current": "3_2",
+    "proposed": "q6_income_2",
+    "rationale": "left of box: \"income............................................................................................................................................ $\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0072",
+    "page": 3,
+    "rect": [
+      482.64,
+      419.4,
+      528.84,
+      430.32
+    ],
+    "type": "text",
+    "current": "undefined_16",
+    "proposed": "undefined_16",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0076",
+    "page": 3,
+    "rect": [
+      530.64,
+      419.4,
+      576.36,
+      430.32
+    ],
+    "type": "text",
+    "current": "4_2",
+    "proposed": "q6_field",
+    "rationale": "left of box: \"$\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0077",
+    "page": 3,
+    "rect": [
+      482.64,
+      397.68,
+      528.84,
+      408.6
+    ],
+    "type": "text",
+    "current": "undefined_17",
+    "proposed": "undefined_17",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0078",
+    "page": 3,
+    "rect": [
+      530.64,
+      397.68,
+      576.36,
+      408.6
+    ],
+    "type": "text",
+    "current": "undefined_18",
+    "proposed": "undefined_18",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0079",
+    "page": 3,
+    "rect": [
+      98.28,
+      385.92,
+      115.32,
+      394.2
+    ],
+    "type": "text",
+    "current": "ownersole proprietor",
+    "proposed": "q7_i_am",
+    "rationale": "left of box: \"I am the\" | section 7",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0080",
+    "page": 3,
+    "rect": [
+      226.32,
+      385.92,
+      243.36,
+      394.2
+    ],
+    "type": "text",
+    "current": "business partner",
+    "proposed": "q7_owner_sole_proprietor",
+    "rationale": "left of box: \"owner/sole proprietor\" | section 7",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0081",
+    "page": 3,
+    "rect": [
+      336.24,
+      385.92,
+      353.28,
+      394.2
+    ],
+    "type": "text",
+    "current": "other specify",
+    "proposed": "q7_business_partner",
+    "rationale": "left of box: \"business partner\" | section 7",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0082",
+    "page": 3,
+    "rect": [
+      51.36,
+      300.6,
+      68.4,
+      308.88
+    ],
+    "type": "text",
+    "current": "Additional income I received onetime money lottery winnings inheritance etc in the last 12 months specify source and",
+    "proposed": "q7_8",
+    "rationale": "left of box: \"8.\" | section 7",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0083",
+    "page": 3,
+    "rect": [
+      51.84,
+      269.04,
+      68.88,
+      277.32
+    ],
+    "type": "signature",
+    "current": "Change in income My financial situation has changed significantly over the last 12 months because specify",
+    "proposed": "q8_9",
+    "rationale": "left of box: \"9.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0084",
+    "page": 3,
+    "rect": [
+      530.16,
+      227.16,
+      576.36,
+      238.08
+    ],
+    "type": "text",
+    "current": "undefined_19",
+    "proposed": "undefined_19",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0085",
+    "page": 3,
+    "rect": [
+      530.16,
+      215.4,
+      576.36,
+      226.32
+    ],
+    "type": "text",
+    "current": "undefined_20",
+    "proposed": "undefined_20",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0086",
+    "page": 3,
+    "rect": [
+      530.16,
+      202.92,
+      576.36,
+      213.84
+    ],
+    "type": "text",
+    "current": "undefined_21",
+    "proposed": "undefined_21",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0087",
+    "page": 3,
+    "rect": [
+      530.16,
+      189.36,
+      576.36,
+      200.28
+    ],
+    "type": "text",
+    "current": "undefined_22",
+    "proposed": "undefined_22",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0089",
+    "page": 3,
+    "rect": [
+      454.56,
+      179.52,
+      519.6,
+      189.96
+    ],
+    "type": "text",
+    "current": "federally tax deductible",
+    "proposed": "q12_f_e_d_e_r_ll",
+    "rationale": "left of box: \"f e d e r a ll y t a x d e d u c t ib l e *\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0090",
+    "page": 3,
+    "rect": [
+      530.16,
+      177.6,
+      576.36,
+      188.52
+    ],
+    "type": "text",
+    "current": "undefined_23",
+    "proposed": "undefined_23",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0088",
+    "page": 3,
+    "rect": [
+      336.24,
+      178.08,
+      353.28,
+      186.36
+    ],
+    "type": "text",
+    "current": "Partner support that I pay by court order from a different domestic partnership",
+    "proposed": "q9_i_pay_court_order_different_marriage",
+    "rationale": "left of box: \"that I pay by court order from a different marriage\" | section 9",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0091",
+    "page": 3,
+    "rect": [
+      530.16,
+      165.0,
+      576.36,
+      175.92
+    ],
+    "type": "text",
+    "current": "undefined_24",
+    "proposed": "undefined_24",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0092",
+    "page": 3,
+    "rect": [
+      530.16,
+      152.16,
+      576.36,
+      163.08
+    ],
+    "type": "text",
+    "current": "undefined_25",
+    "proposed": "undefined_25",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0093",
+    "page": 3,
+    "rect": [
+      530.16,
+      117.72,
+      576.36,
+      127.92
+    ],
+    "type": "text",
+    "current": "Total",
+    "proposed": "q12_market_other_deposit_accounts",
+    "rationale": "left of box: \"market, and other deposit accounts...............................$\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0094",
+    "page": 3,
+    "rect": [
+      530.16,
+      105.96,
+      576.36,
+      116.88
+    ],
+    "type": "text",
+    "current": "undefined_26",
+    "proposed": "undefined_26",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0097",
+    "page": 3,
+    "rect": [
+      530.16,
+      93.6,
+      576.36,
+      104.52
+    ],
+    "type": "text",
+    "current": "undefined_27",
+    "proposed": "undefined_27",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0095",
+    "page": 3,
+    "rect": [
+      144.24,
+      93.84,
+      161.28,
+      102.12
+    ],
+    "type": "text",
+    "current": "real",
+    "proposed": "real",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0096",
+    "page": 3,
+    "rect": [
+      226.44,
+      93.84,
+      243.48,
+      102.12
+    ],
+    "type": "text",
+    "current": "personal",
+    "proposed": "personal",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0098",
+    "page": 3,
+    "rect": [
+      36.0,
+      55.68,
+      218.52,
+      63.36
+    ],
+    "type": "text",
+    "current": "FL150 Rev September 1 2024",
+    "proposed": "field",
+    "rationale": "above box: \"*\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0099",
+    "page": 3,
+    "rect": [
+      222.72,
+      55.68,
+      576.36,
+      63.36
+    ],
+    "type": "text",
+    "current": "INCOME AND EXPENSE DECLARATION_2",
+    "proposed": "maintains_spousal_support_payments_taxable",
+    "rationale": "left of box: \"maintains the spousal support payments as taxable\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0100",
+    "page": 4,
+    "rect": [
+      184.68,
+      701.4,
+      394.68,
+      744.36
+    ],
+    "type": "text",
+    "current": "PETITIONER RESPONDENT OTHER PARTYPARENTCLAIMANT_3",
+    "proposed": "respondent_3",
+    "rationale": "left of box: \"RESPONDENT:\" [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0101",
+    "page": 4,
+    "rect": [
+      445.8,
+      701.4,
+      574.68,
+      744.36
+    ],
+    "type": "text",
+    "current": "CASE NUMBER_3",
+    "proposed": "case_number_2",
+    "rationale": "acrobat name: \"CASE NUMBER\" [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0102",
+    "page": 4,
+    "rect": [
+      77.88,
+      653.4,
+      213.6,
+      675.72
+    ],
+    "type": "text",
+    "current": "Age",
+    "proposed": "name",
+    "rationale": "left of box: \"Name\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0111",
+    "page": 4,
+    "rect": [
+      216.0,
+      588.0,
+      253.8,
+      651.72
+    ],
+    "type": "text",
+    "current": "a b c d e",
+    "proposed": "c",
+    "rationale": "left of box: \"c.\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0112",
+    "page": 4,
+    "rect": [
+      256.56,
+      588.0,
+      358.32,
+      651.72
+    ],
+    "type": "text",
+    "current": "How the person is related to me ex sona b c d e",
+    "proposed": "c_2",
+    "rationale": "left of box: \"c.\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0103",
+    "page": 4,
+    "rect": [
+      473.4,
+      639.6,
+      490.44,
+      647.88
+    ],
+    "type": "text",
+    "current": "Yes_2",
+    "proposed": "household",
+    "rationale": "above box: \"household\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0104",
+    "page": 4,
+    "rect": [
+      529.08,
+      639.6,
+      546.12,
+      647.88
+    ],
+    "type": "text",
+    "current": "No_2",
+    "proposed": "yes",
+    "rationale": "left of box: \"Yes\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0105",
+    "page": 4,
+    "rect": [
+      473.4,
+      628.2,
+      490.44,
+      636.48
+    ],
+    "type": "text",
+    "current": "Yes_3",
+    "proposed": "household_2",
+    "rationale": "above box: \"household\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0106",
+    "page": 4,
+    "rect": [
+      529.08,
+      628.2,
+      546.12,
+      636.48
+    ],
+    "type": "text",
+    "current": "No_3",
+    "proposed": "yes_2",
+    "rationale": "left of box: \"Yes\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0107",
+    "page": 4,
+    "rect": [
+      473.4,
+      616.68,
+      490.44,
+      624.96
+    ],
+    "type": "text",
+    "current": "Yes_4",
+    "proposed": "yes_3",
+    "rationale": "acrobat name: \"Yes\" [+_3 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0108",
+    "page": 4,
+    "rect": [
+      529.08,
+      616.68,
+      546.12,
+      624.96
+    ],
+    "type": "text",
+    "current": "No_4",
+    "proposed": "yes_4",
+    "rationale": "left of box: \"Yes\" [+_4 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0109",
+    "page": 4,
+    "rect": [
+      473.4,
+      605.4,
+      490.44,
+      613.68
+    ],
+    "type": "text",
+    "current": "Yes_5",
+    "proposed": "yes_5",
+    "rationale": "acrobat name: \"Yes\" [+_5 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0110",
+    "page": 4,
+    "rect": [
+      529.08,
+      605.4,
+      546.12,
+      613.68
+    ],
+    "type": "text",
+    "current": "No_5",
+    "proposed": "yes_6",
+    "rationale": "left of box: \"Yes\" [+_6 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0113",
+    "page": 4,
+    "rect": [
+      473.4,
+      593.76,
+      490.44,
+      602.04
+    ],
+    "type": "text",
+    "current": "Yes_6",
+    "proposed": "yes_7",
+    "rationale": "acrobat name: \"Yes\" [+_7 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0114",
+    "page": 4,
+    "rect": [
+      529.08,
+      593.76,
+      546.12,
+      602.04
+    ],
+    "type": "text",
+    "current": "No_6",
+    "proposed": "yes_8",
+    "rationale": "left of box: \"Yes\" [+_8 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0115",
+    "page": 4,
+    "rect": [
+      186.24,
+      571.8,
+      203.28,
+      580.08
+    ],
+    "type": "text",
+    "current": "Estimated expenses",
+    "proposed": "q13_average_monthly_expenses",
+    "rationale": "left of box: \"13.Average monthly expenses\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0116",
+    "page": 4,
+    "rect": [
+      304.56,
+      571.8,
+      321.6,
+      580.08
+    ],
+    "type": "text",
+    "current": "Actual expenses",
+    "proposed": "estimated_expenses",
+    "rationale": "left of box: \"Estimated expenses\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0117",
+    "page": 4,
+    "rect": [
+      415.68,
+      571.8,
+      432.72,
+      580.08
+    ],
+    "type": "text",
+    "current": "Proposed needs",
+    "proposed": "actual_expenses",
+    "rationale": "left of box: \"Actual expenses\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0121",
+    "page": 4,
+    "rect": [
+      516.96,
+      554.52,
+      575.52,
+      567.24
+    ],
+    "type": "text",
+    "current": "undefined_29",
+    "proposed": "undefined_29",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0120",
+    "page": 4,
+    "rect": [
+      256.8,
+      541.44,
+      315.36,
+      554.16
+    ],
+    "type": "text",
+    "current": "undefined_28",
+    "proposed": "undefined_28",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0122",
+    "page": 4,
+    "rect": [
+      516.96,
+      540.84,
+      575.52,
+      553.56
+    ],
+    "type": "text",
+    "current": "undefined_30",
+    "proposed": "undefined_30",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0118",
+    "page": 4,
+    "rect": [
+      81.72,
+      542.52,
+      98.76,
+      550.8
+    ],
+    "type": "text",
+    "current": "Rent",
+    "proposed": "q1",
+    "rationale": "left of box: \"(1)\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0119",
+    "page": 4,
+    "rect": [
+      160.2,
+      542.52,
+      177.24,
+      550.8
+    ],
+    "type": "text",
+    "current": "mortgage",
+    "proposed": "mortgage",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0124",
+    "page": 4,
+    "rect": [
+      516.96,
+      528.84,
+      575.52,
+      540.24
+    ],
+    "type": "text",
+    "current": "undefined_32",
+    "proposed": "undefined_32",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0123",
+    "page": 4,
+    "rect": [
+      194.28,
+      517.08,
+      254.16,
+      529.8
+    ],
+    "type": "text",
+    "current": "undefined_31",
+    "proposed": "undefined_31",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0126",
+    "page": 4,
+    "rect": [
+      516.96,
+      516.96,
+      575.52,
+      528.24
+    ],
+    "type": "text",
+    "current": "undefined_34",
+    "proposed": "undefined_34",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0127",
+    "page": 4,
+    "rect": [
+      194.28,
+      504.72,
+      254.16,
+      516.48
+    ],
+    "type": "text",
+    "current": "undefined_35",
+    "proposed": "undefined_35",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0128",
+    "page": 4,
+    "rect": [
+      516.96,
+      493.56,
+      575.52,
+      506.28
+    ],
+    "type": "text",
+    "current": "undefined_36",
+    "proposed": "undefined_36",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0125",
+    "page": 4,
+    "rect": [
+      257.16,
+      489.72,
+      315.72,
+      502.44
+    ],
+    "type": "text",
+    "current": "undefined_33",
+    "proposed": "undefined_33",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0131",
+    "page": 4,
+    "rect": [
+      516.96,
+      469.8,
+      575.52,
+      482.52
+    ],
+    "type": "text",
+    "current": "undefined_38",
+    "proposed": "undefined_38",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0130",
+    "page": 4,
+    "rect": [
+      459.72,
+      471.72,
+      502.2,
+      480.72
+    ],
+    "type": "text",
+    "current": "auto home or health insurance",
+    "proposed": "auto_m_insurance_home_life_health",
+    "rationale": "left of box: \"auto, m.Insurance home, or (life, health accident, etc.; do\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0129",
+    "page": 4,
+    "rect": [
+      257.16,
+      467.04,
+      315.72,
+      479.76
+    ],
+    "type": "text",
+    "current": "undefined_37",
+    "proposed": "undefined_37",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0133",
+    "page": 4,
+    "rect": [
+      516.96,
+      456.48,
+      575.52,
+      469.2
+    ],
+    "type": "text",
+    "current": "undefined_40",
+    "proposed": "undefined_40",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0132",
+    "page": 4,
+    "rect": [
+      257.28,
+      454.8,
+      315.84,
+      466.44
+    ],
+    "type": "text",
+    "current": "undefined_39",
+    "proposed": "undefined_39",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0135",
+    "page": 4,
+    "rect": [
+      516.96,
+      444.0,
+      575.52,
+      455.88
+    ],
+    "type": "text",
+    "current": "undefined_42",
+    "proposed": "undefined_42",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0134",
+    "page": 4,
+    "rect": [
+      257.16,
+      440.04,
+      315.72,
+      452.76
+    ],
+    "type": "text",
+    "current": "undefined_41",
+    "proposed": "undefined_41",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0136",
+    "page": 4,
+    "rect": [
+      257.76,
+      425.64,
+      316.32,
+      438.36
+    ],
+    "type": "text",
+    "current": "undefined_43",
+    "proposed": "undefined_43",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0137",
+    "page": 4,
+    "rect": [
+      516.96,
+      420.12,
+      575.52,
+      432.84
+    ],
+    "type": "text",
+    "current": "undefined_44",
+    "proposed": "undefined_44",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0138",
+    "page": 4,
+    "rect": [
+      257.16,
+      411.12,
+      315.72,
+      423.84
+    ],
+    "type": "text",
+    "current": "undefined_45",
+    "proposed": "undefined_45",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0139",
+    "page": 4,
+    "rect": [
+      516.96,
+      406.56,
+      575.52,
+      419.28
+    ],
+    "type": "text",
+    "current": "undefined_46",
+    "proposed": "undefined_46",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0140",
+    "page": 4,
+    "rect": [
+      257.4,
+      397.08,
+      315.96,
+      409.8
+    ],
+    "type": "text",
+    "current": "undefined_47",
+    "proposed": "undefined_47",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0141",
+    "page": 4,
+    "rect": [
+      258.0,
+      381.84,
+      315.84,
+      396.12
+    ],
+    "type": "text",
+    "current": "r",
+    "proposed": "r",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0142",
+    "page": 4,
+    "rect": [
+      257.04,
+      366.84,
+      315.6,
+      379.56
+    ],
+    "type": "text",
+    "current": "undefined_48",
+    "proposed": "undefined_48",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0143",
+    "page": 4,
+    "rect": [
+      516.96,
+      361.8,
+      575.52,
+      374.52
+    ],
+    "type": "text",
+    "current": "undefined_49",
+    "proposed": "undefined_49",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0144",
+    "page": 4,
+    "rect": [
+      394.56,
+      314.28,
+      418.92,
+      327.72
+    ],
+    "type": "text",
+    "current": "Amount",
+    "proposed": "amount",
+    "rationale": "left of box: \"Amount\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0145",
+    "page": 4,
+    "rect": [
+      453.6,
+      314.28,
+      476.52,
+      327.72
+    ],
+    "type": "text",
+    "current": "Date of last payment",
+    "proposed": "q14_balance",
+    "rationale": "left of box: \"Balance\" | section 14",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0146",
+    "page": 4,
+    "rect": [
+      50.76,
+      298.44,
+      213.48,
+      313.32
+    ],
+    "type": "text",
+    "current": "Paid toRow1",
+    "proposed": "paid",
+    "rationale": "above box: \"Paid\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0147",
+    "page": 4,
+    "rect": [
+      214.8,
+      298.44,
+      360.48,
+      313.32
+    ],
+    "type": "text",
+    "current": "ForRow1",
+    "proposed": "for",
+    "rationale": "above box: \"For\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0148",
+    "page": 4,
+    "rect": [
+      367.32,
+      298.44,
+      418.92,
+      313.32
+    ],
+    "type": "text",
+    "current": "undefined_50",
+    "proposed": "undefined_50",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0149",
+    "page": 4,
+    "rect": [
+      477.84,
+      298.44,
+      575.04,
+      313.32
+    ],
+    "type": "text",
+    "current": "Date of last payment_2",
+    "proposed": "q14_field",
+    "rationale": "left of box: \"$\" | section 14",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0150",
+    "page": 4,
+    "rect": [
+      50.76,
+      282.6,
+      213.48,
+      297.48
+    ],
+    "type": "text",
+    "current": "Paid toRow2",
+    "proposed": "paid_2",
+    "rationale": "above box: \"Paid\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0151",
+    "page": 4,
+    "rect": [
+      214.8,
+      282.6,
+      360.48,
+      297.48
+    ],
+    "type": "text",
+    "current": "ForRow2",
+    "proposed": "for_2",
+    "rationale": "above box: \"For\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0152",
+    "page": 4,
+    "rect": [
+      367.32,
+      282.6,
+      418.92,
+      297.48
+    ],
+    "type": "text",
+    "current": "undefined_51",
+    "proposed": "undefined_51",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0153",
+    "page": 4,
+    "rect": [
+      477.84,
+      282.6,
+      575.04,
+      297.48
+    ],
+    "type": "text",
+    "current": "Date of last payment_3",
+    "proposed": "q14_field_2",
+    "rationale": "left of box: \"$\" | section 14 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0154",
+    "page": 4,
+    "rect": [
+      50.76,
+      266.76,
+      213.48,
+      281.64
+    ],
+    "type": "text",
+    "current": "Paid toRow3",
+    "proposed": "paid_torow3",
+    "rationale": "acrobat name: \"Paid toRow3\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0155",
+    "page": 4,
+    "rect": [
+      214.8,
+      266.76,
+      360.48,
+      281.64
+    ],
+    "type": "text",
+    "current": "ForRow3",
+    "proposed": "forrow3",
+    "rationale": "acrobat name: \"ForRow3\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0156",
+    "page": 4,
+    "rect": [
+      367.32,
+      266.76,
+      418.92,
+      281.64
+    ],
+    "type": "text",
+    "current": "undefined_52",
+    "proposed": "undefined_52",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0157",
+    "page": 4,
+    "rect": [
+      477.84,
+      266.76,
+      575.04,
+      281.64
+    ],
+    "type": "text",
+    "current": "Date of last payment_4",
+    "proposed": "q14_field_3",
+    "rationale": "left of box: \"$\" | section 14 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0158",
+    "page": 4,
+    "rect": [
+      50.76,
+      250.92,
+      213.48,
+      265.8
+    ],
+    "type": "text",
+    "current": "Paid toRow4",
+    "proposed": "paid_torow4",
+    "rationale": "acrobat name: \"Paid toRow4\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0159",
+    "page": 4,
+    "rect": [
+      214.8,
+      250.92,
+      360.48,
+      265.8
+    ],
+    "type": "text",
+    "current": "ForRow4",
+    "proposed": "forrow4",
+    "rationale": "acrobat name: \"ForRow4\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0160",
+    "page": 4,
+    "rect": [
+      367.32,
+      250.92,
+      418.92,
+      265.8
+    ],
+    "type": "text",
+    "current": "undefined_53",
+    "proposed": "undefined_53",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0161",
+    "page": 4,
+    "rect": [
+      477.84,
+      250.92,
+      575.04,
+      265.8
+    ],
+    "type": "text",
+    "current": "Date of last payment_5",
+    "proposed": "q14_field_4",
+    "rationale": "left of box: \"$\" | section 14 [+_4 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0162",
+    "page": 4,
+    "rect": [
+      50.76,
+      235.08,
+      213.48,
+      249.96
+    ],
+    "type": "text",
+    "current": "Paid toRow5",
+    "proposed": "paid_torow5",
+    "rationale": "acrobat name: \"Paid toRow5\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0163",
+    "page": 4,
+    "rect": [
+      214.8,
+      235.08,
+      360.48,
+      249.96
+    ],
+    "type": "text",
+    "current": "ForRow5",
+    "proposed": "forrow5",
+    "rationale": "acrobat name: \"ForRow5\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0164",
+    "page": 4,
+    "rect": [
+      367.32,
+      235.08,
+      418.92,
+      249.96
+    ],
+    "type": "text",
+    "current": "undefined_54",
+    "proposed": "undefined_54",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0165",
+    "page": 4,
+    "rect": [
+      477.84,
+      235.08,
+      575.04,
+      249.96
+    ],
+    "type": "text",
+    "current": "Date of last payment_6",
+    "proposed": "q14_field_5",
+    "rationale": "left of box: \"$\" | section 14 [+_5 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0166",
+    "page": 4,
+    "rect": [
+      50.76,
+      219.36,
+      213.48,
+      234.12
+    ],
+    "type": "text",
+    "current": "Paid toRow6",
+    "proposed": "paid_torow6",
+    "rationale": "acrobat name: \"Paid toRow6\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0167",
+    "page": 4,
+    "rect": [
+      214.8,
+      219.36,
+      360.48,
+      234.12
+    ],
+    "type": "text",
+    "current": "ForRow6",
+    "proposed": "forrow6",
+    "rationale": "acrobat name: \"ForRow6\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0168",
+    "page": 4,
+    "rect": [
+      367.32,
+      219.36,
+      418.92,
+      234.12
+    ],
+    "type": "text",
+    "current": "undefined_55",
+    "proposed": "undefined_55",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0169",
+    "page": 4,
+    "rect": [
+      477.84,
+      219.36,
+      575.04,
+      234.12
+    ],
+    "type": "text",
+    "current": "Date of last payment_7",
+    "proposed": "q14_field_6",
+    "rationale": "left of box: \"$\" | section 14 [+_6 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0170",
+    "page": 4,
+    "rect": [
+      61.32,
+      101.52,
+      169.92,
+      114.24
+    ],
+    "type": "text",
+    "current": "Date 1_2",
+    "proposed": "date_2",
+    "rationale": "left of box: \"Date:\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0171",
+    "page": 4,
+    "rect": [
+      36.12,
+      84.24,
+      276.6,
+      96.96
+    ],
+    "type": "text",
+    "current": "Date 2_2",
+    "proposed": "date_3",
+    "rationale": "above box: \"Date:\" [+_3 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0172",
+    "page": 4,
+    "rect": [
+      315.6,
+      82.8,
+      576.36,
+      95.52
+    ],
+    "type": "signature",
+    "current": "SIGNATURE OF ATTORNEY",
+    "proposed": "signature_attorney",
+    "rationale": "acrobat name: \"SIGNATURE OF ATTORNEY\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0173",
+    "page": 4,
+    "rect": [
+      36.0,
+      62.28,
+      218.64,
+      75.0
+    ],
+    "type": "text",
+    "current": "FL150 Rev September 1 2024_2",
+    "proposed": "fl150_rev_september_1_2024",
+    "rationale": "acrobat name: \"FL150 Rev September 1 2024\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0174",
+    "page": 4,
+    "rect": [
+      222.72,
+      62.28,
+      576.36,
+      75.0
+    ],
+    "type": "text",
+    "current": "INCOME AND EXPENSE DECLARATION_3",
+    "proposed": "income_expense_declaration",
+    "rationale": "acrobat name: \"INCOME AND EXPENSE DECLARATION\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0175",
+    "page": 5,
+    "rect": [
+      192.36,
+      701.52,
+      394.68,
+      744.48
+    ],
+    "type": "text",
+    "current": "PETITIONER RESPONDENT OTHER PARTYPARENTCLAIMANT_4",
+    "proposed": "respondent_4",
+    "rationale": "left of box: \"RESPONDENT:\" [+_4 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0176",
+    "page": 5,
+    "rect": [
+      445.8,
+      701.52,
+      574.68,
+      744.48
+    ],
+    "type": "text",
+    "current": "CASE NUMBER_4",
+    "proposed": "case_number_3",
+    "rationale": "acrobat name: \"CASE NUMBER\" [+_3 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0178",
+    "page": 5,
+    "rect": [
+      66.84,
+      523.92,
+      83.88,
+      532.2
+    ],
+    "type": "text",
+    "current": "Name of insurance company",
+    "proposed": "a",
+    "rationale": "left of box: \"a.\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0177",
+    "page": 5,
+    "rect": [
+      124.08,
+      523.92,
+      141.12,
+      532.2
+    ],
+    "type": "text",
+    "current": "I do not",
+    "proposed": "i",
+    "rationale": "left of box: \"I do\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0179",
+    "page": 5,
+    "rect": [
+      415.08,
+      401.04,
+      493.56,
+      411.48
+    ],
+    "type": "text",
+    "current": "undefined_56",
+    "proposed": "undefined_56",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0180",
+    "page": 5,
+    "rect": [
+      415.08,
+      388.44,
+      493.56,
+      399.12
+    ],
+    "type": "text",
+    "current": "undefined_57",
+    "proposed": "undefined_57",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0181",
+    "page": 5,
+    "rect": [
+      415.08,
+      375.48,
+      493.56,
+      386.16
+    ],
+    "type": "text",
+    "current": "undefined_58",
+    "proposed": "undefined_58",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0182",
+    "page": 5,
+    "rect": [
+      415.08,
+      361.8,
+      493.56,
+      372.48
+    ],
+    "type": "text",
+    "current": "undefined_59",
+    "proposed": "undefined_59",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0183",
+    "page": 5,
+    "rect": [
+      265.2,
+      309.84,
+      352.8,
+      320.52
+    ],
+    "type": "text",
+    "current": "Extraordinary health expenses not included in 18b",
+    "proposed": "extraordinary_health_expenses_not_included",
+    "rationale": "left of box: \"Extraordinary health expenses not included in\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0184",
+    "page": 5,
+    "rect": [
+      392.64,
+      308.4,
+      470.16,
+      319.08
+    ],
+    "type": "text",
+    "current": "undefined_60",
+    "proposed": "undefined_60",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0187",
+    "page": 5,
+    "rect": [
+      480.0,
+      306.36,
+      576.36,
+      317.04
+    ],
+    "type": "text",
+    "current": "For how many months 1",
+    "proposed": "field_2",
+    "rationale": "left of box: \"$\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0186",
+    "page": 5,
+    "rect": [
+      392.64,
+      287.88,
+      470.16,
+      298.56
+    ],
+    "type": "text",
+    "current": "undefined_61",
+    "proposed": "undefined_61",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0188",
+    "page": 5,
+    "rect": [
+      480.0,
+      285.96,
+      576.36,
+      296.64
+    ],
+    "type": "text",
+    "current": "For how many months 2",
+    "proposed": "field_3",
+    "rationale": "left of box: \"$\" [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0185",
+    "page": 5,
+    "rect": [
+      117.0,
+      286.68,
+      354.6,
+      295.8
+    ],
+    "type": "text",
+    "current": "insured loss",
+    "proposed": "b_major_insured_losses",
+    "rationale": "left of box: \"b. Major insured losses\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0190",
+    "page": 5,
+    "rect": [
+      392.64,
+      264.6,
+      470.16,
+      275.28
+    ],
+    "type": "text",
+    "current": "undefined_62",
+    "proposed": "undefined_62",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0191",
+    "page": 5,
+    "rect": [
+      480.0,
+      262.56,
+      576.36,
+      273.24
+    ],
+    "type": "text",
+    "current": "undefined_63",
+    "proposed": "undefined_63",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0189",
+    "page": 5,
+    "rect": [
+      153.36,
+      264.0,
+      358.44,
+      273.0
+    ],
+    "type": "text",
+    "current": "are living with me",
+    "proposed": "c_1_living_expenses_my",
+    "rationale": "left of box: \"c. (1) are living Expenses for with my\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0192",
+    "page": 5,
+    "rect": [
+      241.56,
+      195.36,
+      359.16,
+      206.04
+    ],
+    "type": "text",
+    "current": "3 Child support I receive for those children",
+    "proposed": "q3_child_support_i_receive",
+    "rationale": "left of box: \"(3) Child support I receive for those\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0193",
+    "page": 5,
+    "rect": [
+      392.64,
+      192.96,
+      466.56,
+      203.64
+    ],
+    "type": "text",
+    "current": "undefined_64",
+    "proposed": "undefined_64",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p5_0194",
+    "page": 5,
+    "rect": [
+      36.0,
+      62.28,
+      218.64,
+      72.96
+    ],
+    "type": "text",
+    "current": "FL150 Rev September 1 2024_3",
+    "proposed": "fl150_rev_september_1_2024_2",
+    "rationale": "acrobat name: \"FL150 Rev September 1 2024\" [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0195",
+    "page": 5,
+    "rect": [
+      222.72,
+      62.28,
+      576.36,
+      72.96
+    ],
+    "type": "text",
+    "current": "INCOME AND EXPENSE DECLARATION_4",
+    "proposed": "income_expense_declaration_2",
+    "rationale": "acrobat name: \"INCOME AND EXPENSE DECLARATION\" [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0198",
+    "page": 6,
+    "rect": [
+      397.44,
+      588.36,
+      574.68,
+      748.56
+    ],
+    "type": "text",
+    "current": "FOR COURT USE ONLY_2",
+    "proposed": "fl_155",
+    "rationale": "above box: \"FL-155\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0196",
+    "page": 6,
+    "rect": [
+      230.16,
+      626.16,
+      394.68,
+      684.12
+    ],
+    "type": "text",
+    "current": "SUPERIOR COURT OF CALIFORNIA COUNTY OF STREET ADDRESS MAILING ADDRESS CITY AND ZIP CODE BRANCH NAME_2",
+    "proposed": "mailing_address_2",
+    "rationale": "left of box: \"MAILING ADDRESS:\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0197",
+    "page": 6,
+    "rect": [
+      157.56,
+      588.36,
+      394.68,
+      624.36
+    ],
+    "type": "text",
+    "current": "PETITIONERPLAINTIFF RESPONDENTDEFENDANT OTHER PARENT",
+    "proposed": "respondent_defendant",
+    "rationale": "left of box: \"RESPONDENT/DEFENDANT:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0199",
+    "page": 6,
+    "rect": [
+      446.64,
+      559.56,
+      574.92,
+      586.8
+    ],
+    "type": "text",
+    "current": "CASE NUMBER_5",
+    "proposed": "simplified",
+    "rationale": "left of box: \"(SIMPLIFIED)\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0200",
+    "page": 6,
+    "rect": [
+      66.48,
+      527.4,
+      82.68,
+      536.52
+    ],
+    "type": "text",
+    "current": "My only source of income is TANF SSI or GAGR",
+    "proposed": "q1_2",
+    "rationale": "left of box: \"1. a.\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0201",
+    "page": 6,
+    "rect": [
+      66.48,
+      515.52,
+      82.68,
+      524.64
+    ],
+    "type": "text",
+    "current": "I have applied for TANF SSI or GAGR",
+    "proposed": "q1_b",
+    "rationale": "left of box: \"b.\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0202",
+    "page": 6,
+    "rect": [
+      511.32,
+      505.92,
+      574.32,
+      516.48
+    ],
+    "type": "text",
+    "current": "undefined_65",
+    "proposed": "undefined_65",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0206",
+    "page": 6,
+    "rect": [
+      425.4,
+      449.52,
+      441.6,
+      458.76
+    ],
+    "type": "text",
+    "current": "married filing separately_2",
+    "proposed": "q3_head_household_2",
+    "rationale": "left of box: \"head of household\" | section 3 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0205",
+    "page": 6,
+    "rect": [
+      320.16,
+      449.4,
+      336.24,
+      458.52
+    ],
+    "type": "text",
+    "current": "head of household_2",
+    "proposed": "q3_married_filing_jointly",
+    "rationale": "left of box: \"married filing jointly\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0203",
+    "page": 6,
+    "rect": [
+      153.12,
+      449.16,
+      169.2,
+      458.4
+    ],
+    "type": "text",
+    "current": "single_2",
+    "proposed": "single_2",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0204",
+    "page": 6,
+    "rect": [
+      209.4,
+      449.16,
+      225.6,
+      458.4
+    ],
+    "type": "text",
+    "current": "married filing jointly",
+    "proposed": "q3_single_2",
+    "rationale": "left of box: \"single\" | section 3 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0207",
+    "page": 6,
+    "rect": [
+      517.2,
+      438.0,
+      574.32,
+      448.56
+    ],
+    "type": "text",
+    "current": "undefined_66",
+    "proposed": "undefined_66",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0209",
+    "page": 6,
+    "rect": [
+      518.28,
+      414.48,
+      574.92,
+      425.04
+    ],
+    "type": "text",
+    "current": "undefined_67",
+    "proposed": "undefined_67",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0208",
+    "page": 6,
+    "rect": [
+      114.84,
+      413.16,
+      131.04,
+      422.4
+    ],
+    "type": "text",
+    "current": "Salarywages Amount before taxes per month",
+    "proposed": "q1_copy_1_pay",
+    "rationale": "left of box: \"copy Attach of 1 pay\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0211",
+    "page": 6,
+    "rect": [
+      518.28,
+      403.32,
+      574.92,
+      413.76
+    ],
+    "type": "text",
+    "current": "undefined_68",
+    "proposed": "undefined_68",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0210",
+    "page": 6,
+    "rect": [
+      114.84,
+      401.16,
+      131.04,
+      410.28
+    ],
+    "type": "text",
+    "current": "Retirement Amount before taxes per month",
+    "proposed": "q1_stubs",
+    "rationale": "left of box: \"stubs for\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0213",
+    "page": 6,
+    "rect": [
+      518.28,
+      391.2,
+      574.92,
+      401.76
+    ],
+    "type": "text",
+    "current": "undefined_69",
+    "proposed": "undefined_69",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0212",
+    "page": 6,
+    "rect": [
+      114.84,
+      389.04,
+      131.04,
+      398.28
+    ],
+    "type": "text",
+    "current": "Unemployment compensation Amount per month",
+    "proposed": "q1_last_2",
+    "rationale": "left of box: \"last 2\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0215",
+    "page": 6,
+    "rect": [
+      518.28,
+      378.6,
+      574.92,
+      389.16
+    ],
+    "type": "text",
+    "current": "undefined_70",
+    "proposed": "undefined_70",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0214",
+    "page": 6,
+    "rect": [
+      114.84,
+      377.04,
+      131.04,
+      386.16
+    ],
+    "type": "text",
+    "current": "Workers compensation Amount per month",
+    "proposed": "q2_months_here",
+    "rationale": "left of box: \"months here\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0219",
+    "page": 6,
+    "rect": [
+      518.28,
+      367.44,
+      574.92,
+      378.0
+    ],
+    "type": "text",
+    "current": "undefined_71",
+    "proposed": "undefined_71",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0217",
+    "page": 6,
+    "rect": [
+      209.28,
+      365.28,
+      225.36,
+      374.52
+    ],
+    "type": "text",
+    "current": "SSI",
+    "proposed": "q2_social_security",
+    "rationale": "left of box: \"Social security:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0218",
+    "page": 6,
+    "rect": [
+      254.04,
+      365.28,
+      270.24,
+      374.52
+    ],
+    "type": "text",
+    "current": "Other",
+    "proposed": "q2_ssi",
+    "rationale": "left of box: \"SSI\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0216",
+    "page": 6,
+    "rect": [
+      114.84,
+      365.16,
+      131.04,
+      374.28
+    ],
+    "type": "text",
+    "current": "Social security",
+    "proposed": "q2_cross_out",
+    "rationale": "left of box: \"(cross out\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0221",
+    "page": 6,
+    "rect": [
+      518.28,
+      354.72,
+      574.92,
+      365.28
+    ],
+    "type": "text",
+    "current": "undefined_72",
+    "proposed": "undefined_72",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0220",
+    "page": 6,
+    "rect": [
+      114.84,
+      353.28,
+      131.04,
+      362.4
+    ],
+    "type": "text",
+    "current": "Disability Amount per month",
+    "proposed": "q2_social",
+    "rationale": "left of box: \"social\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0223",
+    "page": 6,
+    "rect": [
+      518.16,
+      342.72,
+      574.8,
+      353.28
+    ],
+    "type": "text",
+    "current": "undefined_73",
+    "proposed": "undefined_73",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0222",
+    "page": 6,
+    "rect": [
+      114.84,
+      341.28,
+      131.04,
+      350.52
+    ],
+    "type": "text",
+    "current": "Interest income  from bank accounts or other Amount per month",
+    "proposed": "q2_security_numbers",
+    "rationale": "left of box: \"security numbers)\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0225",
+    "page": 6,
+    "rect": [
+      518.16,
+      306.24,
+      574.32,
+      316.8
+    ],
+    "type": "text",
+    "current": "undefined_74",
+    "proposed": "undefined_74",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0224",
+    "page": 6,
+    "rect": [
+      66.36,
+      304.44,
+      82.44,
+      313.68
+    ],
+    "type": "text",
+    "current": "Day care or preschool to allow me to work or go to school",
+    "proposed": "q6_a_2",
+    "rationale": "left of box: \"a.\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0227",
+    "page": 6,
+    "rect": [
+      518.16,
+      293.64,
+      574.32,
+      304.2
+    ],
+    "type": "text",
+    "current": "undefined_75",
+    "proposed": "undefined_75",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0226",
+    "page": 6,
+    "rect": [
+      66.36,
+      292.44,
+      82.44,
+      301.56
+    ],
+    "type": "text",
+    "current": "Health care not paid for by insurance",
+    "proposed": "q6_b",
+    "rationale": "left of box: \"b.\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0229",
+    "page": 6,
+    "rect": [
+      518.16,
+      282.48,
+      574.32,
+      293.04
+    ],
+    "type": "text",
+    "current": "undefined_76",
+    "proposed": "undefined_76",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0228",
+    "page": 6,
+    "rect": [
+      66.36,
+      280.56,
+      82.44,
+      289.68
+    ],
+    "type": "text",
+    "current": "School education tuition or other special needs of the child",
+    "proposed": "q6_c",
+    "rationale": "left of box: \"c.\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0231",
+    "page": 6,
+    "rect": [
+      518.16,
+      269.76,
+      574.32,
+      280.32
+    ],
+    "type": "text",
+    "current": "undefined_77",
+    "proposed": "undefined_77",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0230",
+    "page": 6,
+    "rect": [
+      66.36,
+      268.68,
+      82.44,
+      277.8
+    ],
+    "type": "text",
+    "current": "Travel expenses for visitation",
+    "proposed": "q6_d",
+    "rationale": "left of box: \"d.\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0233",
+    "page": 6,
+    "rect": [
+      187.8,
+      255.12,
+      238.32,
+      265.68
+    ],
+    "type": "text",
+    "current": "There are specify number",
+    "proposed": "q6_there_specify_number",
+    "rationale": "left of box: \"There are (specify number)\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0232",
+    "page": 6,
+    "rect": [
+      50.88,
+      254.04,
+      67.08,
+      263.16
+    ],
+    "type": "text",
+    "current": "7_2",
+    "proposed": "q6_7",
+    "rationale": "left of box: \"7.\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0234",
+    "page": 6,
+    "rect": [
+      518.16,
+      243.6,
+      574.32,
+      254.16
+    ],
+    "type": "text",
+    "current": "undefined_78",
+    "proposed": "undefined_78",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0236",
+    "page": 6,
+    "rect": [
+      518.16,
+      217.44,
+      574.32,
+      228.0
+    ],
+    "type": "text",
+    "current": "undefined_79",
+    "proposed": "undefined_79",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0235",
+    "page": 6,
+    "rect": [
+      65.76,
+      217.32,
+      81.96,
+      226.56
+    ],
+    "type": "text",
+    "current": "Jobrelated expenses that are not paid by my employer specify reasons for expenses on separate sheet",
+    "proposed": "q8_a",
+    "rationale": "left of box: \"a.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0238",
+    "page": 6,
+    "rect": [
+      518.16,
+      206.64,
+      574.32,
+      216.72
+    ],
+    "type": "text",
+    "current": "undefined_80",
+    "proposed": "undefined_80",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0237",
+    "page": 6,
+    "rect": [
+      65.76,
+      205.44,
+      81.96,
+      214.68
+    ],
+    "type": "text",
+    "current": "Required union dues",
+    "proposed": "q8_b",
+    "rationale": "left of box: \"b.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0240",
+    "page": 6,
+    "rect": [
+      518.16,
+      195.48,
+      574.32,
+      205.8
+    ],
+    "type": "text",
+    "current": "undefined_81",
+    "proposed": "undefined_81",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0239",
+    "page": 6,
+    "rect": [
+      65.76,
+      193.56,
+      81.96,
+      202.8
+    ],
+    "type": "text",
+    "current": "Required retirement payments not social security FICA 401k or IRA",
+    "proposed": "q8_c",
+    "rationale": "left of box: \"c.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0242",
+    "page": 6,
+    "rect": [
+      518.16,
+      183.48,
+      574.32,
+      194.04
+    ],
+    "type": "text",
+    "current": "undefined_82",
+    "proposed": "undefined_82",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0241",
+    "page": 6,
+    "rect": [
+      65.76,
+      181.56,
+      81.96,
+      190.68
+    ],
+    "type": "text",
+    "current": "Health insurance costs",
+    "proposed": "q8_d",
+    "rationale": "left of box: \"d.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0244",
+    "page": 6,
+    "rect": [
+      518.16,
+      170.88,
+      574.32,
+      181.44
+    ],
+    "type": "text",
+    "current": "undefined_83",
+    "proposed": "undefined_83",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0243",
+    "page": 6,
+    "rect": [
+      65.76,
+      169.68,
+      81.96,
+      178.8
+    ],
+    "type": "text",
+    "current": "Child support I am paying for other minor children of mine who are not living with me",
+    "proposed": "q8_e",
+    "rationale": "left of box: \"e.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0246",
+    "page": 6,
+    "rect": [
+      518.16,
+      159.72,
+      574.32,
+      170.16
+    ],
+    "type": "text",
+    "current": "undefined_84",
+    "proposed": "undefined_84",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0245",
+    "page": 6,
+    "rect": [
+      65.76,
+      157.8,
+      81.96,
+      166.92
+    ],
+    "type": "text",
+    "current": "Spousal support I am paying because of a court order for another relationship",
+    "proposed": "q8_f",
+    "rationale": "left of box: \"f.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0250",
+    "page": 6,
+    "rect": [
+      518.16,
+      146.88,
+      574.32,
+      157.44
+    ],
+    "type": "text",
+    "current": "undefined_85",
+    "proposed": "undefined_85",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0247",
+    "page": 6,
+    "rect": [
+      65.76,
+      145.92,
+      81.96,
+      155.04
+    ],
+    "type": "text",
+    "current": "Monthly housing costs",
+    "proposed": "q8_g",
+    "rationale": "left of box: \"g.\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0249",
+    "page": 6,
+    "rect": [
+      257.28,
+      145.92,
+      273.48,
+      155.04
+    ],
+    "type": "text",
+    "current": "mortgage_2",
+    "proposed": "mortgage_2",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0248",
+    "page": 6,
+    "rect": [
+      193.2,
+      145.68,
+      209.4,
+      154.92
+    ],
+    "type": "text",
+    "current": "rent or",
+    "proposed": "q8_monthly_housing_costs",
+    "rationale": "left of box: \"Monthly housing costs:\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0251",
+    "page": 6,
+    "rect": [
+      220.44,
+      133.44,
+      280.2,
+      144.0
+    ],
+    "type": "text",
+    "current": "If mortgage  interest payments",
+    "proposed": "q8_mortgage_interest_payments",
+    "rationale": "left of box: \"If mortgage: interest payments\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0252",
+    "page": 6,
+    "rect": [
+      366.84,
+      133.44,
+      426.6,
+      144.0
+    ],
+    "type": "text",
+    "current": "real property taxes",
+    "proposed": "q8_interest_payments_real_property_taxes",
+    "rationale": "left of box: \"interest payments $____________ real property taxes\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0253",
+    "page": 6,
+    "rect": [
+      156.12,
+      120.0,
+      172.32,
+      129.24
+    ],
+    "type": "text",
+    "current": "my current employment",
+    "proposed": "q8_9_information_concerning",
+    "rationale": "left of box: \"9. Information concerning\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0254",
+    "page": 6,
+    "rect": [
+      285.6,
+      120.0,
+      301.68,
+      129.24
+    ],
+    "type": "text",
+    "current": "my most recent employment",
+    "proposed": "q8_my_current_employment",
+    "rationale": "left of box: \"my current employment\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0255",
+    "page": 7,
+    "rect": [
+      397.08,
+      720.0,
+      574.92,
+      747.48
+    ],
+    "type": "text",
+    "current": "CASE NUMBER_6",
+    "proposed": "case_number_4",
+    "rationale": "acrobat name: \"CASE NUMBER\" [+_4 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0256",
+    "page": 7,
+    "rect": [
+      521.4,
+      704.88,
+      574.92,
+      716.16
+    ],
+    "type": "text",
+    "current": "undefined_86",
+    "proposed": "undefined_86",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p7_0257",
+    "page": 7,
+    "rect": [
+      521.28,
+      693.0,
+      574.8,
+      704.28
+    ],
+    "type": "text",
+    "current": "12 Other information I want the court to know concerning child support in my case attach extra sheet with the information",
+    "proposed": "q10_field",
+    "rationale": "left of box: \". . . . . . . . . . . . . . . . . . .. . . . . . . . . . . . . . . . . . . . $\" | section 10",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0258",
+    "page": 7,
+    "rect": [
+      55.2,
+      668.76,
+      71.88,
+      677.88
+    ],
+    "type": "text",
+    "current": "I am attaching a copy of page 3 of form FL150 Income and Expense Declaration showing my expenses",
+    "proposed": "q12_13",
+    "rationale": "left of box: \"13.\" | section 12",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0259",
+    "page": 7,
+    "rect": [
+      37.08,
+      604.8,
+      288.0,
+      616.08
+    ],
+    "type": "text",
+    "current": "TYPE OR PRINT NAME",
+    "proposed": "date_4",
+    "rationale": "above box: \"Date:\" [+_4 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0260",
+    "page": 7,
+    "rect": [
+      324.12,
+      604.8,
+      575.04,
+      616.08
+    ],
+    "type": "signature",
+    "current": "SIGNATURE OF DECLARANT_2",
+    "proposed": "q13_signature_declarant",
+    "rationale": "acrobat name: \"SIGNATURE OF DECLARANT\" | section 13",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0261",
+    "page": 7,
+    "rect": [
+      351.48,
+      583.68,
+      368.16,
+      592.92
+    ],
+    "type": "text",
+    "current": "PETITIONERPLAINTIFF",
+    "proposed": "q13_petitionerplaintiff",
+    "rationale": "acrobat name: \"PETITIONERPLAINTIFF\" | section 13",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0262",
+    "page": 7,
+    "rect": [
+      452.04,
+      583.56,
+      468.72,
+      592.92
+    ],
+    "type": "text",
+    "current": "RESPONDENTDEFENDANT",
+    "proposed": "q13_petitioner_plaintiff",
+    "rationale": "left of box: \"PETITIONER/PLAINTIFF\" | section 13",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0263",
+    "page": 7,
+    "rect": [
+      37.08,
+      48.24,
+      576.12,
+      59.52
+    ],
+    "type": "text",
+    "current": "Page 2 of 2",
+    "proposed": "q2_2",
+    "rationale": "acrobat name: \"Page 2 of 2\"",
+    "confidence": 0.35,
+    "status": "propose"
+  }
+]

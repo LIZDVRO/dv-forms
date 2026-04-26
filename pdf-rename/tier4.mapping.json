@@ -1,0 +1,5858 @@
+[
+  {
+    "id": "p1_0000",
+    "page": 1,
+    "rect": [
+      399.72,
+      667.56,
+      574.44,
+      688.68
+    ],
+    "type": "text",
+    "current": "To Court Clerk Do not file this form",
+    "proposed": "you_sheriff_need_cannot_served_but",
+    "rationale": "left of box: \"you sheriff need cannot served, but guarantee they that will they try to will be serve\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0006",
+    "page": 1,
+    "rect": [
+      399.84,
+      611.64,
+      574.2,
+      640.44
+    ],
+    "type": "text",
+    "current": "Sheriff File Number for sheriff to complete if needed",
+    "proposed": "person_you_need_served",
+    "rationale": "left of box: \"person you need served.\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0001",
+    "page": 1,
+    "rect": [
+      43.32,
+      635.88,
+      46.8,
+      639.36
+    ],
+    "type": "radio",
+    "current": "SER001A Special Instructions for Writs and LeviesAttachment",
+    "proposed": "complete_this_form",
+    "rationale": "right of box: \"Complete this form\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0002",
+    "page": 1,
+    "rect": [
+      43.32,
+      601.92,
+      46.8,
+      605.4
+    ],
+    "type": "radio",
+    "current": "SER001A Special Instructions for Writs and LeviesAttachment",
+    "proposed": "find_out",
+    "rationale": "right of box: \"Find out where the\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0007",
+    "page": 1,
+    "rect": [
+      400.2,
+      562.2,
+      574.08,
+      587.52
+    ],
+    "type": "text",
+    "current": "Court Case Number",
+    "proposed": "some_court_papers_more",
+    "rationale": "left of box: \"of some court papers. For more\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0003",
+    "page": 1,
+    "rect": [
+      43.32,
+      568.32,
+      46.8,
+      571.8
+    ],
+    "type": "radio",
+    "current": "SER001A Special Instructions for Writs and LeviesAttachment",
+    "proposed": "you_have",
+    "rationale": "right of box: \"You may have to\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0004",
+    "page": 1,
+    "rect": [
+      43.32,
+      524.64,
+      46.8,
+      528.12
+    ],
+    "type": "radio",
+    "current": "SER001A Special Instructions for Writs and LeviesAttachment",
+    "proposed": "not_use",
+    "rationale": "right of box: \"Do not use this form\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0005",
+    "page": 1,
+    "rect": [
+      43.2,
+      463.44,
+      46.68,
+      466.92
+    ],
+    "type": "radio",
+    "current": "SER001A Special Instructions for Writs and LeviesAttachment",
+    "proposed": "you_want_sheriff",
+    "rationale": "right of box: \"If you want the sheriff\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0008",
+    "page": 1,
+    "rect": [
+      322.32,
+      381.24,
+      576.36,
+      395.16
+    ],
+    "type": "text",
+    "current": "To the Sheriff or Marshal of name of county",
+    "proposed": "q5_sheriff_marshal_name_county",
+    "rationale": "left of box: \"Sheriff or Marshal of (name of county):\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0009",
+    "page": 1,
+    "rect": [
+      251.64,
+      324.36,
+      575.64,
+      338.28
+    ],
+    "type": "text",
+    "current": "a Your name party requesting service",
+    "proposed": "q2_your_name_party_requesting_service",
+    "rationale": "left of box: \"a. Your name (party requesting service):\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0010",
+    "page": 1,
+    "rect": [
+      111.0,
+      282.6,
+      576.0,
+      296.52
+    ],
+    "type": "text",
+    "current": "Name",
+    "proposed": "q2_name",
+    "rationale": "left of box: \"Name:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0011",
+    "page": 1,
+    "rect": [
+      136.8,
+      268.44,
+      576.0,
+      282.0
+    ],
+    "type": "text",
+    "current": "Firm name",
+    "proposed": "q2_firm_name",
+    "rationale": "left of box: \"Firm name:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0012",
+    "page": 1,
+    "rect": [
+      156.36,
+      239.88,
+      576.36,
+      253.8
+    ],
+    "type": "text",
+    "current": "c Court case name",
+    "proposed": "q2_c_court_case_name",
+    "rationale": "left of box: \"c. Court case name:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0013",
+    "page": 1,
+    "rect": [
+      198.48,
+      143.88,
+      576.12,
+      157.8
+    ],
+    "type": "text",
+    "current": "Address to receive mail",
+    "proposed": "q2_address_receive_mail",
+    "rationale": "left of box: \"Address to receive mail:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0014",
+    "page": 1,
+    "rect": [
+      104.76,
+      129.24,
+      349.56,
+      143.16
+    ],
+    "type": "text",
+    "current": "City",
+    "proposed": "city",
+    "rationale": "left of box: \"City:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0015",
+    "page": 1,
+    "rect": [
+      390.6,
+      128.76,
+      442.2,
+      142.68
+    ],
+    "type": "text",
+    "current": "State",
+    "proposed": "state",
+    "rationale": "left of box: \"State:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0016",
+    "page": 1,
+    "rect": [
+      478.44,
+      128.76,
+      576.36,
+      142.68
+    ],
+    "type": "text",
+    "current": "Zip",
+    "proposed": "zip",
+    "rationale": "left of box: \"Zip:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0017",
+    "page": 1,
+    "rect": [
+      213.6,
+      114.72,
+      327.96,
+      128.64
+    ],
+    "type": "text",
+    "current": "Telephone number optional",
+    "proposed": "telephone_number",
+    "rationale": "left of box: \"Telephone number (optional):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p1_0018",
+    "page": 1,
+    "rect": [
+      447.0,
+      114.72,
+      576.36,
+      128.16
+    ],
+    "type": "text",
+    "current": "Email address optional",
+    "proposed": "email_address",
+    "rationale": "left of box: \"Email address (optional):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0019",
+    "page": 2,
+    "rect": [
+      399.6,
+      729.24,
+      575.28,
+      747.6
+    ],
+    "type": "text",
+    "current": "Court Case Number_2",
+    "proposed": "court_case_number",
+    "rationale": "acrobat name: \"Court Case Number\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0020",
+    "page": 2,
+    "rect": [
+      78.24,
+      663.72,
+      87.72,
+      673.2
+    ],
+    "type": "checkbox",
+    "current": "I ask the sheriff to serve a person complete section below",
+    "proposed": "q3_i_ask_sheriff",
+    "rationale": "right of box: \"I ask the sheriff to\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0021",
+    "page": 2,
+    "rect": [
+      174.84,
+      643.92,
+      576.36,
+      658.92
+    ],
+    "type": "text",
+    "current": "1 Name of person",
+    "proposed": "q3_1_name_person",
+    "rationale": "left of box: \"(1) Name of person:\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0022",
+    "page": 2,
+    "rect": [
+      245.76,
+      629.52,
+      576.36,
+      643.32
+    ],
+    "type": "text",
+    "current": "Nicknames or aliases optional",
+    "proposed": "q3_nicknames_aliases",
+    "rationale": "left of box: \"Nicknames or aliases (optional):\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0023",
+    "page": 2,
+    "rect": [
+      234.12,
+      604.2,
+      576.36,
+      619.2
+    ],
+    "type": "text",
+    "current": "2 Telephone number optional",
+    "proposed": "q3_2_telephone_number",
+    "rationale": "left of box: \"(2) Telephone number (optional):\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0024",
+    "page": 2,
+    "rect": [
+      98.4,
+      565.2,
+      107.88,
+      574.68
+    ],
+    "type": "checkbox",
+    "current": "No I do not have any information about the persons description",
+    "proposed": "q3_no_i_not_have",
+    "rationale": "right of box: \"No, I do not have\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0025",
+    "page": 2,
+    "rect": [
+      98.4,
+      548.4,
+      107.88,
+      557.88
+    ],
+    "type": "checkbox",
+    "current": "Yes complete the section below with any information you have",
+    "proposed": "q3_yes",
+    "rationale": "right of box: \"Yes (complete the\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0026",
+    "page": 2,
+    "rect": [
+      167.76,
+      532.44,
+      177.24,
+      541.92
+    ],
+    "type": "radio",
+    "current": "Gender",
+    "proposed": "q3_male",
+    "rationale": "right of box: \"Male\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0027",
+    "page": 2,
+    "rect": [
+      220.68,
+      532.44,
+      230.16,
+      541.92
+    ],
+    "type": "radio",
+    "current": "Gender",
+    "proposed": "q3_female",
+    "rationale": "right of box: \"Female\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0028",
+    "page": 2,
+    "rect": [
+      284.16,
+      532.44,
+      293.64,
+      541.92
+    ],
+    "type": "radio",
+    "current": "Gender",
+    "proposed": "q3_nonbinary",
+    "rationale": "right of box: \"Nonbinary\" | section 3",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0029",
+    "page": 2,
+    "rect": [
+      153.36,
+      515.28,
+      194.76,
+      530.28
+    ],
+    "type": "text",
+    "current": "Height",
+    "proposed": "q3_height",
+    "rationale": "left of box: \"Height:\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0030",
+    "page": 2,
+    "rect": [
+      233.04,
+      515.28,
+      270.36,
+      530.28
+    ],
+    "type": "text",
+    "current": "Weight",
+    "proposed": "q3_weight",
+    "rationale": "left of box: \"Weight:\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0031",
+    "page": 2,
+    "rect": [
+      320.16,
+      515.28,
+      368.76,
+      530.28
+    ],
+    "type": "text",
+    "current": "Hair color",
+    "proposed": "q3_hair_color",
+    "rationale": "left of box: \"Hair color:\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0032",
+    "page": 2,
+    "rect": [
+      419.04,
+      515.28,
+      470.4,
+      530.28
+    ],
+    "type": "text",
+    "current": "Eye color",
+    "proposed": "q3_eye_color",
+    "rationale": "left of box: \"Eye color:\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0033",
+    "page": 2,
+    "rect": [
+      330.6,
+      499.68,
+      576.36,
+      514.68
+    ],
+    "type": "text",
+    "current": "Date of birth or age give estimate if unknown",
+    "proposed": "q3_date_birth_age_estimate_unknown",
+    "rationale": "left of box: \"Date of birth or age (give estimate, if unknown):\" | section 3",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0034",
+    "page": 2,
+    "rect": [
+      189.36,
+      484.08,
+      576.36,
+      499.08
+    ],
+    "type": "text",
+    "current": "RaceEthnicity",
+    "proposed": "race_ethnicity",
+    "rationale": "left of box: \"Race/Ethnicity:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0035",
+    "page": 2,
+    "rect": [
+      324.72,
+      468.36,
+      576.36,
+      483.36
+    ],
+    "type": "text",
+    "current": "Special marks or features tattoos scars etc",
+    "proposed": "special_marks_features_tattoos_scars_etc",
+    "rationale": "left of box: \"Special marks or features (tattoos, scars, etc.):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0036",
+    "page": 2,
+    "rect": [
+      334.92,
+      452.76,
+      576.36,
+      467.76
+    ],
+    "type": "text",
+    "current": "Vehicle type model year color plate number",
+    "proposed": "vehicle_type_model_year_color_plate",
+    "rationale": "left of box: \"Vehicle (type, model, year, color, plate number):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0037",
+    "page": 2,
+    "rect": [
+      117.12,
+      439.68,
+      126.6,
+      449.16
+    ],
+    "type": "checkbox",
+    "current": "Check here if you are including a picture of the person",
+    "proposed": "here_you",
+    "rationale": "right of box: \"Check here if you\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0038",
+    "page": 2,
+    "rect": [
+      98.4,
+      395.88,
+      107.88,
+      405.36
+    ],
+    "type": "checkbox",
+    "current": "No",
+    "proposed": "no",
+    "rationale": "right of box: \"No\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0039",
+    "page": 2,
+    "rect": [
+      98.4,
+      381.36,
+      107.88,
+      390.84
+    ],
+    "type": "checkbox",
+    "current": "Yes complete the section below with any information you have_2",
+    "proposed": "yes",
+    "rationale": "right of box: \"Yes (complete the\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0040",
+    "page": 2,
+    "rect": [
+      117.12,
+      351.48,
+      126.6,
+      360.96
+    ],
+    "type": "checkbox",
+    "current": "Has a gun or other weapon",
+    "proposed": "has_gun_other",
+    "rationale": "right of box: \"Has a gun or other\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0046",
+    "page": 2,
+    "rect": [
+      408.48,
+      351.48,
+      417.96,
+      360.96
+    ],
+    "type": "checkbox",
+    "current": "Is on probation or parole",
+    "proposed": "probation",
+    "rationale": "right of box: \"Is on probation or\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0041",
+    "page": 2,
+    "rect": [
+      117.12,
+      337.08,
+      126.6,
+      346.56
+    ],
+    "type": "checkbox",
+    "current": "Has a history of violence or abuse",
+    "proposed": "has_history_violence",
+    "rationale": "right of box: \"Has a history of violence\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0047",
+    "page": 2,
+    "rect": [
+      408.48,
+      337.08,
+      417.96,
+      346.56
+    ],
+    "type": "checkbox",
+    "current": "Has an aggressive animal",
+    "proposed": "has_aggressive",
+    "rationale": "right of box: \"Has an aggressive\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0042",
+    "page": 2,
+    "rect": [
+      117.12,
+      322.8,
+      126.6,
+      332.28
+    ],
+    "type": "checkbox",
+    "current": "Has special training examples military first responder",
+    "proposed": "has_special_training",
+    "rationale": "right of box: \"Has special training\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0048",
+    "page": 2,
+    "rect": [
+      408.48,
+      322.8,
+      417.96,
+      332.28
+    ],
+    "type": "checkbox",
+    "current": "Has mental health issues",
+    "proposed": "has_mental_health",
+    "rationale": "right of box: \"Has mental health\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0043",
+    "page": 2,
+    "rect": [
+      117.12,
+      308.4,
+      126.6,
+      317.88
+    ],
+    "type": "checkbox",
+    "current": "Is deaf or hard of hearing",
+    "proposed": "deaf_hard",
+    "rationale": "right of box: \"Is deaf or hard of\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0049",
+    "page": 2,
+    "rect": [
+      311.52,
+      292.08,
+      519.36,
+      307.08
+    ],
+    "type": "text",
+    "current": "undefined",
+    "proposed": "undefined",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p2_0044",
+    "page": 2,
+    "rect": [
+      117.12,
+      294.12,
+      126.6,
+      303.6
+    ],
+    "type": "checkbox",
+    "current": "Does not speak English list language",
+    "proposed": "not_speak_english",
+    "rationale": "right of box: \"Does not speak English\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0045",
+    "page": 2,
+    "rect": [
+      117.12,
+      279.72,
+      126.6,
+      289.2
+    ],
+    "type": "checkbox",
+    "current": "Add any other information about safety or accessibility that you know about",
+    "proposed": "add_any_other_information",
+    "rationale": "right of box: \"Add any other information\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0050",
+    "page": 2,
+    "rect": [
+      117.12,
+      264.96,
+      549.72,
+      278.16
+    ],
+    "type": "text",
+    "current": "1",
+    "proposed": "does",
+    "rationale": "above box: \"Does\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0051",
+    "page": 2,
+    "rect": [
+      117.12,
+      250.2,
+      549.72,
+      264.36
+    ],
+    "type": "text",
+    "current": "2",
+    "proposed": "add",
+    "rationale": "above box: \"Add\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0052",
+    "page": 2,
+    "rect": [
+      78.24,
+      221.28,
+      87.72,
+      230.76
+    ],
+    "type": "checkbox",
+    "current": "I ask the sheriff to serve an entity examples business or government agency",
+    "proposed": "i_ask_sheriff",
+    "rationale": "right of box: \"I ask the sheriff to\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0053",
+    "page": 2,
+    "rect": [
+      210.36,
+      202.92,
+      576.36,
+      217.92
+    ],
+    "type": "text",
+    "current": "1 Name and type of entity",
+    "proposed": "q1_name_type_entity",
+    "rationale": "left of box: \"(1) Name and type of entity:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0054",
+    "page": 2,
+    "rect": [
+      234.12,
+      185.88,
+      576.36,
+      200.88
+    ],
+    "type": "text",
+    "current": "Telephone number optional_2",
+    "proposed": "telephone_number_2",
+    "rationale": "left of box: \"Telephone number (optional):\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0055",
+    "page": 2,
+    "rect": [
+      370.68,
+      165.84,
+      576.36,
+      180.84
+    ],
+    "type": "text",
+    "current": "2 If there is a specific person who should be served give name",
+    "proposed": "specific_person_who_served_name",
+    "rationale": "left of box: \"specific person who should be served, give name:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0056",
+    "page": 2,
+    "rect": [
+      333.84,
+      141.96,
+      576.36,
+      156.96
+    ],
+    "type": "text",
+    "current": "3 If there is an agent for service of process give name",
+    "proposed": "agent_service_process_name",
+    "rationale": "left of box: \"is an agent for service of process, give name:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p2_0057",
+    "page": 2,
+    "rect": [
+      98.4,
+      104.64,
+      576.36,
+      119.16
+    ],
+    "type": "text",
+    "current": "CONFIDENTIAL",
+    "proposed": "if",
+    "rationale": "above box: \"If\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0058",
+    "page": 3,
+    "rect": [
+      399.6,
+      729.24,
+      575.28,
+      747.6
+    ],
+    "type": "text",
+    "current": "Court Case Number_3",
+    "proposed": "court_case_number_2",
+    "rationale": "acrobat name: \"Court Case Number\" [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0061",
+    "page": 3,
+    "rect": [
+      105.48,
+      661.08,
+      433.68,
+      674.52
+    ],
+    "type": "text",
+    "current": "Address",
+    "proposed": "q4_address",
+    "rationale": "left of box: \"Address:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0059",
+    "page": 3,
+    "rect": [
+      436.56,
+      663.12,
+      446.04,
+      672.6
+    ],
+    "type": "checkbox",
+    "current": "Home",
+    "proposed": "q4_home",
+    "rationale": "right of box: \"Home\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0060",
+    "page": 3,
+    "rect": [
+      490.56,
+      663.12,
+      500.04,
+      672.6
+    ],
+    "type": "checkbox",
+    "current": "Business",
+    "proposed": "q4_business",
+    "rationale": "right of box: \"Business\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0062",
+    "page": 3,
+    "rect": [
+      89.76,
+      644.88,
+      328.68,
+      658.32
+    ],
+    "type": "text",
+    "current": "City_2",
+    "proposed": "q4_city",
+    "rationale": "left of box: \"City:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0063",
+    "page": 3,
+    "rect": [
+      364.2,
+      644.88,
+      426.96,
+      658.32
+    ],
+    "type": "text",
+    "current": "State_2",
+    "proposed": "q4_state",
+    "rationale": "left of box: \"State:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0064",
+    "page": 3,
+    "rect": [
+      457.2,
+      644.88,
+      573.6,
+      658.32
+    ],
+    "type": "text",
+    "current": "Zip_2",
+    "proposed": "q4_zip",
+    "rationale": "left of box: \"Zip:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0065",
+    "page": 3,
+    "rect": [
+      212.52,
+      628.56,
+      575.64,
+      642.0
+    ],
+    "type": "text",
+    "current": "Gate code or special instructions",
+    "proposed": "q4_gate_code_special_instructions",
+    "rationale": "left of box: \"Gate code or special instructions:\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0066",
+    "page": 3,
+    "rect": [
+      320.28,
+      612.36,
+      575.64,
+      625.8
+    ],
+    "type": "text",
+    "current": "Best time to serve at this address example 8 amnoon",
+    "proposed": "q4_serve_address_example_8_m_noon",
+    "rationale": "left of box: \"serve at this address (example: 8 a.m.\u2013noon):\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0068",
+    "page": 3,
+    "rect": [
+      372.96,
+      596.52,
+      576.36,
+      609.96
+    ],
+    "type": "text",
+    "current": "undefined_2",
+    "proposed": "undefined_2",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p3_0067",
+    "page": 3,
+    "rect": [
+      62.76,
+      598.56,
+      72.24,
+      608.04
+    ],
+    "type": "checkbox",
+    "current": "Check here if the person is in jail or prison give name of facility",
+    "proposed": "q4_here",
+    "rationale": "right of box: \"Check here if the\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0071",
+    "page": 3,
+    "rect": [
+      107.52,
+      524.76,
+      433.92,
+      538.2
+    ],
+    "type": "text",
+    "current": "Address_2",
+    "proposed": "q4_address_2",
+    "rationale": "left of box: \"Address:\" | section 4 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0069",
+    "page": 3,
+    "rect": [
+      436.56,
+      526.8,
+      446.04,
+      536.28
+    ],
+    "type": "checkbox",
+    "current": "Home_2",
+    "proposed": "q8_home",
+    "rationale": "right of box: \"Home\" | section 8",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0070",
+    "page": 3,
+    "rect": [
+      490.56,
+      526.8,
+      500.04,
+      536.28
+    ],
+    "type": "checkbox",
+    "current": "Business_2",
+    "proposed": "q8_business",
+    "rationale": "right of box: \"Business\" | section 8",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0072",
+    "page": 3,
+    "rect": [
+      87.72,
+      508.68,
+      327.84,
+      522.12
+    ],
+    "type": "text",
+    "current": "City_3",
+    "proposed": "q4_city_2",
+    "rationale": "left of box: \"City:\" | section 4 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0073",
+    "page": 3,
+    "rect": [
+      364.08,
+      508.68,
+      426.84,
+      522.12
+    ],
+    "type": "text",
+    "current": "State_3",
+    "proposed": "q8_state",
+    "rationale": "left of box: \"State:\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0074",
+    "page": 3,
+    "rect": [
+      457.2,
+      508.68,
+      573.12,
+      522.12
+    ],
+    "type": "text",
+    "current": "Zip_3",
+    "proposed": "q8_zip",
+    "rationale": "left of box: \"Zip:\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0075",
+    "page": 3,
+    "rect": [
+      213.24,
+      492.6,
+      575.28,
+      506.04
+    ],
+    "type": "text",
+    "current": "Gate code or special instructions_2",
+    "proposed": "q4_gate_code_special_instructions_2",
+    "rationale": "left of box: \"Gate code or special instructions:\" | section 4 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0076",
+    "page": 3,
+    "rect": [
+      321.36,
+      476.4,
+      575.28,
+      489.84
+    ],
+    "type": "text",
+    "current": "Best time to serve at this address example 8 amnoon_2",
+    "proposed": "q8_serve_address_example_8_m_noon",
+    "rationale": "left of box: \"serve at this address (example: 8 a.m.\u2013noon):\" | section 8",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0077",
+    "page": 3,
+    "rect": [
+      78.24,
+      377.28,
+      575.28,
+      390.72
+    ],
+    "type": "text",
+    "current": "small claims bank levy or writ of attachment",
+    "proposed": "q5_small",
+    "rationale": "above box: \"small\" | section 5",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0078",
+    "page": 3,
+    "rect": [
+      79.2,
+      267.0,
+      575.88,
+      280.44
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 1",
+    "proposed": "q5_self_help",
+    "rationale": "above box: \"self-help\" | section 5",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0079",
+    "page": 3,
+    "rect": [
+      79.2,
+      253.08,
+      575.88,
+      266.4
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 2",
+    "proposed": "q5_self_help_2",
+    "rationale": "above box: \"self-help\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0080",
+    "page": 3,
+    "rect": [
+      79.2,
+      239.04,
+      575.88,
+      252.48
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 3",
+    "proposed": "q5_selfhelp_center_free_information_3",
+    "rationale": "acrobat name: \"selfhelp center for free information 3\" | section 5",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0081",
+    "page": 3,
+    "rect": [
+      79.2,
+      225.0,
+      575.88,
+      238.44
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 4",
+    "proposed": "q5_selfhelp_center_free_information_4",
+    "rationale": "acrobat name: \"selfhelp center for free information 4\" | section 5",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0082",
+    "page": 3,
+    "rect": [
+      79.2,
+      211.08,
+      575.88,
+      224.4
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 5",
+    "proposed": "selfhelp_center_free_information_5",
+    "rationale": "acrobat name: \"selfhelp center for free information 5\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0083",
+    "page": 3,
+    "rect": [
+      79.2,
+      197.04,
+      575.88,
+      210.48
+    ],
+    "type": "text",
+    "current": "selfhelp center for free information 6",
+    "proposed": "selfhelp_center_free_information_6",
+    "rationale": "acrobat name: \"selfhelp center for free information 6\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0084",
+    "page": 3,
+    "rect": [
+      78.24,
+      150.12,
+      87.72,
+      159.6
+    ],
+    "type": "checkbox",
+    "current": "I dont know",
+    "proposed": "i_don_t_know",
+    "rationale": "right of box: \"I don\u2019t know\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0085",
+    "page": 3,
+    "rect": [
+      78.24,
+      135.48,
+      87.72,
+      144.96
+    ],
+    "type": "checkbox",
+    "current": "No_2",
+    "proposed": "no_2",
+    "rationale": "right of box: \"No\" [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0087",
+    "page": 3,
+    "rect": [
+      247.44,
+      118.92,
+      450.36,
+      132.36
+    ],
+    "type": "text",
+    "current": "CONFIDENTIAL_2",
+    "proposed": "yes_yes_date_hearing",
+    "rationale": "left of box: \"Yes (if yes, give date of hearing):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p3_0086",
+    "page": 3,
+    "rect": [
+      78.24,
+      120.84,
+      87.72,
+      130.32
+    ],
+    "type": "checkbox",
+    "current": "Yes if yes give date of hearing",
+    "proposed": "yes_yes",
+    "rationale": "right of box: \"Yes (if yes, give\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0088",
+    "page": 4,
+    "rect": [
+      399.6,
+      729.24,
+      575.28,
+      747.6
+    ],
+    "type": "text",
+    "current": "Court Case Number_4",
+    "proposed": "court_case_number_3",
+    "rationale": "acrobat name: \"Court Case Number\" [+_3 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0089",
+    "page": 4,
+    "rect": [
+      78.24,
+      690.6,
+      87.72,
+      700.08
+    ],
+    "type": "checkbox",
+    "current": "I dont know_2",
+    "proposed": "q5_i_don_t_know",
+    "rationale": "right of box: \"I don\u2019t know\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0090",
+    "page": 4,
+    "rect": [
+      78.24,
+      676.32,
+      87.72,
+      685.8
+    ],
+    "type": "checkbox",
+    "current": "No_3",
+    "proposed": "q5_no",
+    "rationale": "right of box: \"No\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0092",
+    "page": 4,
+    "rect": [
+      215.4,
+      660.12,
+      513.84,
+      673.44
+    ],
+    "type": "text",
+    "current": "undefined_3",
+    "proposed": "undefined_3",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p4_0091",
+    "page": 4,
+    "rect": [
+      78.24,
+      662.16,
+      87.72,
+      671.64
+    ],
+    "type": "checkbox",
+    "current": "Yes if yes give deadline",
+    "proposed": "q5_yes_yes",
+    "rationale": "right of box: \"Yes (if yes, give\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0093",
+    "page": 4,
+    "rect": [
+      78.24,
+      597.84,
+      87.72,
+      607.32
+    ],
+    "type": "checkbox",
+    "current": "I dont know_3",
+    "proposed": "q5_i_don_t_know_2",
+    "rationale": "right of box: \"I don\u2019t know\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0094",
+    "page": 4,
+    "rect": [
+      78.24,
+      583.68,
+      87.72,
+      593.16
+    ],
+    "type": "checkbox",
+    "current": "No_4",
+    "proposed": "q5_no_2",
+    "rationale": "right of box: \"No\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0095",
+    "page": 4,
+    "rect": [
+      78.24,
+      569.4,
+      87.72,
+      578.88
+    ],
+    "type": "checkbox",
+    "current": "Yes if yes include a copy of the order allowing another type of service",
+    "proposed": "q5_yes_yes_include",
+    "rationale": "right of box: \"Yes (if yes, include\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0096",
+    "page": 4,
+    "rect": [
+      78.24,
+      519.96,
+      87.72,
+      529.44
+    ],
+    "type": "checkbox",
+    "current": "No_5",
+    "proposed": "q5_no_3",
+    "rationale": "right of box: \"No\" | section 5 [+_3 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0097",
+    "page": 4,
+    "rect": [
+      78.24,
+      505.32,
+      87.72,
+      514.8
+    ],
+    "type": "checkbox",
+    "current": "Yes if yes give information below",
+    "proposed": "q5_yes_yes_information",
+    "rationale": "right of box: \"Yes (if yes, give information\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0098",
+    "page": 4,
+    "rect": [
+      78.24,
+      491.4,
+      575.88,
+      503.76
+    ],
+    "type": "text",
+    "current": "1_2",
+    "proposed": "no_3",
+    "rationale": "above box: \"No\" [+_3 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0099",
+    "page": 4,
+    "rect": [
+      78.24,
+      477.36,
+      575.88,
+      490.68
+    ],
+    "type": "text",
+    "current": "2_2",
+    "proposed": "yes_2",
+    "rationale": "above box: \"Yes\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0100",
+    "page": 4,
+    "rect": [
+      78.24,
+      463.44,
+      575.88,
+      476.76
+    ],
+    "type": "text",
+    "current": "3",
+    "proposed": "q3",
+    "rationale": "acrobat name: \"3\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0101",
+    "page": 4,
+    "rect": [
+      78.24,
+      449.4,
+      575.88,
+      462.72
+    ],
+    "type": "text",
+    "current": "4",
+    "proposed": "q4",
+    "rationale": "acrobat name: \"4\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0102",
+    "page": 4,
+    "rect": [
+      78.24,
+      435.36,
+      575.88,
+      448.68
+    ],
+    "type": "text",
+    "current": "5",
+    "proposed": "q5",
+    "rationale": "acrobat name: \"5\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0103",
+    "page": 4,
+    "rect": [
+      78.24,
+      421.44,
+      575.88,
+      434.76
+    ],
+    "type": "text",
+    "current": "6",
+    "proposed": "q6",
+    "rationale": "acrobat name: \"6\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0104",
+    "page": 4,
+    "rect": [
+      78.24,
+      407.4,
+      575.88,
+      420.72
+    ],
+    "type": "text",
+    "current": "7",
+    "proposed": "q7",
+    "rationale": "acrobat name: \"7\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0105",
+    "page": 4,
+    "rect": [
+      78.24,
+      393.48,
+      575.88,
+      406.8
+    ],
+    "type": "text",
+    "current": "8",
+    "proposed": "q8",
+    "rationale": "acrobat name: \"8\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0106",
+    "page": 4,
+    "rect": [
+      62.76,
+      264.72,
+      72.24,
+      274.2
+    ],
+    "type": "checkbox",
+    "current": "Yes",
+    "proposed": "q6_yes",
+    "rationale": "right of box: \"Yes\" | section 6",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0107",
+    "page": 4,
+    "rect": [
+      62.76,
+      249.84,
+      72.24,
+      259.32
+    ],
+    "type": "checkbox",
+    "current": "No I only want the sheriff to act as levying officer A registered process server has or will serve my papers",
+    "proposed": "q6_no_i_only_want",
+    "rationale": "right of box: \"No. I only want the\" | section 6",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0108",
+    "page": 4,
+    "rect": [
+      63.36,
+      162.96,
+      284.28,
+      176.28
+    ],
+    "type": "signature",
+    "current": "Your Signature party asking for service or their lawyer",
+    "proposed": "q6_date",
+    "rationale": "left of box: \"Date:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0109",
+    "page": 4,
+    "rect": [
+      35.76,
+      143.88,
+      283.68,
+      157.2
+    ],
+    "type": "text",
+    "current": "Date",
+    "proposed": "date",
+    "rationale": "above box: \"Date:\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p4_0110",
+    "page": 4,
+    "rect": [
+      303.12,
+      141.6,
+      548.76,
+      154.92
+    ],
+    "type": "signature",
+    "current": "Sign your name may be electronic",
+    "proposed": "sign_your_name_electronic",
+    "rationale": "acrobat name: \"Sign your name may be electronic\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0111",
+    "page": 5,
+    "rect": [
+      399.6,
+      729.24,
+      575.28,
+      747.6
+    ],
+    "type": "text",
+    "current": "Court Case Number_5",
+    "proposed": "court_case_number_4",
+    "rationale": "acrobat name: \"Court Case Number\" [+_4 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0112",
+    "page": 5,
+    "rect": [
+      36.0,
+      681.72,
+      39.48,
+      685.2
+    ],
+    "type": "radio",
+    "current": "Your Next Steps",
+    "proposed": "find_out_you_need",
+    "rationale": "right of box: \"Find out if you need\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0115",
+    "page": 5,
+    "rect": [
+      48.6,
+      649.68,
+      52.08,
+      653.16
+    ],
+    "type": "checkbox",
+    "current": "If you have a fee waiver in your case fee waiver granted by a judge on form FW003 or FW005",
+    "proposed": "you_have_fee",
+    "rationale": "right of box: \"If you have a fee\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0116",
+    "page": 5,
+    "rect": [
+      48.6,
+      633.0,
+      52.08,
+      636.48
+    ],
+    "type": "checkbox",
+    "current": "If you are serving a domestic violence elder abuse or gun violence restraining order",
+    "proposed": "you_serving",
+    "rationale": "right of box: \"If you are serving\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0117",
+    "page": 5,
+    "rect": [
+      48.6,
+      616.44,
+      52.08,
+      619.92
+    ],
+    "type": "checkbox",
+    "current": "If you have a civil harassment workplace violence or school violence restraining order based on a credible threat of",
+    "proposed": "you_have_civil",
+    "rationale": "right of box: \"If you have a civil\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0113",
+    "page": 5,
+    "rect": [
+      36.0,
+      571.44,
+      39.48,
+      574.92
+    ],
+    "type": "radio",
+    "current": "Your Next Steps",
+    "proposed": "give_this_form_and",
+    "rationale": "right of box: \"Give this form and\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0114",
+    "page": 5,
+    "rect": [
+      36.0,
+      523.2,
+      39.48,
+      526.68
+    ],
+    "type": "radio",
+    "current": "Your Next Steps",
+    "proposed": "you_get",
+    "rationale": "right of box: \"You should get a\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0118",
+    "page": 5,
+    "rect": [
+      48.6,
+      504.0,
+      52.08,
+      507.48
+    ],
+    "type": "radio",
+    "current": "you get a copy from the sheriff and file it with the court Note that if there is a court stamp at the top right corner",
+    "proposed": "sheriff",
+    "rationale": "right of box: \"If the sheriff was\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p5_0119",
+    "page": 5,
+    "rect": [
+      48.6,
+      460.8,
+      52.08,
+      464.28
+    ],
+    "type": "radio",
+    "current": "you get a copy from the sheriff and file it with the court Note that if there is a court stamp at the top right corner",
+    "proposed": "sheriff_2",
+    "rationale": "right of box: \"If the sheriff was\" [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0120",
+    "page": 6,
+    "rect": [
+      397.68,
+      611.88,
+      574.44,
+      746.28
+    ],
+    "type": "text",
+    "current": "Clerk stamps date here when form is filed",
+    "proposed": "restrained",
+    "rationale": "left of box: \"Restrained:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0121",
+    "page": 6,
+    "rect": [
+      62.76,
+      691.56,
+      386.04,
+      704.4
+    ],
+    "type": "text",
+    "current": "Name of Party to Be Restrained",
+    "proposed": "q1_name",
+    "rationale": "above box: \"Name\" | section 1",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0122",
+    "page": 6,
+    "rect": [
+      62.76,
+      660.96,
+      386.04,
+      673.8
+    ],
+    "type": "text",
+    "current": "Notice to Server",
+    "proposed": "q2_notice_server",
+    "rationale": "acrobat name: \"Notice to Server\" | section 2",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0123",
+    "page": 6,
+    "rect": [
+      397.68,
+      516.48,
+      574.44,
+      587.04
+    ],
+    "type": "text",
+    "current": "Superior Court of California County of",
+    "proposed": "q1_mail_then_sign",
+    "rationale": "left of box: \"mail). Then complete and sign this form,\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0124",
+    "page": 6,
+    "rect": [
+      78.0,
+      497.64,
+      87.48,
+      507.12
+    ],
+    "type": "checkbox",
+    "current": "DV109 with DV100 and a blank DV120 Notice of Court",
+    "proposed": "q4_dv_109_dv_100",
+    "rationale": "right of box: \"DV-109 with DV-100\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0133",
+    "page": 6,
+    "rect": [
+      397.32,
+      464.76,
+      574.8,
+      490.08
+    ],
+    "type": "text",
+    "current": "Case Number",
+    "proposed": "q4_domestic_violence_restraining_order",
+    "rationale": "left of box: \"for Domestic Violence Restraining Order)\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0125",
+    "page": 6,
+    "rect": [
+      78.0,
+      455.64,
+      87.48,
+      465.12
+    ],
+    "type": "checkbox",
+    "current": "DV110 Temporary Restraining Order",
+    "proposed": "q4_dv_110_temporary",
+    "rationale": "right of box: \"DV-110 (Temporary\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0126",
+    "page": 6,
+    "rect": [
+      78.0,
+      441.6,
+      87.48,
+      451.08
+    ],
+    "type": "checkbox",
+    "current": "DV105 and DV140 Request for Child Custody and Visitation Orders Child Custody and Visitation Order",
+    "proposed": "q4_dv_105_dv_140",
+    "rationale": "right of box: \"DV-105 and DV-140\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0127",
+    "page": 6,
+    "rect": [
+      78.0,
+      427.44,
+      87.48,
+      436.92
+    ],
+    "type": "checkbox",
+    "current": "FL150 with a blank FL150 Income and Expense Declaration",
+    "proposed": "q4_fl_150_blank",
+    "rationale": "right of box: \"FL-150 with a blank\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0128",
+    "page": 6,
+    "rect": [
+      78.0,
+      413.4,
+      87.48,
+      422.88
+    ],
+    "type": "checkbox",
+    "current": "FL155 with a blank FL155 Financial Statement Simplified",
+    "proposed": "q4_fl_155_blank",
+    "rationale": "right of box: \"FL-155 with a blank\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0129",
+    "page": 6,
+    "rect": [
+      78.0,
+      399.36,
+      87.48,
+      408.84
+    ],
+    "type": "checkbox",
+    "current": "DV115 Request to Continue Hearing",
+    "proposed": "q4_dv_115_request",
+    "rationale": "right of box: \"DV-115 (Request\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0130",
+    "page": 6,
+    "rect": [
+      78.0,
+      385.32,
+      87.48,
+      394.8
+    ],
+    "type": "checkbox",
+    "current": "DV116 Order on Request to Continue Hearing",
+    "proposed": "q4_dv_116_order",
+    "rationale": "right of box: \"DV-116 (Order on\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0131",
+    "page": 6,
+    "rect": [
+      78.0,
+      371.28,
+      87.48,
+      380.76
+    ],
+    "type": "checkbox",
+    "current": "DV130 Restraining Order After Hearing",
+    "proposed": "q4_dv_130_restraining",
+    "rationale": "right of box: \"DV-130 (Restraining\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0132",
+    "page": 6,
+    "rect": [
+      78.0,
+      357.12,
+      87.48,
+      366.6
+    ],
+    "type": "checkbox",
+    "current": "Other specify",
+    "proposed": "q4_other_specify",
+    "rationale": "right of box: \"Other (specify):\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0136",
+    "page": 6,
+    "rect": [
+      106.56,
+      315.48,
+      233.76,
+      328.32
+    ],
+    "type": "text",
+    "current": "a   Date",
+    "proposed": "q5_date",
+    "rationale": "left of box: \"a. Date:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0137",
+    "page": 6,
+    "rect": [
+      268.44,
+      315.48,
+      354.24,
+      328.32
+    ],
+    "type": "text",
+    "current": "Time",
+    "proposed": "q5_time",
+    "rationale": "left of box: \"Time:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0134",
+    "page": 6,
+    "rect": [
+      363.36,
+      315.96,
+      372.84,
+      325.44
+    ],
+    "type": "checkbox",
+    "current": "am",
+    "proposed": "am",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0135",
+    "page": 6,
+    "rect": [
+      405.6,
+      315.96,
+      415.08,
+      325.44
+    ],
+    "type": "checkbox",
+    "current": "pm",
+    "proposed": "pm",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p6_0138",
+    "page": 6,
+    "rect": [
+      147.72,
+      299.52,
+      576.24,
+      312.36
+    ],
+    "type": "text",
+    "current": "b   At this address",
+    "proposed": "q5_b_address",
+    "rationale": "left of box: \"b. At this address:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0139",
+    "page": 6,
+    "rect": [
+      101.76,
+      284.04,
+      362.04,
+      296.88
+    ],
+    "type": "text",
+    "current": "City_4",
+    "proposed": "q5_city",
+    "rationale": "left of box: \"City:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0140",
+    "page": 6,
+    "rect": [
+      397.08,
+      284.04,
+      462.96,
+      296.88
+    ],
+    "type": "text",
+    "current": "State_4",
+    "proposed": "q5_state",
+    "rationale": "left of box: \"State:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0141",
+    "page": 6,
+    "rect": [
+      492.12,
+      284.04,
+      576.12,
+      296.88
+    ],
+    "type": "text",
+    "current": "Zip_4",
+    "proposed": "q5_zip",
+    "rationale": "left of box: \"Zip:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0142",
+    "page": 6,
+    "rect": [
+      94.68,
+      244.2,
+      575.76,
+      257.04
+    ],
+    "type": "text",
+    "current": "Name_2",
+    "proposed": "q6_name",
+    "rationale": "left of box: \"Name:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0143",
+    "page": 6,
+    "rect": [
+      107.04,
+      231.0,
+      576.0,
+      243.6
+    ],
+    "type": "text",
+    "current": "Address_3",
+    "proposed": "q6_address",
+    "rationale": "left of box: \"Address:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0144",
+    "page": 6,
+    "rect": [
+      89.76,
+      217.56,
+      363.12,
+      230.4
+    ],
+    "type": "text",
+    "current": "City_5",
+    "proposed": "q6_city",
+    "rationale": "left of box: \"City:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0145",
+    "page": 6,
+    "rect": [
+      398.04,
+      217.56,
+      463.08,
+      230.4
+    ],
+    "type": "text",
+    "current": "State_5",
+    "proposed": "q6_state",
+    "rationale": "left of box: \"State:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0146",
+    "page": 6,
+    "rect": [
+      493.56,
+      217.56,
+      576.24,
+      230.4
+    ],
+    "type": "text",
+    "current": "Zip_5",
+    "proposed": "q6_zip",
+    "rationale": "left of box: \"Zip:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0147",
+    "page": 6,
+    "rect": [
+      115.56,
+      204.24,
+      363.12,
+      216.96
+    ],
+    "type": "text",
+    "current": "Telephone",
+    "proposed": "q6_telephone",
+    "rationale": "left of box: \"Telephone:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0149",
+    "page": 6,
+    "rect": [
+      442.2,
+      175.32,
+      576.12,
+      188.16
+    ],
+    "type": "text",
+    "current": "Registration number",
+    "proposed": "q6_registration_number",
+    "rationale": "left of box: \"Registration number:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0148",
+    "page": 6,
+    "rect": [
+      167.4,
+      175.08,
+      333.0,
+      187.92
+    ],
+    "type": "text",
+    "current": "County of registration",
+    "proposed": "q6_county_registration",
+    "rationale": "left of box: \"County of registration:\" | section 6",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0150",
+    "page": 6,
+    "rect": [
+      92.16,
+      106.56,
+      304.2,
+      119.4
+    ],
+    "type": "text",
+    "current": "Date 1",
+    "proposed": "q7_date",
+    "rationale": "left of box: \"Date:\" | section 7",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0152",
+    "page": 6,
+    "rect": [
+      330.72,
+      88.8,
+      576.48,
+      101.64
+    ],
+    "type": "signature",
+    "current": "Server to sign here",
+    "proposed": "q7_server_sign_here",
+    "rationale": "acrobat name: \"Server to sign here\" | section 7",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p6_0151",
+    "page": 6,
+    "rect": [
+      64.32,
+      87.0,
+      303.96,
+      99.84
+    ],
+    "type": "text",
+    "current": "Date 2",
+    "proposed": "q7_date_2",
+    "rationale": "above box: \"Date:\" | section 7 [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0153",
+    "page": 7,
+    "rect": [
+      397.68,
+      611.76,
+      574.44,
+      746.28
+    ],
+    "type": "text",
+    "current": "Clerk stamps date here when form is filed_2",
+    "proposed": "restrained_2",
+    "rationale": "left of box: \"Restrained:\" [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0154",
+    "page": 7,
+    "rect": [
+      42.0,
+      723.96,
+      57.72,
+      734.28
+    ],
+    "type": "text",
+    "current": "1_3",
+    "proposed": "q1",
+    "rationale": "acrobat name: \"1\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0155",
+    "page": 7,
+    "rect": [
+      62.16,
+      723.96,
+      373.2,
+      734.28
+    ],
+    "type": "text",
+    "current": "Name of Person Asking for Protection",
+    "proposed": "name_person_asking_protection",
+    "rationale": "acrobat name: \"Name of Person Asking for Protection\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0156",
+    "page": 7,
+    "rect": [
+      61.92,
+      689.28,
+      388.2,
+      701.16
+    ],
+    "type": "text",
+    "current": "Name of Person to Be Restrained",
+    "proposed": "q1_name_2",
+    "rationale": "above box: \"Name\" | section 1 [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0157",
+    "page": 7,
+    "rect": [
+      61.92,
+      657.24,
+      387.0,
+      668.52
+    ],
+    "type": "text",
+    "current": "Notice to Server_2",
+    "proposed": "q2_notice_server_2",
+    "rationale": "acrobat name: \"Notice to Server\" | section 2 [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0158",
+    "page": 7,
+    "rect": [
+      397.68,
+      516.24,
+      574.44,
+      586.8
+    ],
+    "type": "text",
+    "current": "Superior Court of California County of_2",
+    "proposed": "q2_documents_checked_4",
+    "rationale": "left of box: \"documents checked in 4\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0159",
+    "page": 7,
+    "rect": [
+      397.32,
+      464.52,
+      574.8,
+      489.84
+    ],
+    "type": "text",
+    "current": "Case Number_2",
+    "proposed": "q4_person_5",
+    "rationale": "left of box: \"the person in 5 :\" | section 4",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0160",
+    "page": 7,
+    "rect": [
+      78.48,
+      461.16,
+      87.96,
+      470.64
+    ],
+    "type": "checkbox",
+    "current": "DV112 Waiver of Hearing on Denied Request for Temporary",
+    "proposed": "q4_dv_112_waiver",
+    "rationale": "right of box: \"DV-112, Waiver\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0161",
+    "page": 7,
+    "rect": [
+      78.48,
+      432.72,
+      87.96,
+      442.2
+    ],
+    "type": "checkbox",
+    "current": "DV120 Response to Request for Domestic Violence Restraining Order",
+    "proposed": "q4_dv_120_response",
+    "rationale": "right of box: \"DV-120, Response\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0162",
+    "page": 7,
+    "rect": [
+      78.48,
+      418.08,
+      87.96,
+      427.56
+    ],
+    "type": "checkbox",
+    "current": "FL150 Income and Expense Declaration",
+    "proposed": "q4_fl_150_income",
+    "rationale": "right of box: \"FL-150, Income\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0163",
+    "page": 7,
+    "rect": [
+      78.48,
+      403.56,
+      87.96,
+      413.04
+    ],
+    "type": "checkbox",
+    "current": "FL155 Simplified Financial Statement",
+    "proposed": "q4_fl_155_simplified",
+    "rationale": "right of box: \"FL-155, Simplified\" | section 4",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0164",
+    "page": 7,
+    "rect": [
+      78.48,
+      389.04,
+      87.96,
+      398.52
+    ],
+    "type": "checkbox",
+    "current": "DV130 Restraining Order After Hearing Order of Protection",
+    "proposed": "q4_dv_130_restraining_2",
+    "rationale": "right of box: \"DV-130, Restraining\" | section 4 [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0166",
+    "page": 7,
+    "rect": [
+      171.12,
+      373.32,
+      570.24,
+      385.2
+    ],
+    "type": "text",
+    "current": "specify",
+    "proposed": "specify",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p7_0165",
+    "page": 7,
+    "rect": [
+      78.48,
+      373.92,
+      87.96,
+      383.4
+    ],
+    "type": "checkbox",
+    "current": "Other",
+    "proposed": "q4_other_specify_2",
+    "rationale": "right of box: \"Other (specify):\" | section 4 [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0167",
+    "page": 7,
+    "rect": [
+      186.72,
+      330.36,
+      577.08,
+      342.24
+    ],
+    "type": "text",
+    "current": "Name of person served",
+    "proposed": "q5_name_person_served",
+    "rationale": "left of box: \"a. Name of person served:\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0168",
+    "page": 7,
+    "rect": [
+      151.92,
+      317.76,
+      577.08,
+      329.64
+    ],
+    "type": "text",
+    "current": "To this address",
+    "proposed": "q5_b_address_2",
+    "rationale": "left of box: \"b. To this address:\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0169",
+    "page": 7,
+    "rect": [
+      103.32,
+      305.16,
+      366.24,
+      317.04
+    ],
+    "type": "text",
+    "current": "City_6",
+    "proposed": "q5_city_2",
+    "rationale": "left of box: \"City:\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0170",
+    "page": 7,
+    "rect": [
+      402.0,
+      305.16,
+      481.08,
+      317.04
+    ],
+    "type": "text",
+    "current": "State_6",
+    "proposed": "q5_state_2",
+    "rationale": "left of box: \"State:\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0171",
+    "page": 7,
+    "rect": [
+      508.08,
+      305.16,
+      577.2,
+      317.04
+    ],
+    "type": "text",
+    "current": "Zip_6",
+    "proposed": "q5_zip_2",
+    "rationale": "left of box: \"Zip:\" | section 5 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0172",
+    "page": 7,
+    "rect": [
+      161.64,
+      292.56,
+      297.84,
+      304.44
+    ],
+    "type": "text",
+    "current": "Mailed on date",
+    "proposed": "q5_c_mailed_date",
+    "rationale": "left of box: \"c. Mailed on (date):\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0173",
+    "page": 7,
+    "rect": [
+      164.76,
+      279.84,
+      377.4,
+      291.72
+    ],
+    "type": "text",
+    "current": "Mailed from city",
+    "proposed": "q5_d_mailed_city",
+    "rationale": "left of box: \"d. Mailed from (city):\" | section 5",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0174",
+    "page": 7,
+    "rect": [
+      418.56,
+      279.84,
+      490.44,
+      291.72
+    ],
+    "type": "text",
+    "current": "state",
+    "proposed": "state",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p7_0175",
+    "page": 7,
+    "rect": [
+      95.04,
+      239.64,
+      577.2,
+      251.52
+    ],
+    "type": "text",
+    "current": "Name_3",
+    "proposed": "q6_name_2",
+    "rationale": "left of box: \"Name:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0176",
+    "page": 7,
+    "rect": [
+      104.76,
+      226.92,
+      577.08,
+      238.8
+    ],
+    "type": "text",
+    "current": "Address_4",
+    "proposed": "q6_address_2",
+    "rationale": "left of box: \"Address:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0177",
+    "page": 7,
+    "rect": [
+      87.48,
+      214.44,
+      365.04,
+      226.32
+    ],
+    "type": "text",
+    "current": "City_7",
+    "proposed": "q6_city_2",
+    "rationale": "left of box: \"City:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0178",
+    "page": 7,
+    "rect": [
+      397.44,
+      214.44,
+      476.4,
+      226.32
+    ],
+    "type": "text",
+    "current": "State_7",
+    "proposed": "q6_state_2",
+    "rationale": "left of box: \"State:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0179",
+    "page": 7,
+    "rect": [
+      508.08,
+      214.44,
+      577.2,
+      226.32
+    ],
+    "type": "text",
+    "current": "Zip_7",
+    "proposed": "q6_zip_2",
+    "rationale": "left of box: \"Zip:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0180",
+    "page": 7,
+    "rect": [
+      117.24,
+      201.72,
+      282.0,
+      213.6
+    ],
+    "type": "text",
+    "current": "Telephone_2",
+    "proposed": "q6_telephone_2",
+    "rationale": "left of box: \"Telephone:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0181",
+    "page": 7,
+    "rect": [
+      188.28,
+      171.24,
+      362.88,
+      183.12
+    ],
+    "type": "text",
+    "current": "County of registration_2",
+    "proposed": "q6_county_registration_2",
+    "rationale": "left of box: \"County of registration:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0182",
+    "page": 7,
+    "rect": [
+      466.44,
+      171.24,
+      576.12,
+      183.12
+    ],
+    "type": "text",
+    "current": "Registration number_2",
+    "proposed": "q6_registration_number_2",
+    "rationale": "left of box: \"Registration number:\" | section 6 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0183",
+    "page": 7,
+    "rect": [
+      95.52,
+      119.4,
+      288.0,
+      131.28
+    ],
+    "type": "text",
+    "current": "Date 1_2",
+    "proposed": "q7_date_3",
+    "rationale": "left of box: \"Date:\" | section 7 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0184",
+    "page": 7,
+    "rect": [
+      62.16,
+      94.8,
+      297.36,
+      106.68
+    ],
+    "type": "text",
+    "current": "Date 2_2",
+    "proposed": "q7_date_4",
+    "rationale": "above box: \"Date:\" | section 7 [+_4 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p7_0185",
+    "page": 7,
+    "rect": [
+      336.96,
+      93.12,
+      573.48,
+      105.0
+    ],
+    "type": "signature",
+    "current": "Server to sign here_2",
+    "proposed": "q7_server_sign_here_2",
+    "rationale": "acrobat name: \"Server to sign here\" | section 7 [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p8_0186",
+    "page": 8,
+    "rect": [
+      36.24,
+      82.32,
+      109.08,
+      118.32
+    ],
+    "type": "text",
+    "current": "Judicial Council of California",
+    "proposed": "judicial_council_california",
+    "rationale": "acrobat name: \"Judicial Council of California\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p8_0187",
+    "page": 8,
+    "rect": [
+      114.0,
+      82.32,
+      470.04,
+      118.32
+    ],
+    "type": "text",
+    "current": "courtscagov",
+    "proposed": "courtscagov",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p8_0188",
+    "page": 8,
+    "rect": [
+      474.96,
+      82.32,
+      576.72,
+      118.32
+    ],
+    "type": "text",
+    "current": "DV120INFO Page 1 of 4",
+    "proposed": "about",
+    "rationale": "above box: \"about\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p10_0189",
+    "page": 10,
+    "rect": [
+      203.52,
+      81.96,
+      469.32,
+      98.64
+    ],
+    "type": "text",
+    "current": "How Can I Respond to a Request for",
+    "proposed": "respond_dv_restraining_order_obey_firearms",
+    "rationale": "above box: \"respond-to-DV-restraining-order/obey-firearms-orders/\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p10_0190",
+    "page": 10,
+    "rect": [
+      474.48,
+      81.96,
+      576.24,
+      98.64
+    ],
+    "type": "text",
+    "current": "DV120INFO Page 3 of 4",
+    "proposed": "respond_dv_restraining_order_obey_firearms_2",
+    "rationale": "above box: \"respond-to-DV-restraining-order/obey-firearms-orders/\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p11_0191",
+    "page": 11,
+    "rect": [
+      204.12,
+      87.96,
+      469.92,
+      123.96
+    ],
+    "type": "text",
+    "current": "How Can I Respond to a Request for_2",
+    "proposed": "i_respond_request",
+    "rationale": "acrobat name: \"How Can I Respond to a Request for\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p11_0192",
+    "page": 11,
+    "rect": [
+      475.08,
+      87.96,
+      576.84,
+      123.96
+    ],
+    "type": "text",
+    "current": "DV120INFO Page 4 of 4",
+    "proposed": "dv120info_4_4",
+    "rationale": "acrobat name: \"DV120INFO Page 4 of 4\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0193",
+    "page": 12,
+    "rect": [
+      397.32,
+      612.36,
+      574.44,
+      747.6
+    ],
+    "type": "text",
+    "current": "Clerk stamps date here when form is filed_3",
+    "proposed": "copy_dv_100_request",
+    "rationale": "left of box: \"a copy of the form (DV-100, Request for\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0194",
+    "page": 12,
+    "rect": [
+      397.32,
+      516.36,
+      574.44,
+      586.92
+    ],
+    "type": "text",
+    "current": "Superior Court of California County of_3",
+    "proposed": "q5_fill",
+    "rationale": "above box: \"Fill\" | section 5",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0195",
+    "page": 12,
+    "rect": [
+      62.76,
+      537.12,
+      388.92,
+      551.64
+    ],
+    "type": "text",
+    "current": "See form DV100 item",
+    "proposed": "q1_see",
+    "rationale": "above box: \"(See\" | section 1",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0196",
+    "page": 12,
+    "rect": [
+      134.76,
+      500.28,
+      390.0,
+      514.8
+    ],
+    "type": "text",
+    "current": "Your Name",
+    "proposed": "q1_2_your_name",
+    "rationale": "left of box: \"2 Your Name:\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0197",
+    "page": 12,
+    "rect": [
+      396.96,
+      464.04,
+      574.8,
+      489.6
+    ],
+    "type": "text",
+    "current": "Case Number_3",
+    "proposed": "q2_receive_court_papers",
+    "rationale": "left of box: \"can receive court papers\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0198",
+    "page": 12,
+    "rect": [
+      105.12,
+      385.8,
+      390.84,
+      400.32
+    ],
+    "type": "text",
+    "current": "Address_5",
+    "proposed": "q2_address",
+    "rationale": "left of box: \"Address:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0199",
+    "page": 12,
+    "rect": [
+      88.68,
+      370.68,
+      214.08,
+      385.2
+    ],
+    "type": "text",
+    "current": "City_8",
+    "proposed": "q2_city",
+    "rationale": "left of box: \"City:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0200",
+    "page": 12,
+    "rect": [
+      250.68,
+      370.68,
+      293.16,
+      385.2
+    ],
+    "type": "text",
+    "current": "State_8",
+    "proposed": "q2_state",
+    "rationale": "left of box: \"State:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0201",
+    "page": 12,
+    "rect": [
+      324.72,
+      370.68,
+      390.72,
+      385.2
+    ],
+    "type": "text",
+    "current": "Zip_8",
+    "proposed": "q2_zip",
+    "rationale": "left of box: \"Zip:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0202",
+    "page": 12,
+    "rect": [
+      138.24,
+      291.84,
+      276.48,
+      306.36
+    ],
+    "type": "text",
+    "current": "Email Address",
+    "proposed": "q2_email_address",
+    "rationale": "left of box: \"Email Address:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0203",
+    "page": 12,
+    "rect": [
+      337.8,
+      291.84,
+      436.56,
+      306.36
+    ],
+    "type": "text",
+    "current": "Telephone_3",
+    "proposed": "q2_telephone",
+    "rationale": "left of box: \"Telephone:\" | section 2",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0204",
+    "page": 12,
+    "rect": [
+      466.44,
+      291.84,
+      565.92,
+      306.36
+    ],
+    "type": "text",
+    "current": "Fax",
+    "proposed": "q1_fax",
+    "rationale": "left of box: \"Fax:\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0205",
+    "page": 12,
+    "rect": [
+      95.76,
+      245.64,
+      279.84,
+      260.16
+    ],
+    "type": "text",
+    "current": "Name_4",
+    "proposed": "name",
+    "rationale": "left of box: \"Name:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0206",
+    "page": 12,
+    "rect": [
+      353.88,
+      245.64,
+      430.2,
+      260.16
+    ],
+    "type": "text",
+    "current": "State Bar No",
+    "proposed": "state_bar_no",
+    "rationale": "left of box: \"State Bar No.:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p12_0207",
+    "page": 12,
+    "rect": [
+      120.72,
+      230.52,
+      428.88,
+      245.04
+    ],
+    "type": "text",
+    "current": "Firm Name",
+    "proposed": "firm_name",
+    "rationale": "left of box: \"Firm Name:\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0208",
+    "page": 13,
+    "rect": [
+      399.72,
+      729.24,
+      575.4,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_4",
+    "proposed": "case_number",
+    "rationale": "acrobat name: \"Case Number\"",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0209",
+    "page": 13,
+    "rect": [
+      62.52,
+      582.72,
+      573.96,
+      596.88
+    ],
+    "type": "text",
+    "current": "space below to give the correct information",
+    "proposed": "q4_space",
+    "rationale": "above box: \"space\" | section 4",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0210",
+    "page": 13,
+    "rect": [
+      63.12,
+      509.4,
+      72.6,
+      518.88
+    ],
+    "type": "radio",
+    "current": "In item",
+    "proposed": "q5_yes",
+    "rationale": "right of box: \"Yes\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0211",
+    "page": 13,
+    "rect": [
+      103.56,
+      509.4,
+      113.04,
+      518.88
+    ],
+    "type": "radio",
+    "current": "In item",
+    "proposed": "q5_no_no_what",
+    "rationale": "right of box: \"No If no, what is\" | section 5",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0212",
+    "page": 13,
+    "rect": [
+      63.0,
+      490.8,
+      568.2,
+      504.96
+    ],
+    "type": "text",
+    "current": "If no what is your relationship with the person in",
+    "proposed": "q5_if",
+    "rationale": "above box: \"If\" | section 5",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0213",
+    "page": 13,
+    "rect": [
+      60.96,
+      403.08,
+      573.12,
+      417.24
+    ],
+    "type": "text",
+    "current": "or missing use the space below to give information 1",
+    "proposed": "q6_the",
+    "rationale": "above box: \"The\" | section 6",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0214",
+    "page": 13,
+    "rect": [
+      60.96,
+      390.36,
+      574.32,
+      402.48
+    ],
+    "type": "text",
+    "current": "or missing use the space below to give information 2",
+    "proposed": "q6_or",
+    "rationale": "above box: \"or\" | section 6",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0215",
+    "page": 13,
+    "rect": [
+      60.96,
+      375.84,
+      70.44,
+      385.32
+    ],
+    "type": "checkbox",
+    "current": "Check here if you are including a copy of restraining order or court order that you want the judge to know about",
+    "proposed": "q6_here_you",
+    "rationale": "right of box: \"Check here if you\" | section 6",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0216",
+    "page": 13,
+    "rect": [
+      62.88,
+      329.52,
+      72.36,
+      339.0
+    ],
+    "type": "checkbox",
+    "current": "Other Protected People",
+    "proposed": "q6_other_protected",
+    "rationale": "right of box: \"Other Protected\" | section 6",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0217",
+    "page": 13,
+    "rect": [
+      76.92,
+      282.12,
+      86.4,
+      291.6
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested",
+    "proposed": "q7_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 7",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0218",
+    "page": 13,
+    "rect": [
+      76.92,
+      266.52,
+      86.4,
+      276.0
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested",
+    "proposed": "q7_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 7",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0219",
+    "page": 13,
+    "rect": [
+      431.76,
+      246.84,
+      575.4,
+      261.0
+    ],
+    "type": "text",
+    "current": "undefined_4",
+    "proposed": "undefined_4",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p13_0220",
+    "page": 13,
+    "rect": [
+      75.24,
+      230.64,
+      574.32,
+      244.8
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to",
+    "proposed": "q7_explain",
+    "rationale": "above box: \"Explain\" | section 7",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0221",
+    "page": 13,
+    "rect": [
+      63.48,
+      185.16,
+      72.96,
+      194.64
+    ],
+    "type": "checkbox",
+    "current": "Order to Not Abuse see item",
+    "proposed": "q7_order_not",
+    "rationale": "right of box: \"Order to Not\" | section 7",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0222",
+    "page": 13,
+    "rect": [
+      76.92,
+      169.2,
+      86.4,
+      178.68
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_2",
+    "proposed": "q8_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 8",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0223",
+    "page": 13,
+    "rect": [
+      76.92,
+      153.6,
+      86.4,
+      163.08
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_2",
+    "proposed": "q8_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 8",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p13_0224",
+    "page": 13,
+    "rect": [
+      431.28,
+      134.04,
+      575.4,
+      148.2
+    ],
+    "type": "text",
+    "current": "undefined_5",
+    "proposed": "undefined_5",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p13_0225",
+    "page": 13,
+    "rect": [
+      75.24,
+      117.84,
+      574.32,
+      132.0
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_2",
+    "proposed": "q8_explain",
+    "rationale": "above box: \"Explain\" | section 8",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0226",
+    "page": 14,
+    "rect": [
+      400.2,
+      729.24,
+      575.88,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_5",
+    "proposed": "case_number_2",
+    "rationale": "acrobat name: \"Case Number\" [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0227",
+    "page": 14,
+    "rect": [
+      61.56,
+      697.2,
+      71.04,
+      706.68
+    ],
+    "type": "checkbox",
+    "current": "NoContact Order see item",
+    "proposed": "no_contact_order",
+    "rationale": "right of box: \"No-Contact Order\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0228",
+    "page": 14,
+    "rect": [
+      75.0,
+      681.24,
+      84.48,
+      690.72
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_3",
+    "proposed": "q9_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 9",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0229",
+    "page": 14,
+    "rect": [
+      75.0,
+      665.64,
+      84.48,
+      675.12
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_3",
+    "proposed": "q9_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 9",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0230",
+    "page": 14,
+    "rect": [
+      429.36,
+      645.96,
+      573.48,
+      661.32
+    ],
+    "type": "text",
+    "current": "undefined_6",
+    "proposed": "undefined_6",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p14_0231",
+    "page": 14,
+    "rect": [
+      73.32,
+      630.0,
+      573.0,
+      645.36
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_3",
+    "proposed": "q9_explain",
+    "rationale": "above box: \"Explain\" | section 9",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0232",
+    "page": 14,
+    "rect": [
+      63.0,
+      581.64,
+      72.48,
+      591.12
+    ],
+    "type": "checkbox",
+    "current": "StayAway Order see item",
+    "proposed": "q9_stay_away_order",
+    "rationale": "right of box: \"Stay-Away Order\" | section 9",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0233",
+    "page": 14,
+    "rect": [
+      77.04,
+      565.56,
+      86.52,
+      575.04
+    ],
+    "type": "checkbox",
+    "current": "I agree to the orders requested",
+    "proposed": "q10_i_agree_orders",
+    "rationale": "right of box: \"I agree to the orders\" | section 10",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0234",
+    "page": 14,
+    "rect": [
+      77.04,
+      549.96,
+      86.52,
+      559.44
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the orders requested",
+    "proposed": "q10_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 10",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0235",
+    "page": 14,
+    "rect": [
+      430.8,
+      530.4,
+      575.52,
+      545.76
+    ],
+    "type": "text",
+    "current": "undefined_7",
+    "proposed": "undefined_7",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p14_0236",
+    "page": 14,
+    "rect": [
+      75.36,
+      514.44,
+      575.04,
+      529.8
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_4",
+    "proposed": "q10_explain",
+    "rationale": "above box: \"Explain\" | section 10",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0237",
+    "page": 14,
+    "rect": [
+      63.72,
+      463.8,
+      73.2,
+      473.28
+    ],
+    "type": "checkbox",
+    "current": "Order to Move Out see item",
+    "proposed": "q10_order_move",
+    "rationale": "right of box: \"Order to Move\" | section 10",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0238",
+    "page": 14,
+    "rect": [
+      76.92,
+      447.24,
+      86.4,
+      456.72
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_4",
+    "proposed": "q11_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 11",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0239",
+    "page": 14,
+    "rect": [
+      76.92,
+      431.64,
+      86.4,
+      441.12
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_4",
+    "proposed": "q11_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 11",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0240",
+    "page": 14,
+    "rect": [
+      431.76,
+      411.96,
+      575.4,
+      427.32
+    ],
+    "type": "text",
+    "current": "undefined_8",
+    "proposed": "undefined_8",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p14_0241",
+    "page": 14,
+    "rect": [
+      75.24,
+      396.0,
+      575.04,
+      411.36
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_5",
+    "proposed": "q11_explain",
+    "rationale": "above box: \"Explain\" | section 11",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0242",
+    "page": 14,
+    "rect": [
+      63.96,
+      347.16,
+      73.44,
+      356.64
+    ],
+    "type": "checkbox",
+    "current": "Other Orders see item",
+    "proposed": "q11_other_orders",
+    "rationale": "right of box: \"Other Orders\" | section 11",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0243",
+    "page": 14,
+    "rect": [
+      77.88,
+      329.88,
+      87.36,
+      339.36
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_5",
+    "proposed": "q12_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 12",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0244",
+    "page": 14,
+    "rect": [
+      77.88,
+      314.28,
+      87.36,
+      323.76
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_5",
+    "proposed": "q12_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 12",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0245",
+    "page": 14,
+    "rect": [
+      431.76,
+      294.6,
+      576.36,
+      309.96
+    ],
+    "type": "text",
+    "current": "undefined_9",
+    "proposed": "undefined_9",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p14_0246",
+    "page": 14,
+    "rect": [
+      76.2,
+      278.16,
+      575.52,
+      293.52
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_6",
+    "proposed": "q12_explain",
+    "rationale": "above box: \"Explain\" | section 12",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0247",
+    "page": 14,
+    "rect": [
+      63.96,
+      227.28,
+      73.44,
+      236.76
+    ],
+    "type": "checkbox",
+    "current": "Child Custody and Visitation see item",
+    "proposed": "q12_child_custody",
+    "rationale": "right of box: \"Child Custody\" | section 12",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0248",
+    "page": 14,
+    "rect": [
+      77.88,
+      207.12,
+      87.36,
+      216.6
+    ],
+    "type": "checkbox",
+    "current": "I am not the parent of the children listed in form DV105 Request for Child Custody and Visitation Orders",
+    "proposed": "q13_i_am_not_parent",
+    "rationale": "right of box: \"I am not the parent\" | section 13",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0249",
+    "page": 14,
+    "rect": [
+      77.88,
+      190.08,
+      87.36,
+      199.56
+    ],
+    "type": "checkbox",
+    "current": "I am the parent of the children listed in form DV105 and check one",
+    "proposed": "q13_i_am_parent",
+    "rationale": "right of box: \"I am the parent of\" | section 13",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0250",
+    "page": 14,
+    "rect": [
+      93.6,
+      169.68,
+      103.08,
+      179.16
+    ],
+    "type": "checkbox",
+    "current": "I agree to the orders requested_2",
+    "proposed": "q13_i_agree_orders",
+    "rationale": "right of box: \"I agree to the orders\" | section 13",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p14_0251",
+    "page": 14,
+    "rect": [
+      93.6,
+      151.2,
+      103.08,
+      160.68
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the orders requested Complete form DV125 Response to Request for Child",
+    "proposed": "q13_i_not_agree",
+    "rationale": "right of box: \"I do not agree to\" | section 13",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0252",
+    "page": 15,
+    "rect": [
+      401.16,
+      729.24,
+      576.12,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_6",
+    "proposed": "case_number_3",
+    "rationale": "acrobat name: \"Case Number\" [+_3 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0253",
+    "page": 15,
+    "rect": [
+      62.88,
+      701.64,
+      72.36,
+      711.12
+    ],
+    "type": "checkbox",
+    "current": "Protect Animals see item",
+    "proposed": "protect_animals",
+    "rationale": "right of box: \"Protect Animals\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0254",
+    "page": 15,
+    "rect": [
+      76.44,
+      684.84,
+      85.92,
+      694.32
+    ],
+    "type": "checkbox",
+    "current": "I agree to the orders requested_3",
+    "proposed": "q14_i_agree_orders",
+    "rationale": "right of box: \"I agree to the orders\" | section 14",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0255",
+    "page": 15,
+    "rect": [
+      76.44,
+      669.24,
+      85.92,
+      678.72
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the orders requested_2",
+    "proposed": "q14_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 14",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0256",
+    "page": 15,
+    "rect": [
+      430.32,
+      649.56,
+      574.92,
+      665.28
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1",
+    "proposed": "q14_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 14",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0257",
+    "page": 15,
+    "rect": [
+      74.76,
+      633.12,
+      575.4,
+      648.84
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2",
+    "proposed": "q14_explain",
+    "rationale": "above box: \"Explain\" | section 14",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0258",
+    "page": 15,
+    "rect": [
+      63.36,
+      593.16,
+      72.84,
+      602.64
+    ],
+    "type": "checkbox",
+    "current": "Control of Property see item",
+    "proposed": "q14_control_property",
+    "rationale": "right of box: \"Control of Property\" | section 14",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0259",
+    "page": 15,
+    "rect": [
+      76.92,
+      576.72,
+      86.4,
+      586.2
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_6",
+    "proposed": "q15_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 15",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0260",
+    "page": 15,
+    "rect": [
+      76.92,
+      561.12,
+      86.4,
+      570.6
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_6",
+    "proposed": "q15_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 15",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0261",
+    "page": 15,
+    "rect": [
+      431.76,
+      541.44,
+      575.4,
+      557.16
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_2",
+    "proposed": "q15_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 15",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0262",
+    "page": 15,
+    "rect": [
+      75.24,
+      525.12,
+      574.92,
+      540.84
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_2",
+    "proposed": "q15_explain",
+    "rationale": "above box: \"Explain\" | section 15",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0263",
+    "page": 15,
+    "rect": [
+      63.36,
+      483.0,
+      72.84,
+      492.48
+    ],
+    "type": "checkbox",
+    "current": "Health and Other Insurance see item",
+    "proposed": "q15_health_other",
+    "rationale": "right of box: \"Health and Other\" | section 15",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0264",
+    "page": 15,
+    "rect": [
+      76.92,
+      466.32,
+      86.4,
+      475.8
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_7",
+    "proposed": "q16_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 16",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0265",
+    "page": 15,
+    "rect": [
+      76.92,
+      450.72,
+      86.4,
+      460.2
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_7",
+    "proposed": "q16_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 16",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0266",
+    "page": 15,
+    "rect": [
+      431.16,
+      431.16,
+      575.4,
+      446.88
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_3",
+    "proposed": "q16_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 16",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0267",
+    "page": 15,
+    "rect": [
+      75.24,
+      414.96,
+      574.92,
+      430.56
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_3",
+    "proposed": "q16_explain",
+    "rationale": "above box: \"Explain\" | section 16",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0268",
+    "page": 15,
+    "rect": [
+      63.72,
+      374.04,
+      73.2,
+      383.52
+    ],
+    "type": "checkbox",
+    "current": "Record Communications see item",
+    "proposed": "q16_record_communications",
+    "rationale": "right of box: \"Record Communications\" | section 16",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0269",
+    "page": 15,
+    "rect": [
+      77.76,
+      356.76,
+      87.24,
+      366.24
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_8",
+    "proposed": "q17_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 17",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0270",
+    "page": 15,
+    "rect": [
+      78.0,
+      340.08,
+      87.48,
+      349.56
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_8",
+    "proposed": "q17_i_not_agree",
+    "rationale": "right of box: \"I do not agree to\" | section 17",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0271",
+    "page": 15,
+    "rect": [
+      64.8,
+      298.56,
+      74.28,
+      308.04
+    ],
+    "type": "checkbox",
+    "current": "Property Restraint see item",
+    "proposed": "q17_property_restraint",
+    "rationale": "right of box: \"Property Restraint\" | section 17",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0272",
+    "page": 15,
+    "rect": [
+      77.76,
+      281.64,
+      87.24,
+      291.12
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_9",
+    "proposed": "q18_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 18",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0273",
+    "page": 15,
+    "rect": [
+      77.76,
+      266.04,
+      87.24,
+      275.52
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_9",
+    "proposed": "q18_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 18",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0274",
+    "page": 15,
+    "rect": [
+      433.08,
+      246.36,
+      576.24,
+      262.08
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_4",
+    "proposed": "q18_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 18",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0275",
+    "page": 15,
+    "rect": [
+      76.2,
+      230.04,
+      575.88,
+      245.76
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_4",
+    "proposed": "q18_explain",
+    "rationale": "above box: \"Explain\" | section 18",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0276",
+    "page": 15,
+    "rect": [
+      64.68,
+      186.96,
+      74.16,
+      196.44
+    ],
+    "type": "checkbox",
+    "current": "Pay Debt Bills Owed for Property see item",
+    "proposed": "q18_pay_debt_bills",
+    "rationale": "right of box: \"Pay Debt (Bills)\" | section 18",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0277",
+    "page": 15,
+    "rect": [
+      77.88,
+      169.92,
+      87.36,
+      179.4
+    ],
+    "type": "checkbox",
+    "current": "I agree to the orders requested_4",
+    "proposed": "q19_i_agree_orders",
+    "rationale": "right of box: \"I agree to the orders\" | section 19",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0278",
+    "page": 15,
+    "rect": [
+      77.88,
+      154.32,
+      87.36,
+      163.8
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the orders requested_3",
+    "proposed": "q19_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 19",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0279",
+    "page": 15,
+    "rect": [
+      430.68,
+      134.64,
+      576.36,
+      150.36
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_5",
+    "proposed": "q19_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 19",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p15_0280",
+    "page": 15,
+    "rect": [
+      75.96,
+      118.68,
+      576.36,
+      134.04
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_5",
+    "proposed": "q19_explain",
+    "rationale": "above box: \"Explain\" | section 19",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0281",
+    "page": 16,
+    "rect": [
+      399.6,
+      729.24,
+      575.28,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_7",
+    "proposed": "case_number_4",
+    "rationale": "acrobat name: \"Case Number\" [+_4 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0282",
+    "page": 16,
+    "rect": [
+      63.72,
+      697.92,
+      73.2,
+      707.4
+    ],
+    "type": "checkbox",
+    "current": "Pay Expenses Caused by the Abuse see item",
+    "proposed": "pay_expenses",
+    "rationale": "right of box: \"Pay Expenses\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0283",
+    "page": 16,
+    "rect": [
+      76.2,
+      681.36,
+      85.68,
+      690.84
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_10",
+    "proposed": "q20_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 20",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0284",
+    "page": 16,
+    "rect": [
+      76.2,
+      665.76,
+      85.68,
+      675.24
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_10",
+    "proposed": "q20_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 20",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0285",
+    "page": 16,
+    "rect": [
+      430.68,
+      646.08,
+      574.32,
+      661.8
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_6",
+    "proposed": "q20_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 20",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0286",
+    "page": 16,
+    "rect": [
+      74.16,
+      630.0,
+      573.72,
+      645.48
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_6",
+    "proposed": "q20_explain",
+    "rationale": "above box: \"Explain\" | section 20",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0287",
+    "page": 16,
+    "rect": [
+      62.16,
+      582.0,
+      71.64,
+      591.48
+    ],
+    "type": "checkbox",
+    "current": "Child Support see item",
+    "proposed": "q20_child_support",
+    "rationale": "right of box: \"Child Support\" | section 20",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0288",
+    "page": 16,
+    "rect": [
+      76.2,
+      563.04,
+      85.68,
+      572.52
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_11",
+    "proposed": "q21_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 21",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0289",
+    "page": 16,
+    "rect": [
+      76.2,
+      548.52,
+      85.68,
+      558.0
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_11",
+    "proposed": "q21_i_not_agree",
+    "rationale": "right of box: \"I do not agree to\" | section 21",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0290",
+    "page": 16,
+    "rect": [
+      76.2,
+      534.96,
+      85.68,
+      544.44
+    ],
+    "type": "checkbox",
+    "current": "I agree to pay guideline child support Learn more about guideline child support at",
+    "proposed": "q21_i_agree_pay_guideline",
+    "rationale": "right of box: \"I agree to pay guideline\" | section 21",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0291",
+    "page": 16,
+    "rect": [
+      61.8,
+      470.4,
+      71.28,
+      479.88
+    ],
+    "type": "checkbox",
+    "current": "Spousal Support see item",
+    "proposed": "q21_spousal_support",
+    "rationale": "right of box: \"Spousal Support\" | section 21",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0292",
+    "page": 16,
+    "rect": [
+      76.2,
+      453.48,
+      85.68,
+      462.96
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_12",
+    "proposed": "q22_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 22",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0293",
+    "page": 16,
+    "rect": [
+      76.2,
+      437.88,
+      85.68,
+      447.36
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_12",
+    "proposed": "q22_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 22",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0294",
+    "page": 16,
+    "rect": [
+      427.2,
+      418.2,
+      573.36,
+      433.92
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_7",
+    "proposed": "q22_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 22",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0295",
+    "page": 16,
+    "rect": [
+      73.2,
+      401.4,
+      573.36,
+      417.12
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_7",
+    "proposed": "q22_explain",
+    "rationale": "above box: \"Explain\" | section 22",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0296",
+    "page": 16,
+    "rect": [
+      62.76,
+      355.68,
+      72.24,
+      365.16
+    ],
+    "type": "checkbox",
+    "current": "Lawyers Fees and Costs",
+    "proposed": "q22_lawyer_s_fees",
+    "rationale": "right of box: \"Lawyer's Fees\" | section 22",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0297",
+    "page": 16,
+    "rect": [
+      62.64,
+      222.24,
+      72.12,
+      231.72
+    ],
+    "type": "checkbox",
+    "current": "Check here if you want the person in",
+    "proposed": "q23_here_you",
+    "rationale": "right of box: \"Check here if you\" | section 23",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0298",
+    "page": 16,
+    "rect": [
+      64.08,
+      174.0,
+      73.56,
+      183.48
+    ],
+    "type": "checkbox",
+    "current": "Batterer Intervention Program see item",
+    "proposed": "q23_batterer_intervention",
+    "rationale": "right of box: \"Batterer Intervention\" | section 23",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0299",
+    "page": 16,
+    "rect": [
+      77.16,
+      157.68,
+      86.64,
+      167.16
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_13",
+    "proposed": "q24_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 24",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0300",
+    "page": 16,
+    "rect": [
+      77.16,
+      141.96,
+      86.64,
+      151.44
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_13",
+    "proposed": "q24_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 24",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0301",
+    "page": 16,
+    "rect": [
+      432.0,
+      122.4,
+      574.56,
+      138.12
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_8",
+    "proposed": "q24_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 24",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p16_0302",
+    "page": 16,
+    "rect": [
+      75.0,
+      106.08,
+      574.56,
+      121.8
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_8",
+    "proposed": "q24_explain",
+    "rationale": "above box: \"Explain\" | section 24",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0303",
+    "page": 17,
+    "rect": [
+      401.28,
+      729.24,
+      576.96,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_8",
+    "proposed": "case_number_5",
+    "rationale": "acrobat name: \"Case Number\" [+_5 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0304",
+    "page": 17,
+    "rect": [
+      63.12,
+      701.28,
+      72.6,
+      710.76
+    ],
+    "type": "checkbox",
+    "current": "Transfer Wireless Phone Account see item",
+    "proposed": "transfer_wireless",
+    "rationale": "right of box: \"Transfer Wireless\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0305",
+    "page": 17,
+    "rect": [
+      75.72,
+      684.96,
+      85.2,
+      694.44
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order requested_14",
+    "proposed": "q25_i_agree_order",
+    "rationale": "right of box: \"I agree to the order\" | section 25",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0306",
+    "page": 17,
+    "rect": [
+      75.72,
+      669.36,
+      85.2,
+      678.84
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order requested_14",
+    "proposed": "q25_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 25",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0307",
+    "page": 17,
+    "rect": [
+      431.52,
+      649.68,
+      574.2,
+      664.56
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 1_9",
+    "proposed": "q25_different_order_you_agree",
+    "rationale": "left of box: \"describe a different order that you would agree to:\" | section 25",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0308",
+    "page": 17,
+    "rect": [
+      75.0,
+      634.2,
+      573.6,
+      649.08
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to 2_9",
+    "proposed": "q25_explain",
+    "rationale": "above box: \"Explain\" | section 25",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0309",
+    "page": 17,
+    "rect": [
+      76.56,
+      480.24,
+      86.04,
+      489.72
+    ],
+    "type": "checkbox",
+    "current": "I do not own or have any prohibited items firearms guns prohibited firearm parts or ammunition",
+    "proposed": "q26_i_not_own_have",
+    "rationale": "right of box: \"I do not own or have\" | section 26",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0310",
+    "page": 17,
+    "rect": [
+      76.56,
+      458.16,
+      86.04,
+      467.64
+    ],
+    "type": "checkbox",
+    "current": "I have turned in all prohibited items that I have or own to law enforcement or soldstored them with a",
+    "proposed": "q26_i_have_turned",
+    "rationale": "right of box: \"I have turned in all\" | section 26",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0312",
+    "page": 17,
+    "rect": [
+      93.12,
+      414.72,
+      102.6,
+      424.2
+    ],
+    "type": "checkbox",
+    "current": "is attached",
+    "proposed": "q26_is_attached",
+    "rationale": "right of box: \"is attached\" | section 26",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0313",
+    "page": 17,
+    "rect": [
+      93.12,
+      401.4,
+      102.6,
+      410.88
+    ],
+    "type": "checkbox",
+    "current": "has already been filed with the court",
+    "proposed": "q26_has_already",
+    "rationale": "right of box: \"has already been\" | section 26",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0311",
+    "page": 17,
+    "rect": [
+      75.0,
+      373.8,
+      84.48,
+      383.28
+    ],
+    "type": "checkbox",
+    "current": "I ask for an exception to carry a firearm or ammunition for work Complete 13 below",
+    "proposed": "i_ask_exception",
+    "rationale": "right of box: \"I ask for an exception\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0314",
+    "page": 17,
+    "rect": [
+      109.56,
+      340.2,
+      119.04,
+      349.68
+    ],
+    "type": "radio",
+    "current": "1 Are you a sworn peace officer",
+    "proposed": "q48_no",
+    "rationale": "right of box: \"No\" | section 48",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0315",
+    "page": 17,
+    "rect": [
+      109.8,
+      326.88,
+      119.28,
+      336.36
+    ],
+    "type": "radio",
+    "current": "1 Are you a sworn peace officer",
+    "proposed": "yes_3",
+    "rationale": "right of box: \"Yes\" [+_3 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0316",
+    "page": 17,
+    "rect": [
+      109.56,
+      285.72,
+      119.04,
+      295.2
+    ],
+    "type": "checkbox",
+    "current": "No_8",
+    "proposed": "no_4",
+    "rationale": "right of box: \"No\" [+_4 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0319",
+    "page": 17,
+    "rect": [
+      189.12,
+      269.04,
+      570.48,
+      283.92
+    ],
+    "type": "text",
+    "current": "undefined_10",
+    "proposed": "undefined_10",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p17_0317",
+    "page": 17,
+    "rect": [
+      109.56,
+      271.8,
+      119.04,
+      281.28
+    ],
+    "type": "checkbox",
+    "current": "Yes explain",
+    "proposed": "yes_4",
+    "rationale": "right of box: \"Yes (explain):\" [+_4 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0320",
+    "page": 17,
+    "rect": [
+      228.0,
+      253.56,
+      570.84,
+      268.44
+    ],
+    "type": "text",
+    "current": "undefined_11",
+    "proposed": "undefined_11",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p17_0318",
+    "page": 17,
+    "rect": [
+      109.56,
+      256.92,
+      119.04,
+      266.4
+    ],
+    "type": "checkbox",
+    "current": "I dont know explain",
+    "proposed": "i_don_t_know_2",
+    "rationale": "right of box: \"I don\u2019t know (explain):\" [+_2 for uniqueness]",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0321",
+    "page": 17,
+    "rect": [
+      428.04,
+      228.24,
+      569.4,
+      243.12
+    ],
+    "type": "text",
+    "current": "3 Explain what your job is and why you need a firearm or ammunition",
+    "proposed": "why_you_need_firearm_ammunition",
+    "rationale": "left of box: \"and why you need a firearm or ammunition):\"",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0322",
+    "page": 17,
+    "rect": [
+      109.56,
+      215.04,
+      569.28,
+      227.64
+    ],
+    "type": "text",
+    "current": "1_4",
+    "proposed": "explain",
+    "rationale": "above box: \"(Explain\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p17_0323",
+    "page": 17,
+    "rect": [
+      109.56,
+      198.36,
+      570.48,
+      213.24
+    ],
+    "type": "text",
+    "current": "2_3",
+    "proposed": "explain_2",
+    "rationale": "above box: \"(Explain\" [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0324",
+    "page": 18,
+    "rect": [
+      401.4,
+      729.24,
+      577.08,
+      747.6
+    ],
+    "type": "text",
+    "current": "Case Number_9",
+    "proposed": "case_number_6",
+    "rationale": "acrobat name: \"Case Number\" [+_6 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0325",
+    "page": 18,
+    "rect": [
+      77.04,
+      625.32,
+      86.52,
+      634.8
+    ],
+    "type": "checkbox",
+    "current": "I do not own or have any body armor",
+    "proposed": "q27_i_not_own_have",
+    "rationale": "right of box: \"I do not own or have\" | section 27",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0326",
+    "page": 18,
+    "rect": [
+      77.04,
+      606.0,
+      86.52,
+      615.48
+    ],
+    "type": "checkbox",
+    "current": "I have relinquished all body armor that I have in my possession",
+    "proposed": "q27_i_have_relinquished",
+    "rationale": "right of box: \"I have relinquished\" | section 27",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0327",
+    "page": 18,
+    "rect": [
+      77.04,
+      584.88,
+      86.52,
+      594.36
+    ],
+    "type": "checkbox",
+    "current": "I was granted an exception or will ask for an exception to have body armor Note this exception is granted",
+    "proposed": "q27_i_granted_exception",
+    "rationale": "right of box: \"I was granted an exception,\" | section 27",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0328",
+    "page": 18,
+    "rect": [
+      77.52,
+      473.4,
+      87.0,
+      482.88
+    ],
+    "type": "checkbox",
+    "current": "I agree to the order",
+    "proposed": "q28_i_agree_order",
+    "rationale": "right of box: \"I agree to the order.\" | section 28",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0329",
+    "page": 18,
+    "rect": [
+      77.4,
+      457.8,
+      86.88,
+      467.28
+    ],
+    "type": "checkbox",
+    "current": "I do not agree to the order",
+    "proposed": "q28_i_not_agree",
+    "rationale": "right of box: \"I do not agree to the\" | section 28",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0330",
+    "page": 18,
+    "rect": [
+      431.28,
+      438.12,
+      576.36,
+      451.44
+    ],
+    "type": "text",
+    "current": "undefined_12",
+    "proposed": "undefined_12",
+    "rationale": "already clean \u2014 left alone",
+    "confidence": 1.0,
+    "status": "skip"
+  },
+  {
+    "id": "p18_0331",
+    "page": 18,
+    "rect": [
+      76.2,
+      422.16,
+      576.36,
+      435.48
+    ],
+    "type": "text",
+    "current": "Explain why you disagree or describe a different order that you would agree to_7",
+    "proposed": "q28_explain",
+    "rationale": "above box: \"Explain\" | section 28",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0332",
+    "page": 18,
+    "rect": [
+      64.32,
+      358.8,
+      73.8,
+      368.28
+    ],
+    "type": "checkbox",
+    "current": "Additional Reasons I Do Not Agree with the Request optional",
+    "proposed": "q28_additional_reasons",
+    "rationale": "right of box: \"Additional Reasons\" | section 28",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0333",
+    "page": 18,
+    "rect": [
+      65.04,
+      321.0,
+      573.72,
+      334.32
+    ],
+    "type": "text",
+    "current": "Explain why you do not agree to any of the orders requested by the person in 1",
+    "proposed": "q29_explain",
+    "rationale": "above box: \"Explain\" | section 29",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0334",
+    "page": 18,
+    "rect": [
+      65.04,
+      304.92,
+      573.72,
+      318.24
+    ],
+    "type": "text",
+    "current": "Explain why you do not agree to any of the orders requested by the person in 2",
+    "proposed": "q29_explain_2",
+    "rationale": "above box: \"Explain\" | section 29 [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0335",
+    "page": 18,
+    "rect": [
+      65.04,
+      291.0,
+      573.72,
+      304.32
+    ],
+    "type": "text",
+    "current": "1_5",
+    "proposed": "q29_1",
+    "rationale": "acrobat name: \"1\" | section 29",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0336",
+    "page": 18,
+    "rect": [
+      65.04,
+      276.12,
+      573.72,
+      289.44
+    ],
+    "type": "text",
+    "current": "2_4",
+    "proposed": "q29_2",
+    "rationale": "acrobat name: \"2\" | section 29",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0337",
+    "page": 18,
+    "rect": [
+      65.04,
+      260.88,
+      573.72,
+      274.2
+    ],
+    "type": "text",
+    "current": "3_2",
+    "proposed": "q29_3",
+    "rationale": "acrobat name: \"3\" | section 29",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0338",
+    "page": 18,
+    "rect": [
+      65.04,
+      245.76,
+      573.72,
+      259.08
+    ],
+    "type": "text",
+    "current": "4_2",
+    "proposed": "q29_4",
+    "rationale": "acrobat name: \"4\" | section 29",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0339",
+    "page": 18,
+    "rect": [
+      65.04,
+      231.96,
+      573.72,
+      245.16
+    ],
+    "type": "text",
+    "current": "1_6",
+    "proposed": "q29_1_2",
+    "rationale": "acrobat name: \"1\" | section 29 [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0340",
+    "page": 18,
+    "rect": [
+      65.04,
+      217.44,
+      573.72,
+      230.76
+    ],
+    "type": "text",
+    "current": "2_5",
+    "proposed": "q29_2_2",
+    "rationale": "acrobat name: \"2\" | section 29 [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0341",
+    "page": 18,
+    "rect": [
+      65.04,
+      203.52,
+      573.72,
+      216.84
+    ],
+    "type": "text",
+    "current": "3_3",
+    "proposed": "q29_3_2",
+    "rationale": "acrobat name: \"3\" | section 29 [+_2 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p18_0342",
+    "page": 18,
+    "rect": [
+      65.4,
+      168.0,
+      74.88,
+      177.48
+    ],
+    "type": "checkbox",
+    "current": "Check here if you need more space Attach a sheet of paper and write DV120 Additional Reasons I Do Not",
+    "proposed": "q29_here_you",
+    "rationale": "right of box: \"Check here if you\" | section 29",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0343",
+    "page": 19,
+    "rect": [
+      399.6,
+      728.76,
+      575.28,
+      747.12
+    ],
+    "type": "text",
+    "current": "Case Number_10",
+    "proposed": "case_number_7",
+    "rationale": "acrobat name: \"Case Number\" [+_7 for uniqueness]",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0344",
+    "page": 19,
+    "rect": [
+      60.84,
+      697.2,
+      70.32,
+      706.68
+    ],
+    "type": "checkbox",
+    "current": "My OutofPocket Expenses",
+    "proposed": "my_out_pocket",
+    "rationale": "right of box: \"My Out-of-Pocket\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0345",
+    "page": 19,
+    "rect": [
+      88.92,
+      639.84,
+      193.32,
+      653.64
+    ],
+    "type": "text",
+    "current": "For",
+    "proposed": "q30_for",
+    "rationale": "left of box: \"For:\" | section 30",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0346",
+    "page": 19,
+    "rect": [
+      237.96,
+      639.84,
+      456.6,
+      653.64
+    ],
+    "type": "text",
+    "current": "Because",
+    "proposed": "q1_because",
+    "rationale": "left of box: \"Because:\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0347",
+    "page": 19,
+    "rect": [
+      510.72,
+      639.84,
+      570.96,
+      653.64
+    ],
+    "type": "text",
+    "current": "Amount",
+    "proposed": "q1_amount",
+    "rationale": "left of box: \"Amount: $\" | section 1",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0348",
+    "page": 19,
+    "rect": [
+      88.92,
+      625.44,
+      193.32,
+      639.24
+    ],
+    "type": "text",
+    "current": "For_2",
+    "proposed": "q30_for_2",
+    "rationale": "left of box: \"For:\" | section 30 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0349",
+    "page": 19,
+    "rect": [
+      237.96,
+      625.44,
+      456.6,
+      639.24
+    ],
+    "type": "text",
+    "current": "Because_2",
+    "proposed": "q1_because_2",
+    "rationale": "left of box: \"Because:\" | section 1 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0350",
+    "page": 19,
+    "rect": [
+      510.72,
+      625.32,
+      570.96,
+      639.12
+    ],
+    "type": "text",
+    "current": "Amount_2",
+    "proposed": "q1_amount_2",
+    "rationale": "left of box: \"Amount: $\" | section 1 [+_2 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0351",
+    "page": 19,
+    "rect": [
+      88.92,
+      611.52,
+      193.32,
+      624.84
+    ],
+    "type": "text",
+    "current": "For_3",
+    "proposed": "q30_for_3",
+    "rationale": "left of box: \"For:\" | section 30 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0352",
+    "page": 19,
+    "rect": [
+      237.96,
+      611.52,
+      456.6,
+      624.84
+    ],
+    "type": "text",
+    "current": "Because_3",
+    "proposed": "q1_because_3",
+    "rationale": "left of box: \"Because:\" | section 1 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0353",
+    "page": 19,
+    "rect": [
+      510.72,
+      611.52,
+      570.96,
+      624.72
+    ],
+    "type": "text",
+    "current": "Amount_3",
+    "proposed": "q1_amount_3",
+    "rationale": "left of box: \"Amount: $\" | section 1 [+_3 for uniqueness]",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0354",
+    "page": 19,
+    "rect": [
+      268.8,
+      548.04,
+      321.96,
+      561.84
+    ],
+    "type": "text",
+    "current": "Number of pages attached to this form if any",
+    "proposed": "q31_number_pages_any",
+    "rationale": "left of box: \"Number of pages attached to this form, if any:\" | section 31",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0355",
+    "page": 19,
+    "rect": [
+      88.68,
+      460.44,
+      197.28,
+      474.24
+    ],
+    "type": "text",
+    "current": "Date 1_3",
+    "proposed": "q32_date",
+    "rationale": "left of box: \"Date:\" | section 32",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0356",
+    "page": 19,
+    "rect": [
+      63.48,
+      444.24,
+      289.08,
+      458.04
+    ],
+    "type": "text",
+    "current": "Date 2_3",
+    "proposed": "q32_date_2",
+    "rationale": "above box: \"Date:\" | section 32 [+_2 for uniqueness]",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0357",
+    "page": 19,
+    "rect": [
+      330.72,
+      443.28,
+      576.48,
+      457.08
+    ],
+    "type": "signature",
+    "current": "Sign your name",
+    "proposed": "q32_sign_your_name",
+    "rationale": "acrobat name: \"Sign your name\" | section 32",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0358",
+    "page": 19,
+    "rect": [
+      86.76,
+      369.72,
+      195.36,
+      383.52
+    ],
+    "type": "text",
+    "current": "Date 1_4",
+    "proposed": "q33_date",
+    "rationale": "left of box: \"Date:\" | section 33",
+    "confidence": 0.65,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0359",
+    "page": 19,
+    "rect": [
+      61.56,
+      354.72,
+      287.16,
+      368.52
+    ],
+    "type": "text",
+    "current": "Date 2_4",
+    "proposed": "q33_your",
+    "rationale": "above box: \"Your\" | section 33",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0360",
+    "page": 19,
+    "rect": [
+      329.64,
+      352.8,
+      575.4,
+      366.6
+    ],
+    "type": "signature",
+    "current": "Lawyers signature",
+    "proposed": "q33_lawyers_signature",
+    "rationale": "acrobat name: \"Lawyers signature\" | section 33",
+    "confidence": 0.35,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0361",
+    "page": 19,
+    "rect": [
+      34.8,
+      315.12,
+      575.04,
+      328.92
+    ],
+    "type": "text",
+    "current": "Your Next Steps_2",
+    "proposed": "lawyer_s",
+    "rationale": "above box: \"Lawyer\u2019s\"",
+    "confidence": 0.55,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0362",
+    "page": 19,
+    "rect": [
+      42.0,
+      267.0,
+      48.0,
+      272.88
+    ],
+    "type": "radio",
+    "current": "asked for child support spousal support or lawyers fees you must complete form",
+    "proposed": "turn_your_completed",
+    "rationale": "right of box: \"Turn in your completed\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0363",
+    "page": 19,
+    "rect": [
+      42.0,
+      252.0,
+      48.0,
+      257.88
+    ],
+    "type": "radio",
+    "current": "asked for child support spousal support or lawyers fees you must complete form",
+    "proposed": "person_1",
+    "rationale": "right of box: \"If the person in 1\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0364",
+    "page": 19,
+    "rect": [
+      42.0,
+      191.04,
+      48.0,
+      197.04
+    ],
+    "type": "radio",
+    "current": "asked for child support spousal support or lawyers fees you must complete form",
+    "proposed": "have_someone_else",
+    "rationale": "right of box: \"Have someone else\"",
+    "confidence": 0.7,
+    "status": "propose"
+  },
+  {
+    "id": "p19_0365",
+    "page": 19,
+    "rect": [
+      42.0,
+      143.4,
+      48.0,
+      149.28
+    ],
+    "type": "radio",
+    "current": "asked for child support spousal support or lawyers fees you must complete form",
+    "proposed": "prepare_your_court",
+    "rationale": "right of box: \"Prepare for your court\"",
+    "confidence": 0.7,
+    "status": "propose"
+  }
+]
