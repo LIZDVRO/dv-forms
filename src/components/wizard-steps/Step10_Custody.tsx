@@ -170,14 +170,6 @@ export default function Step10_Custody({ inputClass }: Step10Props) {
           })}
         </fieldset>
       </section>
-
-      <p
-        className="rounded-xl border border-purple-100 bg-purple-50/50 px-4 py-3 text-sm text-purple-950"
-        role="note"
-      >
-        A full DV-105 parenting schedule can be added in a later update. For now,
-        capture your preferences above.
-      </p>
     </div>
   );
 }
