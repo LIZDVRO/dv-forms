@@ -32,7 +32,7 @@ import Step12_ReviewGenerate, {
 import { personInfoToDisplayName } from "@/components/wizard-steps/wizardShared";
 
 const STEP_TITLES = [
-  "Legal Representation",
+  "Filing & Representation",
   "Who Needs Protection?",
   "Person Causing Harm",
   "Describe Abuse",
