@@ -2,9 +2,11 @@ import type { PDFForm } from "pdf-lib";
 
 import { COURT_ADDRESSES } from "@/lib/courtAddresses";
 
+const CAPTION_COURT_FIELD = "Caption Court";
+
 /**
- * Map selected county + court address block onto common CA judicial council caption fields.
- * Field names vary by PDF revision; each name is tried with try/catch (no throw).
+ * Fills the PDF multiline `Caption Court` field from the selected Superior Court county
+ * (`useFormStore.getState().petitionerExtras.county`, e.g. Fresno / Kings / Tulare).
  */
 export function applyCourtCaptionFromCounty(form: PDFForm, county: string): void {
   const key = String(county ?? "").trim();
@@ -14,22 +16,13 @@ export function applyCourtCaptionFromCounty(form: PDFForm, county: string): void
 
   const lines = block.split(/\n/).map((l) => l.trim()).filter(Boolean);
   const streetLine = lines[0] ?? "";
-  const cityZipLine = lines[1] ?? "";
-  const mailingBlock = block.trim();
+  const cityStateZipLine = lines[1] ?? "";
+  const countyLine = key.toUpperCase();
+  const combined = [countyLine, streetLine, cityStateZipLine].filter(Boolean).join("\n");
 
-  const trySetText = (fieldName: string, text: string) => {
-    try {
-      form.getTextField(fieldName).setText(text);
-    } catch {
-      /* field absent or wrong type in this PDF revision */
-    }
-  };
-
-  trySetText("COUNTY OF", key);
-  trySetText("Superior Court of California County of", key);
-
-  trySetText("STREET ADDRESS", streetLine);
-  trySetText("MAILING ADDRESS", mailingBlock);
-  trySetText("CITY AND ZIP CODE", cityZipLine);
-  trySetText("BRANCH NAME", "Family Law");
+  try {
+    form.getTextField(CAPTION_COURT_FIELD).setText(combined);
+  } catch {
+    /* field absent or wrong type in this PDF revision */
+  }
 }

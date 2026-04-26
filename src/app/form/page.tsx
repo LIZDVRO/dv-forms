@@ -114,6 +114,7 @@ export default function FormWizardPage() {
   const [efileError, setEfileError] = useState("");
 
   const petitioner = useFormStore((s) => s.petitioner);
+  const petitionerExtras = useFormStore((s) => s.petitionerExtras);
   const respondentPerson = useFormStore((s) => s.respondent.person);
 
   const canGoBack = step > 0;
@@ -162,6 +163,7 @@ export default function FormWizardPage() {
       const payload: Dv109PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
         restrainedPersonName: personInfoToDisplayName(respondentPerson),
+        county: petitionerExtras.county ?? "",
       };
       const bytes = await generateDV109PDF(payload);
       triggerPdfDownload(bytes, "filled_dv109.pdf");
@@ -196,6 +198,7 @@ export default function FormWizardPage() {
       const dv109Payload: Dv109PdfData = {
         protectedPersonName: personInfoToDisplayName(petitioner),
         restrainedPersonName: personInfoToDisplayName(respondentPerson),
+        county: petitionerExtras.county ?? "",
       };
       const dv109Bytes = await generateDV109PDF(dv109Payload);
 

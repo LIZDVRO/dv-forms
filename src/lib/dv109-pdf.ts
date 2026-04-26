@@ -1,10 +1,14 @@
 import { PDFDocument, PDFForm } from "pdf-lib";
 
+import { applyCourtCaptionFromCounty } from "@/lib/courtCaption";
+
 export const DV109_PDF_URL = "/dv109.pdf";
 
 export type Dv109PdfData = {
   protectedPersonName: string;
   restrainedPersonName: string;
+  /** Superior Court county for `Caption Court` (`petitionerExtras.county`). */
+  county: string;
 };
 
 function safeSetText(form: PDFForm, name: string, text: string): void {
@@ -22,6 +26,8 @@ export async function generateDV109PDF(data: Dv109PdfData): Promise<Uint8Array> 
   }
   const doc = await PDFDocument.load(await res.arrayBuffer(), { ignoreEncryption: true });
   const form = doc.getForm();
+
+  applyCourtCaptionFromCounty(form, data.county ?? "");
 
   try {
     safeSetText(form, "Name", String(data.protectedPersonName ?? "").trim());

@@ -1712,7 +1712,7 @@ export async function generateDV100PDF(): Promise<GenerateDv100PdfResult> {
   const doc = await loadDv100Document();
   const pdfForm = doc.getForm();
   try {
-    applyCourtCaptionFromCounty(pdfForm, useFormStore.getState().petitioner.county ?? "");
+    applyCourtCaptionFromCounty(pdfForm, useFormStore.getState().petitionerExtras.county ?? "");
   } catch (err) {
     console.warn("DV-100: court caption fields", err);
   }

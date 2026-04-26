@@ -92,7 +92,8 @@ export interface PetitionerExtras {
   county: string;
 }
 
-export type PetitionerInfo = PersonInfo & PetitionerExtras;
+/** Core petitioner fields in store (`petitioner` slice). County lives on `petitionerExtras`. */
+export type PetitionerInfo = PersonInfo & Pick<PetitionerExtras, "fax">;
 
 // ══════════════════════════════════════════════════════════════
 // BLUEPRINT ENTITY 3 — RESPONDENT (identity + CLETS/SER + safety)
@@ -720,6 +721,8 @@ export interface FormState {
   // ── Entities (16 Blueprint domains) ──
   attorney: AttorneyInfo;
   petitioner: PetitionerInfo;
+  /** Court caption county; kept separate from `PersonInfo` / `petitioner`. */
+  petitionerExtras: Pick<PetitionerExtras, "county">;
   respondent: RespondentBundle;
   relationship: RelationshipInfo;
   children: ChildrenInfo;
@@ -738,6 +741,7 @@ export interface FormState {
   // ── Setters ──
   setAttorney: (data: Partial<AttorneyInfo>) => void;
   setPetitioner: (data: Partial<PetitionerInfo>) => void;
+  setPetitionerExtras: (data: Partial<Pick<PetitionerExtras, "county">>) => void;
   setRespondentPerson: (data: Partial<PersonInfo>) => void;
   setRespondentCLETS: (data: Partial<RespondentCLETSInfo>) => void;
   setRespondentSafety: (data: Partial<RespondentSafetyFlags>) => void;
@@ -1055,7 +1059,7 @@ function blankPerson(): PersonInfo {
 }
 
 function blankPetitioner(): PetitionerInfo {
-  return { ...blankPerson(), fax: "", county: "" };
+  return { ...blankPerson(), fax: "" };
 }
 
 function deepMerge<T extends object>(target: T, source: Partial<T>): T {
@@ -1079,6 +1083,7 @@ export const useFormStore = create<FormState>((set, get) => ({
   // ── Initial State ──
   attorney: { ...initialAttorney, firmAddress: { ...emptyAddress } },
   petitioner: blankPetitioner(),
+  petitionerExtras: { county: "" },
   respondent: {
     person: blankPerson(),
     clets: { ...initialRespondentCLETS },
@@ -1144,6 +1149,9 @@ export const useFormStore = create<FormState>((set, get) => ({
           : s.petitioner.address,
       },
     })),
+
+  setPetitionerExtras: (data) =>
+    set((s) => ({ petitionerExtras: { ...s.petitionerExtras, ...data } })),
 
   setRespondentPerson: (data) =>
     set((s) => ({

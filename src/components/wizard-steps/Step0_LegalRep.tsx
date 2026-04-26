@@ -10,8 +10,8 @@ type Step0Props = {
 export default function Step0_LegalRep({ inputClass }: Step0Props) {
   const attorney = useFormStore((s) => s.attorney);
   const setAttorney = useFormStore((s) => s.setAttorney);
-  const petitioner = useFormStore((s) => s.petitioner);
-  const setPetitioner = useFormStore((s) => s.setPetitioner);
+  const petitionerExtras = useFormStore((s) => s.petitionerExtras);
+  const setPetitionerExtras = useFormStore((s) => s.setPetitionerExtras);
 
   return (
     <div className="space-y-6">
@@ -25,15 +25,15 @@ export default function Step0_LegalRep({ inputClass }: Step0Props) {
         <p className="mb-2 text-xs text-slate-600">
           Used for the court name and address on the petition and restraining
           order forms.{" "}
-          {petitioner.county
-            ? COURT_ADDRESSES[petitioner.county]?.split("\n").join(" · ")
+          {petitionerExtras.county
+            ? COURT_ADDRESSES[petitionerExtras.county]?.split("\n").join(" · ")
             : null}
         </p>
         <select
           id="county"
           name="county"
-          value={petitioner.county}
-          onChange={(e) => setPetitioner({ county: e.target.value })}
+          value={petitionerExtras.county}
+          onChange={(e) => setPetitionerExtras({ county: e.target.value })}
           className={inputClass}
         >
           <option value="">Select a county</option>

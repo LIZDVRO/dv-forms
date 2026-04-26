@@ -96,7 +96,7 @@ export async function generateDV110PDF(): Promise<Uint8Array> {
   const doc = await PDFDocument.load(await res.arrayBuffer(), { ignoreEncryption: true });
   const form = doc.getForm();
   try {
-    applyCourtCaptionFromCounty(form, petitioner.county ?? "");
+    applyCourtCaptionFromCounty(form, useFormStore.getState().petitionerExtras.county ?? "");
   } catch (err) {
     console.warn("DV-110: court caption", err);
   }
