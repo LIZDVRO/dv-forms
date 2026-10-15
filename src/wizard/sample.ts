@@ -93,7 +93,33 @@ export function sampleAnswers(): Answers {
   c2.A5 = "N";
   c2.A6 = "He took my phone and read my messages, then followed me to work and waited in the parking lot.";
   c2.A7 = "weekly";
-  a.cards = [c1, c2];
+  // Cards 4–7 exercise DV-101 (items 3, 4 and the item 5 overflow).
+  const more = (date: string, text: string, extra: Partial<typeof c1> = {}) => ({ ...emptyCard(), A1: date, A6: text, A2: "N" as const, A5: "N" as const, A7: "once" as const, ...extra });
+  a.cards = [
+    c1,
+    c2,
+    more("2026-07-04", "He threw a glass at the wall next to my head during a family party."),
+    more("2026-05-20", "He pushed me out of the car and drove off, leaving me on the side of the highway at night.", {
+      A4: "Y",
+      A4text: "Scraped knees and hands.",
+      A5: "Y",
+      A8: "Y",
+      A8protects: "you",
+    }),
+    more("2026-03-02", "He broke my phone so I could not call my sister.", { A2: "Y", A2names: "Sofia (child)" }),
+    more("2026-01-15", "He screamed at me and blocked the door for an hour."),
+    more("2025-11-28", "He took the car keys and my wallet and left me at home with no money for two days.", { A7: "2-5" }),
+  ];
+
+  // Interpreter for me and one witness; the sheriff serves.
+  a.I1 = "Y";
+  a.I1language = "Spanish";
+  a.I3 = [{ name: "Rosa Sample", language: "same", otherLanguage: "" }];
+  a.V1 = "sheriff";
+  a.R15.instructions = "Gate code 4512. Blue house at the end of the street.";
+  a.R15.bestTime = "After 6 p.m.";
+  a.R21 = ["violent history", "military or first-responder training"];
+  a.V3 = "He has a large dog in the backyard.";
 
   a.orders = { O10: true, O11: true, O12: true, O13: true, O16: true, O18: true, O27: true };
   a.O12.places = ["me", "my home", "my job", "protected people", "children's school or childcare"];

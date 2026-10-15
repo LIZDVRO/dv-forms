@@ -6,6 +6,7 @@ import { COURTHOUSES } from "../courthouses";
 import { custodyRequested } from "../derive";
 import type { Answers } from "../types";
 import { Abduction, Children, CustodyOrders } from "./custody";
+import { Service } from "./service";
 import { History, Incidents, Weapons } from "./history";
 import { Orders } from "./orders";
 import { Relationship, Respondent, Roster, You } from "./people";
@@ -137,6 +138,12 @@ export const STEPS: StepDef[] = [
     blurb: "Form DV-108 asks the judge for orders to keep the children from being taken.",
     Component: Abduction,
     when: (a) => custodyRequested(a) && a.K5 === "Y",
+  },
+  {
+    id: "service",
+    title: "Court help and serving the papers",
+    blurb: "A free interpreter if you need one, and who will give the other person copies of your papers.",
+    Component: Service,
   },
 ];
 

@@ -106,11 +106,12 @@ const CARD_TITLES = [
   "Another time (a different kind of abuse, if there was one)",
   "One more time",
 ];
+const cardTitle = (k: number) => CARD_TITLES[k] ?? `Another time (#${k + 1})`;
 
 function CardEditor({ c, k, update, error }: { c: IncidentCard; k: number; update: (p: Partial<IncidentCard>) => void; error?: string }) {
   return (
     <div className="space-y-5">
-      <h4 className="text-base font-semibold text-slate-900">{CARD_TITLES[k]}</h4>
+      <h4 className="text-base font-semibold text-slate-900">{cardTitle(k)}</h4>
       <Question label="When did it happen?" hint="A guess is fine.">
         <Text type="date" value={c.A1} onChange={(v) => update({ A1: v })} className="sm:w-56" />
       </Question>
@@ -149,7 +150,26 @@ function CardEditor({ c, k, update, error }: { c: IncidentCard; k: number; updat
       <Question label="Did the police come?">
         <YesNo dontKnow value={c.A5} onChange={(v) => update({ A5: v })} />
       </Question>
-      {c.A5 === "Y" && <Note>If police gave you an emergency protective order, add it on the &quot;Past orders and cases&quot; step.</Note>}
+      {c.A5 === "Y" && (
+        <Question label="Did the police give an emergency protective order?">
+          <YesNo dontKnow value={c.A8} onChange={(v) => update({ A8: v })} />
+        </Question>
+      )}
+      {c.A5 === "Y" && c.A8 === "Y" && (
+        <>
+          <Question label="Who does it protect?">
+            <Choice
+              value={c.A8protects}
+              onChange={(v) => update({ A8protects: v })}
+              options={[
+                { value: "you", label: "Me" },
+                { value: "respondent", label: "The other person" },
+              ]}
+            />
+          </Question>
+          <Note>Add that order on the &quot;Past orders and cases&quot; step too, and bring a copy if you have one.</Note>
+        </>
+      )}
       <Question label="How often has this kind of abuse happened?">
         <Choice
           value={c.A7}
@@ -176,13 +196,15 @@ function CardEditor({ c, k, update, error }: { c: IncidentCard; k: number; updat
   );
 }
 
-/** Step 6 · what happened (incident cards 1–3). */
+/** Step 6 · what happened. Cards 1–3 print on DV-100; 4 and up on DV-101. */
 export function Incidents({ errors }: StepProps) {
   const { a, set } = useWizard();
   return (
     <div className="space-y-6">
       <Group seen="public">
-        <p className="text-base text-slate-700">Start with the most recent time. You can add up to two more.</p>
+        <p className="text-base text-slate-700">
+          Start with the most recent time. Add as many other times as you need; after three, they go on an extra form (DV-101).
+        </p>
         {a.cards.map((c, k) => (
           <div key={k} className="rounded-xl border border-slate-200 bg-slate-50/60 p-4">
             <CardEditor
@@ -202,15 +224,13 @@ export function Incidents({ errors }: StepProps) {
             )}
           </div>
         ))}
-        {a.cards.length < 3 && (
-          <button
-            type="button"
-            onClick={() => set((x) => void x.cards.push(emptyCard()))}
-            className="rounded-lg border border-dashed border-liz/50 px-4 py-2.5 text-base font-medium text-liz hover:bg-liz/5"
-          >
-            + Add another time
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => set((x) => void x.cards.push(emptyCard()))}
+          className="rounded-lg border border-dashed border-liz/50 px-4 py-2.5 text-base font-medium text-liz hover:bg-liz/5"
+        >
+          + Add another time
+        </button>
       </Group>
     </div>
   );

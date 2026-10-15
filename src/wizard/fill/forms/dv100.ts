@@ -436,7 +436,11 @@ export const DV100: FormSpec = {
   bindings: B,
   sheets,
   after: ({ sheets: s, pages }) => [
-    b("Page5.List7.MultilineCheckBox", () => s.some((x) => x.title === "DV-100, Describe Abuse")),
-    b("Page13.List32.Li1.T97", () => (pages ? String(pages) : "")),
+    // Incidents 4 and up go on DV-101, which counts as 2 extra pages here.
+    b("Page5.List7.MultilineCheckBox", (a) => s.some((x) => x.title === "DV-100, Describe Abuse") || !!card(a, 3)),
+    b("Page13.List32.Li1.T97", (a) => {
+      const n = pages + (card(a, 3) ? 2 : 0);
+      return n ? String(n) : "";
+    }),
   ],
 };

@@ -16,8 +16,15 @@ for five years (K1 = No), each pair of residence groups gets its own DV-105(A)
 adds DV-108 and the proposed DV-145 (parties only). These steps (`Your children`,
 `Custody and visits`, `Preventing abduction`) appear only when they apply.
 
-Not yet included (next branches): minor confidentiality (DV-160/DV-165), DV-101, financial
-forms (support and fees), INT-300, SER-001, and the stage-2/3 forms. Their field bindings
+Also included when they apply:
+- DV-101 for incidents 4 and 5; incident 6 onward goes in its item 5 and an attached sheet.
+  DV-100 page 5's "more space" box and item 32's page count include it.
+- INT-300, one per person who needs an interpreter (the petitioner, then each witness).
+- SER-001 when the sheriff serves (not filed). The case number, court date and service
+  deadline are left for the person to write in from the DV-109 the court returns.
+
+Not yet included (next branches): minor confidentiality (DV-160/DV-165), financial forms
+(support and fees), DV-200, and the stage-2/3 forms. Their field bindings
 are already specified in `docs/field-map`.
 
 ## How it fits together
@@ -49,6 +56,12 @@ npm run check-wizard -- tmp-packet   # fills a sample case and checks every bind
 field in the map has no binding. It writes two sample packets: `a/` (supervised visits on
 the weekly chart, abduction) and `b/` (children lived apart, so two DV-105(A) copies;
 unsupervised visits with supervised exchanges). `/wizard?sample` fills in case `a` for testing.
+
+## Checking filled PDFs
+
+Preview filled pages with PDFium (what Chrome uses) or MuPDF. Poppler (`pdftoppm`) leaves
+some INT-300 check boxes blank even though they are set; that is a poppler quirk, not a
+fill problem.
 
 ## Known gaps
 

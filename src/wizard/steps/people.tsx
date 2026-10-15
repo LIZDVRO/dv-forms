@@ -1,6 +1,7 @@
 "use client";
 
 import { emptyPerson } from "../defaults";
+import { matchLanguage, otherLanguageName } from "../languages";
 import { useWizard } from "../store";
 import type { Gender, RosterPerson } from "../types";
 import { AddressInput, Choice, Group, LongText, Note, Question, Rows, Text, YesNo } from "../ui/fields";
@@ -81,11 +82,31 @@ export function You({ errors }: StepProps) {
           <Text value={a.P5} onChange={(v) => set((x) => void (x.P5 = v))} className="sm:w-72" />
         </Question>
         <Question label="Do you speak English?">
-          <YesNo value={a.P9} onChange={(v) => set((x) => void (x.P9 = v === "Y" ? "Y" : "N"))} />
+          <YesNo
+            value={a.P9}
+            onChange={(v) =>
+              set((x) => {
+                x.P9 = v === "Y" ? "Y" : "N";
+                // Not speaking English pre-answers the interpreter question (map I1).
+                if (x.P9 === "N" && !x.I1) x.I1 = "Y";
+              })
+            }
+          />
         </Question>
         {a.P9 === "N" && (
-          <Question label="Which language do you speak?" hint="You can ask the court for a free interpreter.">
-            <Text value={a.P9language} onChange={(v) => set((x) => void (x.P9language = v))} className="sm:w-72" />
+          <Question label="Which language do you speak?" hint="You can ask the court for a free interpreter. We'll ask about that later.">
+            <Text
+              value={a.P9language}
+              onChange={(v) =>
+                set((x) => {
+                  x.P9language = v;
+                  const match = matchLanguage(v);
+                  x.I1language = match ?? (v.trim() ? "other" : "");
+                  x.I1other = match ? "" : otherLanguageName(v);
+                })
+              }
+              className="sm:w-72"
+            />
           </Question>
         )}
       </Group>

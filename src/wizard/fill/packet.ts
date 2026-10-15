@@ -10,6 +10,7 @@ import { fillForm, type FormSpec } from "./engine";
 import { buildSheetsPdf } from "./attachments";
 import { DV100 } from "./forms/dv100";
 import { DV105, DV108, DV140, DV145, dv105a, residenceGroups } from "./forms/custody";
+import { DV101, SER001, int300, int300Forms, needsDV101 } from "./forms/extras";
 import { CLETS001, DV109, DV110, DV900 } from "./forms/filing";
 
 export type TemplateLoader = (path: string) => Promise<ArrayBuffer | Uint8Array>;
@@ -17,8 +18,8 @@ export type TemplateLoader = (path: string) => Promise<ArrayBuffer | Uint8Array>
 export interface PacketFile {
   id: string;
   fileName: string;
-  /** Where it goes: "court" (filed) or "law enforcement" (given to the clerk, not filed). */
-  goesTo: "court" | "law enforcement";
+  /** Where it goes: "court" (filed), "law enforcement" (CLETS-001, given to the clerk) or "sheriff" (SER-001); the last two are not filed. */
+  goesTo: "court" | "law enforcement" | "sheriff";
   bytes: Uint8Array;
   sheetTitles: string[];
 }
@@ -31,6 +32,7 @@ export interface Packet {
 /** Which forms the wizard produces, from the answers (map: "Forms and when each is used"). */
 export function filingForms(a: Answers): FormSpec[] {
   const forms: FormSpec[] = [DV100];
+  if (needsDV101(a)) forms.push(DV101);
   if (custodyRequested(a)) {
     forms.push(DV105);
     const groups = residenceGroups(a).length;
@@ -42,13 +44,29 @@ export function filingForms(a: Answers): FormSpec[] {
     forms.push(DV140);
     if (a.K5 === "Y") forms.push(DV145);
   }
-  forms.push(CLETS001);
   if (a.orders.O28) forms.push(DV900);
+  forms.push(...int300Forms(a));
+  forms.push(CLETS001);
+  if (a.V1 === "sheriff") forms.push(SER001);
   return forms;
 }
 
 /** Every form spec the wizard can produce (for checks). */
-export const ALL_FORMS: FormSpec[] = [DV100, DV105, dv105a(0), DV108, DV109, DV110, DV140, DV145, CLETS001, DV900];
+export const ALL_FORMS: FormSpec[] = [
+  DV100,
+  DV101,
+  DV105,
+  dv105a(0),
+  DV108,
+  DV109,
+  DV110,
+  DV140,
+  DV145,
+  DV900,
+  int300(),
+  CLETS001,
+  SER001,
+];
 
 export const fileNameFor = (spec: FormSpec) => `${spec.id}${spec.copy && spec.copy > 1 ? `-${spec.copy}` : ""}.pdf`;
 
@@ -79,7 +97,7 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
     files.push({
       id: spec.id,
       fileName: fileNameFor(spec),
-      goesTo: spec.id === "CLETS-001" ? "law enforcement" : "court",
+      goesTo: spec.id === "CLETS-001" ? "law enforcement" : spec.id === "SER-001" ? "sheriff" : "court",
       bytes,
       sheetTitles: filled.sheets.map((s) => s.title),
     });

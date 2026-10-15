@@ -45,6 +45,8 @@ export const emptyCard = (): IncidentCard => ({
   A7: "",
   A7other: "",
   A7dates: "",
+  A8: "",
+  A8protects: "",
 });
 
 let nextId = 0;
@@ -209,6 +211,31 @@ export function emptyAnswers(): Answers {
     W2: "",
     W3: "",
     W4: "",
+
+    I1: "",
+    I1language: "",
+    I1other: "",
+    I2: "",
+    I3: [],
+
+    V1: "",
+    V2: "",
+    V3: "",
+    R15: {
+      kind: "home",
+      address: emptyAddress(),
+      instructions: "",
+      bestTime: "",
+      altKind: "",
+      alt: emptyAddress(),
+      altInstructions: "",
+      altBestTime: "",
+    },
+    R16: "",
+    R16facility: "",
+    R21: [],
+    R21other: "",
+    R22: "",
 
     G1: todayISO(),
   };

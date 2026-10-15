@@ -45,6 +45,7 @@ const ORDER_NAMES: Record<string, string> = {
 
 const FORM_NAMES: Record<string, string> = {
   "DV-100": "Request for Domestic Violence Restraining Order",
+  "DV-101": "Description of Abuse",
   "DV-105": "Request for Child Custody and Visitation Orders",
   "DV-105(A)": "City and State Where Children Lived",
   "DV-108": "Request for Orders to Prevent Child Abduction",
@@ -53,6 +54,8 @@ const FORM_NAMES: Record<string, string> = {
   "DV-140": "Child Custody and Visitation Order",
   "DV-145": "Order to Prevent Child Abduction",
   "CLETS-001": "Confidential Information for Law Enforcement",
+  "INT-300": "Request for Interpreter",
+  "SER-001": "Request for Sheriff to Serve Court Papers",
   "DV-900": "Order Transferring Wireless Phone Account",
 };
 
@@ -160,7 +163,11 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                       {f.fileName.replace(/\.pdf$/, "")} · {FORM_NAMES[f.id]}
                     </div>
                     <div className="text-sm text-slate-600">
-                      {f.goesTo === "law enforcement" ? "Give to the clerk. Not filed in the public record." : "File with the court."}
+                      {f.goesTo === "law enforcement"
+                        ? "Give to the clerk. Not filed in the public record."
+                        : f.goesTo === "sheriff"
+                          ? "Give to the sheriff with copies of your papers after the court returns them. Don't file it."
+                          : "File with the court."}
                       {f.sheetTitles.length > 0 && ` Includes ${f.sheetTitles.length} attached sheet(s).`}
                     </div>
                   </div>
@@ -197,9 +204,21 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 </li>
                 <li>Get your papers back the same or next business day. Your court date is on DV-109.</li>
                 <li>
-                  Have someone 18 or older (not you) give copies to {a.R1 || "the other person"} before the deadline on DV-109. The sheriff
-                  does this for free.
+                  {a.V1 === "sheriff" ? (
+                    <>
+                      Take SER-001 and copies of your papers to the {a.V2 || a.S1} County sheriff. First write the case number on each
+                      page and, in item 5, the court date and service deadline from your DV-109. Service is free.
+                    </>
+                  ) : (
+                    <>
+                      Have someone 18 or older (not you) give copies to {a.R1 || "the other person"} before the deadline on DV-109. The
+                      sheriff does this for free.
+                    </>
+                  )}
                 </li>
+                {packet.files.some((f) => f.id === "INT-300") && (
+                  <li>File your INT-300 with your other papers so the court can schedule an interpreter for your court date.</li>
+                )}
               </ol>
             </Group>
             <p className="text-sm text-slate-500">Signing date on the forms: {fmtDate(a.G1)}.</p>

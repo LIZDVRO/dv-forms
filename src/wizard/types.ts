@@ -142,6 +142,16 @@ export interface IncidentCard {
   A7: "" | "once" | "2-5" | "weekly" | "other";
   A7other: string;
   A7dates: string;
+  /** A8: did police give an emergency protective order (asked when A5 = Y; printed on DV-101) */
+  A8: YND;
+  A8protects: "" | "you" | "respondent";
+}
+
+/** I3: a witness who needs an interpreter (one INT-300 each). */
+export interface Witness {
+  name: string;
+  language: "same" | "other";
+  otherLanguage: string;
 }
 
 export interface Firearm {
@@ -355,6 +365,37 @@ export interface Answers {
   W2: string;
   W3: string;
   W4: string;
+
+  // Interpreter (INT-300)
+  I1: YN;
+  /** One of INT300_LANGUAGES, or "other" */
+  I1language: string;
+  I1other: string;
+  /** Town of origin, for an indigenous language */
+  I2: string;
+  I3: Witness[];
+
+  // Step 11 · service (SER-001)
+  V1: "" | "sheriff" | "adult" | "unsure";
+  /** County where they will be served */
+  V2: string;
+  V3: string;
+  R15: {
+    kind: "home" | "business";
+    /** Blank street = use the home address (R14). */
+    address: Address;
+    instructions: string;
+    bestTime: string;
+    altKind: "" | "home" | "business";
+    alt: Address;
+    altInstructions: string;
+    altBestTime: string;
+  };
+  R16: YN;
+  R16facility: string;
+  R21: string[];
+  R21other: string;
+  R22: YN;
 
   // Step 11 · signing
   G1: string;

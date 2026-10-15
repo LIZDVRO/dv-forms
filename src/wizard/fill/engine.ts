@@ -56,6 +56,8 @@ export interface FormSpec {
   bindings: Binding[];
   /** List rows that do not fit on the form (e.g. more than 4 protected people). */
   sheets?: (a: Answers, d: Derived) => { title: string; text: string }[];
+  /** First-line indent in points, by short field name, where a printed label shares the field's first line. */
+  indents?: Record<string, number>;
   /** Fields set once the attached sheets are known (more-space boxes, page counts). */
   after?: (ctx: { sheets: Sheet[]; pages: number }) => Binding[];
 }
@@ -71,7 +73,8 @@ export interface FilledForm {
 
 /** "Page1.List1.Li1.YourName_tf" → "DV-100[0].Page1[0].List1[0].Li1[0].YourName_tf[0]" */
 export function qualify(root: string, short: string): string {
-  const segs = short.split(".").map((s) => (/\[\d+\]$/.test(s) ? s : `${s}[0]`));
+  // Some official names contain a literal "\." (SER-001 "address\.2d"); that is not a separator.
+  const segs = short.split(/(?<!\\)\./).map((s) => (/\[\d+\]$/.test(s) ? s : `${s}[0]`));
   return [root, ...segs].join(".");
 }
 
@@ -83,13 +86,13 @@ const MIN_SIZE = 6;
 const CONTINUED = " (continued on attached sheet)";
 
 /** Word-wrap text to a width; returns lines (hard line breaks kept). */
-function wrap(text: string, font: PDFFont, size: number, width: number): string[] {
+function wrap(text: string, font: PDFFont, size: number, width: number, firstWidth = width): string[] {
   const out: string[] = [];
   for (const para of text.replace(/\r/g, "").split("\n")) {
     let line = "";
     for (const word of para.split(/\s+/).filter(Boolean)) {
       const next = line ? `${line} ${word}` : word;
-      if (font.widthOfTextAtSize(next, size) <= width) line = next;
+      if (font.widthOfTextAtSize(next, size) <= (out.length === 0 ? firstWidth : width)) line = next;
       else {
         if (line) out.push(line);
         line = word;
@@ -102,30 +105,34 @@ function wrap(text: string, font: PDFFont, size: number, width: number): string[
 
 interface Box {
   width: number;
+  /** First-line indent (points). */
+  indent: number;
   height: number;
   /** Baselines measured from the top of the field, one per line. */
   baselines: number[];
 }
 
 /** Where each line of a multi-line field goes: on the printed rules if any, else evenly spaced. */
-function boxFor(field: PDFTextField, formId: string, size: number): Box {
+function boxFor(field: PDFTextField, formId: string, size: number, indent = 0): Box {
   const { width, height } = field.acroField.getWidgets()[0].getRectangle();
   const rules = rulings[formId]?.[field.getName()];
-  if (rules?.length) return { width, height, baselines: rules.map((r) => r - 2) };
+  if (rules?.length) return { width, height, indent, baselines: rules.map((r) => r - 2) };
   const lineH = size * 1.25;
   const n = Math.max(1, Math.floor((height - 2) / lineH));
-  return { width, height, baselines: Array.from({ length: n }, (_, i) => 2 + size + i * lineH) };
+  return { width, height, indent, baselines: Array.from({ length: n }, (_, i) => 2 + size + i * lineH) };
 }
 
 /** Split text into the lines that fit the box and the words left over. */
 function layout(text: string, font: PDFFont, size: number, box: Box): { lines: string[]; rest: string } {
-  const w = box.width - 6;
-  const lines = wrap(text, font, size, w);
+  // 5% slack: viewers without Helvetica substitute a slightly wider font.
+  const w = (box.width - 6) * 0.95;
+  const lines = wrap(text, font, size, w, w - box.indent);
   const cap = box.baselines.length;
   if (lines.length <= cap) return { lines, rest: "" };
   const keep = lines.slice(0, cap);
   let last = keep.pop() ?? "";
-  while (last && font.widthOfTextAtSize(last + CONTINUED, size) > w) last = last.split(" ").slice(0, -1).join(" ");
+  const lastW = cap === 1 ? w - box.indent : w;
+  while (last && font.widthOfTextAtSize(last + CONTINUED, size) > lastW) last = last.split(" ").slice(0, -1).join(" ");
   const used = [...keep, last].join(" ").split(/\s+/).filter(Boolean).length;
   const rest = text.split(/\s+/).filter(Boolean).slice(used).join(" ");
   return { lines: [...keep, last + CONTINUED], rest };
@@ -135,12 +142,12 @@ function layout(text: string, font: PDFFont, size: number, box: Box): { lines: s
 function drawLines(field: PDFTextField, font: PDFFont, size: number, box: Box, lines: string[]) {
   field.updateAppearances(font, () => {
     const ops: PDFOperator[] = [pushGraphicsState(), beginText(), setFontAndSize(font.name, size), setFillingGrayscaleColor(0)];
-    let x = 3;
+    let x = 3 + box.indent;
     let y = 0;
     lines.forEach((line, i) => {
       const targetY = box.height - box.baselines[i];
       ops.push(moveText(x, targetY - y));
-      x = 0;
+      x = i === 0 ? -box.indent : 0;
       y = targetY;
       ops.push(showText(font.encodeText(line)));
     });
@@ -216,7 +223,7 @@ export async function fillForm(spec: FormSpec, template: ArrayBuffer | Uint8Arra
 
     if (field.isMultiline() || long) {
       const size = long ? LONG_SIZE : TEXT_SIZE;
-      const box = boxFor(field, spec.id, size);
+      const box = boxFor(field, spec.id, size, spec.indents?.[bd.f] ?? 0);
       const { lines, rest } = layout(text, font, size, box);
       if (rest) {
         const sheet = longValue ? longValue.sheet : `${spec.id}, ${bd.f}`;
