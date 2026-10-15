@@ -509,7 +509,19 @@ export function ChildSupport() {
             </Question>
             <div className="sm:col-span-2">
               <Question label="Company's address" optional>
-                <Text value={a.F17.address} onChange={(v) => set((x) => void (x.F17.address = v))} />
+                {a.F4.employerAddress.trim() && (
+                  <Choice
+                    value={a.F17.address === a.F4.employerAddress ? "employer" : a.F17.address ? "other" : ""}
+                    onChange={(v) => set((x) => void (x.F17.address = v === "employer" ? x.F4.employerAddress : " "))}
+                    options={[
+                      { value: "employer", label: "Same as my employer", hint: a.F4.employerAddress },
+                      { value: "other", label: "Another address" },
+                    ]}
+                  />
+                )}
+                {(!a.F4.employerAddress.trim() || (a.F17.address && a.F17.address !== a.F4.employerAddress)) && (
+                  <Text value={a.F17.address.trim()} onChange={(v) => set((x) => void (x.F17.address = v || " "))} />
+                )}
               </Question>
             </div>
           </div>

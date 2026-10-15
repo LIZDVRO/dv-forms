@@ -5,6 +5,7 @@ import { matchLanguage, otherLanguageName } from "../languages";
 import { useWizard } from "../store";
 import type { Gender, RosterPerson } from "../types";
 import { AddressInput, Choice, Group, LongText, Note, Question, Rows, Text, YesNo } from "../ui/fields";
+import { WeaponsQuestions } from "./history";
 import type { StepProps } from "./types";
 
 const GENDERS = [
@@ -201,6 +202,8 @@ export function Respondent({ errors }: StepProps) {
           </Question>
         )}
       </Group>
+
+      <WeaponsQuestions />
     </div>
   );
 }

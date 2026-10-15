@@ -58,6 +58,8 @@ export interface FormSpec {
   bindings: Binding[];
   /** List rows that do not fit on the form (e.g. more than 4 protected people). */
   sheets?: (a: Answers, d: Derived) => { title: string; text: string }[];
+  /** Where drawn signatures go: page (1-based), left edge, and the top of the label printed under the line. */
+  signatures?: { page: number; x: number; top: number; who: "petitioner" | "lawyer"; when?: (a: Answers) => boolean }[];
   /** First-line indent in points, by short field name, where a printed label shares the field's first line. */
   indents?: Record<string, number>;
   /** Fields set once the attached sheets are known (more-space boxes, page counts). */
@@ -263,6 +265,17 @@ export async function fillForm(spec: FormSpec, template: ArrayBuffer | Uint8Arra
   spec.after?.({ sheets, pages }).forEach(apply);
 
   form.updateFieldAppearances(font);
+
+  // Drawn signatures sit just above the signature line, scaled to fit 150 x 26 pt.
+  for (const sg of spec.signatures ?? []) {
+    const url = sg.who === "lawyer" ? answers.lawyerSig : answers.sig;
+    if (!url || (sg.when && !sg.when(answers))) continue;
+    const page = doc.getPages()[sg.page - 1];
+    if (!page) continue;
+    const img = await doc.embedPng(url);
+    const scale = Math.min(150 / img.width, 26 / img.height);
+    page.drawImage(img, { x: sg.x, y: page.getHeight() - sg.top + 1, width: img.width * scale, height: img.height * scale });
+  }
   // Appearances are generated above, so viewers should not regenerate them.
   form.acroForm.dict.set(PDFName.of("NeedAppearances"), PDFBool.False);
   const bytes = await doc.save();

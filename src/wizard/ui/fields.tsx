@@ -4,7 +4,8 @@
  * Small, consistent building blocks for wizard questions.
  * One question, one plain label, an optional one-line hint, big tap targets.
  */
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import SignatureCanvas from "react-signature-canvas";
 
 import type { Address } from "../types";
 
@@ -297,5 +298,38 @@ export function Note({ children, tone = "info" }: { children: ReactNode; tone?: 
     >
       {children}
     </div>
+  );
+}
+
+/** Draw a signature; stores a trimmed PNG data URL ("" when cleared). */
+export function SignaturePad({ label, hint, value, onChange }: { label: string; hint?: string; value: string; onChange: (v: string) => void }) {
+  const ref = useRef<SignatureCanvas>(null);
+  // Show a saved signature again when coming back to this step.
+  useEffect(() => {
+    if (value && ref.current?.isEmpty()) ref.current.fromDataURL(value);
+    // Only on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return (
+    <Question label={label} hint={hint} optional>
+      <div className="rounded-xl border-2 border-dashed border-liz/50 bg-white">
+        <SignatureCanvas
+          ref={ref}
+          penColor="#1e1b4b"
+          canvasProps={{ className: "h-40 w-full cursor-crosshair rounded-xl touch-none" }}
+          onEnd={() => onChange(ref.current?.isEmpty() ? "" : (ref.current?.getTrimmedCanvas().toDataURL("image/png") ?? ""))}
+        />
+      </div>
+      <button
+        type="button"
+        onClick={() => {
+          ref.current?.clear();
+          onChange("");
+        }}
+        className="text-sm font-medium text-slate-500 hover:text-red-700"
+      >
+        Clear
+      </button>
+    </Question>
   );
 }

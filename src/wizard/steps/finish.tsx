@@ -7,7 +7,7 @@ import { custodyRequested, derive, fmtDate } from "../derive";
 import { buildFilingPacket, type Packet, type PacketFile } from "../fill/packet";
 import { useWizard } from "../store";
 import type { Answers } from "../types";
-import { Group, Note, Question, Text } from "../ui/fields";
+import { Group, Note, Question, SignaturePad, Text } from "../ui/fields";
 
 const loadTemplate = async (path: string) => {
   const res = await fetch(path);
@@ -170,6 +170,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
 
   return (
     <div className="space-y-8">
+      <div className="print:hidden">
       <Group title="Check your answers">
         <dl className="divide-y divide-slate-200 rounded-xl border border-slate-200">
           {summary.map(([k, v, step]) => (
@@ -186,15 +187,39 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
         </dl>
       </Group>
 
+      </div>
+
+      <div className="print:hidden">
       <Group title="Signing">
         <Question label="Date you're signing" hint="You'll sign the printed forms by hand.">
           <Text type="date" value={a.G1} onChange={(v) => set((x) => void (x.G1 = v))} className="sm:w-56" />
         </Question>
         <Note>
-          When you sign DV-100, you declare under penalty of perjury that what you wrote is true. Read your forms before you
-          sign.
+          When you sign, you declare under penalty of perjury that what you wrote is true. Read your answers above before you sign.
         </Note>
+        <SignaturePad
+          label="Your signature"
+          hint="Draw with your finger or mouse. It goes on DV-100 and every other form you sign. Or leave it blank and sign the printed forms by hand."
+          value={a.sig}
+          onChange={(v) => {
+            set((x) => void (x.sig = v));
+            setPacket(null);
+          }}
+        />
+        {a.S5 === "Y" && (
+          <SignaturePad
+            label="Your lawyer's signature"
+            hint="Optional. For DV-100 item 34 and the other forms a lawyer signs."
+            value={a.lawyerSig}
+            onChange={(v) => {
+              set((x) => void (x.lawyerSig = v));
+              setPacket(null);
+            }}
+          />
+        )}
       </Group>
+
+      </div>
 
       <Group title="Your forms">
         {!packet && (
@@ -232,7 +257,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                         <button
                           type="button"
                           onClick={() => download(f.fileName, f.bytes)}
-                          className="rounded-lg border border-liz px-4 py-2 text-sm font-medium text-liz hover:bg-liz/5"
+                          className="rounded-lg border border-liz px-4 py-2 text-sm font-medium text-liz hover:bg-liz/5 print:hidden"
                         >
                           Download
                         </button>
@@ -242,16 +267,30 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 </section>
               );
             })}
-            <button type="button" onClick={zipAll} className="rounded-xl bg-liz px-6 py-3 text-base font-semibold text-white hover:bg-liz/90">
+            <button type="button" onClick={zipAll} className="rounded-xl bg-liz px-6 py-3 text-base font-semibold text-white hover:bg-liz/90 print:hidden">
               Download all (zip)
             </button>
-            <button type="button" onClick={make} className="ml-3 text-sm font-medium text-liz hover:underline">
+            <button type="button" onClick={make} className="ml-3 text-sm font-medium text-liz hover:underline print:hidden">
               Make them again
             </button>
+            <div className="rounded-xl border border-liz/30 bg-liz/5 p-4 print:hidden">
+              <p className="text-base text-slate-800">This page has your instructions. Keep a copy.</p>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="mt-2 rounded-lg border border-liz bg-white px-4 py-2 text-sm font-semibold text-liz hover:bg-liz/5"
+              >
+                Print or save these instructions
+              </button>
+              <p className="mt-1 text-sm text-slate-600">To save, choose &quot;Save as PDF&quot; in the print window.</p>
+            </div>
             <Group title="What to do next">
               <ol className="list-decimal space-y-2 pl-5 text-base text-slate-700">
                 <li>
-                  Print the forms, read them, and sign DV-100 (page 13). Don&apos;t sign the order forms (
+                  {a.sig
+                    ? "Print the forms and read them. Your signature is already on them. "
+                    : "Print the forms, read them, and sign DV-100 (page 13) and any other form with a signature line. "}
+                  Don&apos;t sign the order forms (
                   {packet.files
                     .map((f) => f.id)
                     .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900", "DV-165", "DV-130", "DV-150"].includes(id))
@@ -279,7 +318,8 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 </li>
                 {packet.files.some((f) => f.id === "FL-150") && (
                   <li>
-                    Sign FL-150 (page 1). {a.R1 || "The other person"} must be served with it and a blank FL-150. Bring your last two pay
+                    {a.sig ? "" : "Sign FL-150 (page 1). "}
+                    {a.R1 || "The other person"} must be served with it and a blank FL-150. Bring your last two pay
                     stubs and latest tax return to court, with Social Security numbers blacked out.
                   </li>
                 )}

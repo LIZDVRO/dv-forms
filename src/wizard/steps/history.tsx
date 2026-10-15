@@ -87,11 +87,6 @@ export function History() {
                     <Text value={c.caseNumber} onChange={(v) => up({ caseNumber: v })} />
                   </Question>
                 </div>
-                {a.RL1.includes("children") && (
-                  <Question label="Does this case involve your children?">
-                    <YesNo value={c.kids ?? ""} onChange={(v) => up({ kids: v === "Y" ? "Y" : "N" })} />
-                  </Question>
-                )}
               </div>
             )}
           />
@@ -131,12 +126,28 @@ function CardEditor({ c, k, update, error }: { c: IncidentCard; k: number; updat
           <Text value={c.A2names} onChange={(v) => update({ A2names: v })} />
         </Question>
       )}
-      <Question label="Did they use or threaten to use a gun or other weapon?">
-        <YesNo value={c.A3} onChange={(v) => update({ A3: v === "Y" ? "Y" : "N" })} />
+      <Question label="Did they use or threaten to use a weapon?">
+        <Choice
+          value={c.A3kind || (c.A3 === "N" ? "none" : c.A3 === "Y" ? (c.A3text === "Gun" ? "gun" : "other") : "")}
+          onChange={(v) =>
+            update(
+              v === "none"
+                ? { A3kind: v, A3: "N", A3text: "" }
+                : v === "gun"
+                  ? { A3kind: v, A3: "Y", A3text: "Gun" }
+                  : { A3kind: v, A3: "Y", A3text: c.A3text === "Gun" ? "" : c.A3text },
+            )
+          }
+          options={[
+            { value: "none", label: "No" },
+            { value: "gun", label: "A gun" },
+            { value: "other", label: "Another weapon" },
+          ]}
+        />
       </Question>
-      {c.A3 === "Y" && (
-        <Question label="Describe the weapon">
-          <Text value={c.A3text} onChange={(v) => update({ A3text: v })} />
+      {c.A3 === "Y" && c.A3text !== "Gun" && (
+        <Question label="What weapon, and what did they do with it?">
+          <Text value={c.A3text} onChange={(v) => update({ A3text: v })} placeholder="For example: a kitchen knife; he held it up while yelling" />
         </Question>
       )}
       <Question label="Did it hurt you physically or emotionally?">
@@ -236,12 +247,12 @@ export function Incidents({ errors }: StepProps) {
   );
 }
 
-/** Firearms and body armor (R18–R20). */
-export function Weapons() {
+/** Firearms and body armor (R18–R20), asked on "The other person". */
+export function WeaponsQuestions() {
   const { a, set } = useWizard();
   return (
-    <div className="space-y-8">
-      <Group seen="public">
+    <>
+      <Group title="Weapons" seen="public">
         <Question
           label="Does the other person have guns, gun parts, or ammunition?"
           more="Include 'ghost guns' (homemade or unregistered). The judge can tell police, who must try to collect them."
@@ -280,6 +291,6 @@ export function Weapons() {
           </Question>
         )}
       </Group>
-    </div>
+    </>
   );
 }

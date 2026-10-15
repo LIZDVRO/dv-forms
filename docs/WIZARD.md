@@ -44,6 +44,20 @@ These are orders or proofs the court, a server or the phone company completes; t
 only the parts the petitioner knows. The case number is left blank everywhere unless the person
 is updating an existing case. FL-155 and FL-351 are not used (see the build-decisions doc).
 
+## Fewer questions, fewer repeats
+
+- Guns and body armor are asked once, on "The other person". Each incident asks only
+  "No / A gun / Another weapon".
+- Earlier answers are offered as one-tap choices: the move-out home (their address or your
+  mailing address), where the children live now, which earlier cases involve the children,
+  and the children's insurance address (your employer's).
+- Parents default to "parent" for both people; a "Change" link opens the question.
+- Item 23 always starts with the LIZ Break Free document-assistance fee ($250), locked, with
+  the LIZ invoice (`public/forms/LIZ-invoice.pdf`) appended behind DV-100 and counted in item 32.
+- A drawn signature (and the lawyer's, if any) is placed on DV-100, FL-150, DV-160, INT-300
+  and SER-001 (`signatures` in each form spec). Blank means sign by hand.
+- The finish page can be printed or saved as PDF; only the instructions print.
+
 ## How it fits together
 
 | Piece | Where |

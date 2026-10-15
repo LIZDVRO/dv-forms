@@ -138,7 +138,14 @@ export function int300(witness?: number): FormSpec {
     b("Page1.OldHearingTime_dt[2]", (a) => (W(a)?.language === "other" ? W(a)!.otherLanguage : "")),
     b("Page1.CH116Signature_dt", (a) => fmtDate(a.G1)),
   ];
-  return { id: "INT-300", copy: forMe ? 1 : witness + 2, file: "/forms/INT-300.pdf", root: "topmostSubform[0]", bindings: out };
+  return {
+    id: "INT-300",
+    copy: forMe ? 1 : witness + 2,
+    file: "/forms/INT-300.pdf",
+    root: "topmostSubform[0]",
+    bindings: out,
+    signatures: [{ page: 1, x: 360, top: 687, who: "petitioner" }],
+  };
 }
 
 /** INT-300 copies for these answers: the petitioner's (if needed), then one per witness. */
@@ -273,4 +280,10 @@ const S: Binding[] = [
   ] as const
 ).forEach(([f, v]) => S.push(b(`Page2.List3.Li3a.Li3aList.Li3a4.${f}`, (a) => a.R21.includes(v))));
 
-export const SER001: FormSpec = { id: "SER-001", file: "/forms/SER-001.pdf", root: "SER-001[0]", bindings: S };
+export const SER001: FormSpec = {
+  id: "SER-001",
+  file: "/forms/SER-001.pdf",
+  root: "SER-001[0]",
+  bindings: S,
+  signatures: [{ page: 4, x: 330, top: 649, who: "petitioner" }],
+};

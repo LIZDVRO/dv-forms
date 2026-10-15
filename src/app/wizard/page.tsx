@@ -80,7 +80,7 @@ export default function WizardPage() {
 
   return (
     <div ref={top} className="min-h-full flex-1 bg-gradient-to-b from-violet-50/60 via-white to-white">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
             <Image src="/liz-logo.png" alt="LIZ" width={36} height={36} className="h-9 w-auto" />
@@ -117,7 +117,7 @@ export default function WizardPage() {
         )}
       </main>
 
-      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur">
+      <footer className="fixed inset-x-0 bottom-0 z-20 border-t border-slate-200 bg-white/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <button
             type="button"

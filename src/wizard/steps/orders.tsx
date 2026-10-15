@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 
+import { LIZ_FEE, oneLine } from "../derive";
 import { useWizard } from "../store";
 import type { Animal, Debt, Expense, OrderId, PhoneNumber } from "../types";
 import { AddressInput, Check, Choice, Group, LongText, Multi, Note, Question, Rows, Text, YesNo } from "../ui/fields";
@@ -24,6 +25,37 @@ function Order({ id, title, hint, children }: { id: OrderId; title: ReactNode; h
         </span>
       </label>
       {on && children && <div className="mt-4 space-y-5 border-t border-liz/15 pt-4">{children}</div>}
+    </div>
+  );
+}
+
+/** Pick an address you already gave, or type another. */
+function AddressPick({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { label: string; address: string }[];
+}) {
+  const known = options.find((o) => o.address === value);
+  // A single space marks "another address" chosen before anything is typed.
+  const other = !!value && !known;
+  return (
+    <div className="space-y-2">
+      <Choice
+        value={known ? known.address : other ? "__other" : ""}
+        onChange={(v) => onChange(v === "__other" ? " " : v)}
+        columns
+        options={[
+          ...options.map((o) => ({ value: o.address, label: o.label, hint: o.address })),
+          { value: "__other", label: "Another address" },
+        ]}
+      />
+      {(other || !options.length) && (
+        <Text value={value.trim()} onChange={(v) => onChange(v || " ")} placeholder="Street, city, ZIP" />
+      )}
     </div>
   );
 }
@@ -87,8 +119,15 @@ export function Orders() {
           </Question>
         </Order>
         <Order id="O13" title="Make them move out" hint="If you live together.">
-          <Question label="Address of the home">
-            <Text value={a.O13.address} onChange={(v) => set((x) => void (x.O13.address = v))} />
+          <Question label="Which home?">
+            <AddressPick
+              value={a.O13.address}
+              onChange={(v) => set((x) => void (x.O13.address = v))}
+              options={[
+                ...(a.R14.street ? [{ label: `${a.R1.split(" ")[0] || "Their"}'s address`, address: oneLine(a.R14) }] : []),
+                ...(a.P6.street ? [{ label: "My mailing address", address: oneLine(a.P6) }] : []),
+              ]}
+            />
           </Question>
           {a.O13.address && a.P6.street && a.O13.address.toLowerCase().includes(a.P6.street.toLowerCase()) && (
             <Note tone="warn">This is the same as the mailing address you gave. The other person will see it on your request.</Note>
@@ -198,6 +237,29 @@ export function Orders() {
         </Order>
 
         <h3 className="pt-4 text-lg font-semibold text-slate-900">Decided at your court date</h3>
+        <Order id="O23" title="Pay expenses caused by the abuse" hint="Like a broken phone or medical bills. Bring proof to court.">
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-liz/30 bg-white p-3">
+            <div>
+              <div className="text-base font-medium text-slate-900">LIZ Break Free — form preparation</div>
+              <div className="text-sm text-slate-600">Included automatically. The invoice is attached to your request as the receipt.</div>
+            </div>
+            <div className="text-base font-semibold text-slate-900">${LIZ_FEE.amount}.00</div>
+          </div>
+          <p className="text-sm text-slate-600">Add any other costs the abuse caused you:</p>
+          <Rows<Expense>
+            items={a.O23}
+            onChange={(v) => set((x) => void (x.O23 = v))}
+            make={() => ({ payTo: "", for: "", amount: "" })}
+            addLabel="Add an expense"
+            render={(x, up) => (
+              <div className="grid grid-cols-3 gap-2">
+                <Text value={x.payTo} onChange={(v) => up({ payTo: v })} placeholder="Pay to" />
+                <Text value={x.for} onChange={(v) => up({ for: v })} placeholder="For" />
+                <Text value={x.amount} onChange={(v) => up({ amount: v })} placeholder="Amount $" inputMode="decimal" />
+              </div>
+            )}
+          />
+        </Order>
         <Order id="O22" title="Pay debts for property" hint="Like a car payment or mortgage.">
           <Rows<Debt>
             items={a.O22.debts}
@@ -238,21 +300,6 @@ export function Orders() {
               </Question>
             </>
           )}
-        </Order>
-        <Order id="O23" title="Pay expenses caused by the abuse" hint="Like a broken phone or medical bills. Bring proof to court.">
-          <Rows<Expense>
-            items={a.O23}
-            onChange={(v) => set((x) => void (x.O23 = v))}
-            make={() => ({ payTo: "", for: "", amount: "" })}
-            addLabel="Add an expense"
-            render={(x, up) => (
-              <div className="grid grid-cols-3 gap-2">
-                <Text value={x.payTo} onChange={(v) => up({ payTo: v })} placeholder="Pay to" />
-                <Text value={x.for} onChange={(v) => up({ for: v })} placeholder="For" />
-                <Text value={x.amount} onChange={(v) => up({ amount: v })} placeholder="Amount $" inputMode="decimal" />
-              </div>
-            )}
-          />
         </Order>
         {a.RL1.includes("children") && (
           <Order id="O24" title="Child support" hint="For children under 18 you have with the other person. We'll ask about your income next.">

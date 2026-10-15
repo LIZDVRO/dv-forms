@@ -104,6 +104,10 @@ export const DV160: FormSpec = {
   id: "DV-160",
   file: "/forms/DV-160.pdf",
   root: "DV-160[0]",
+  signatures: [
+    { page: 6, x: 345, top: 604, who: "petitioner" },
+    { page: 6, x: 345, top: 670, who: "lawyer", when: (a) => a.S5 === "Y" },
+  ],
   bindings: C,
   sheets: (a) => [
     {

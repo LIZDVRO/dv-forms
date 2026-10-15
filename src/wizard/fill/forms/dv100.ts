@@ -4,7 +4,7 @@
  */
 import type { FormSpec, Binding } from "../engine";
 import { b, caseNo, card, contact, idx, twoLines } from "../helpers";
-import { courtCaption, fmtDate, money, personAge, petitionerAge, respondentAge, type Derived } from "../../derive";
+import { courtCaption, expenses23, fmtDate, money, personAge, petitionerAge, respondentAge, type Derived } from "../../derive";
 import type { Answers } from "../../types";
 
 const B: Binding[] = [];
@@ -358,7 +358,7 @@ add(b("Page11.List23.Li1.CtyChildFreed_cb", (a) => on(a, "O23")));
   ["T63", "T66", "T67"],
   ["T68", "T69", "T70"],
 ].forEach(([p, f, am], i) => {
-  const g = (a: Answers) => (on(a, "O23") ? a.O23[i] : undefined);
+  const g = (a: Answers) => expenses23(a)[i];
   add(
     b(`Page11.List23.Li1.${p}`, (a) => g(a)?.payTo),
     b(`Page11.List23.Li1.${f}`, (a) => g(a)?.for),
@@ -429,7 +429,7 @@ function sheets(a: Answers, d: Derived) {
   if (on(a, "O23"))
     out.push({
       title: "DV-100, Item 23 — Expenses",
-      text: rows(a.O23, 4, (x, n) => `(${n}) Pay to: ${x.payTo} — For: ${x.for} — Amount: $${money(x.amount)}`),
+      text: rows(expenses23(a), 4, (x, n) => `(${n}) Pay to: ${x.payTo} — For: ${x.for} — Amount: $${money(x.amount)}`),
     });
   if (on(a, "O28"))
     out.push({
@@ -443,13 +443,18 @@ export const DV100: FormSpec = {
   id: "DV-100",
   file: "/forms/DV-100.pdf",
   root: "DV-100[0]",
+  signatures: [
+    { page: 13, x: 360, top: 242, who: "petitioner" },
+    { page: 13, x: 355, top: 346, who: "lawyer", when: (a) => a.S5 === "Y" },
+  ],
   bindings: B,
   sheets,
   after: ({ sheets: s, pages }) => [
     // Incidents 4 and up go on DV-101, which counts as 2 extra pages here.
     b("Page5.List7.MultilineCheckBox", (a) => s.some((x) => x.title === "DV-100, Describe Abuse") || !!card(a, 3)),
     b("Page13.List32.Li1.T97", (a) => {
-      const n = pages + (card(a, 3) ? 2 : 0);
+      // Plus DV-101 (2 pages) and the LIZ invoice (1 page) when attached.
+      const n = pages + (card(a, 3) ? 2 : 0) + (a.orders.O23 ? 1 : 0);
       return n ? String(n) : "";
     }),
   ],

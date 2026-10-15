@@ -37,7 +37,7 @@ const childrenSheet = (title: string) => (_a: Answers, d: Derived) => [
 ];
 
 /** "Fresno, CA", or just the state when the address is private. */
-const placeText = (r: Residence) => (r.private ? r.state : [r.city, r.state].filter(Boolean).join(", "));
+const placeText = (r: Residence) => (r.private ? r.state : [r.city.trim(), r.state.trim()].filter(Boolean).join(", "));
 
 interface RowFields {
   from: string;

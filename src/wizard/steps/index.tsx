@@ -9,7 +9,7 @@ import { Confidential } from "./confidential";
 import { Abduction, Children, CustodyOrders } from "./custody";
 import { ChildSupport, Expenses, Income } from "./finances";
 import { Service } from "./service";
-import { History, Incidents, Weapons } from "./history";
+import { History, Incidents } from "./history";
 import { Orders } from "./orders";
 import { Relationship, Respondent, Roster, You } from "./people";
 import { CourtAndLawyer, Start } from "./setup";
@@ -113,12 +113,6 @@ export const STEPS: StepDef[] = [
     }),
   },
   {
-    id: "weapons",
-    title: "Weapons",
-    blurb: "This information is important to the judge and to police.",
-    Component: Weapons,
-  },
-  {
     id: "orders",
     title: "Orders you want",
     Component: Orders,
@@ -130,8 +124,6 @@ export const STEPS: StepDef[] = [
     Component: Children,
     when: custodyRequested,
     validate: (a) => ({
-      ...(!a.PR11 && { PR11: "Choose one." }),
-      ...(!a.PR12 && { PR12: "Choose one." }),
       ...(!a.K1 && { K1: "Choose yes or no." }),
     }),
   },

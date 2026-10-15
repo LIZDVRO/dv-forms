@@ -4,6 +4,8 @@
  * Step 8 · custody (DV-105, DV-105(A), DV-140) and Step 9 · abduction (DV-108, DV-145).
  * Shown only when custody is requested (O15). The children come from the roster.
  */
+import { useState } from "react";
+
 import { derive, fmtDate } from "../derive";
 import { emptyResidence } from "../defaults";
 import { useWizard } from "../store";
@@ -47,7 +49,26 @@ function GuardianQuestion({
 }
 
 /** One place the children lived. Row 0 is where they live now. */
-function ResidenceRow({ r, i, up, respondent }: { r: Residence; i: number; up: (p: Partial<Residence>) => void; respondent: string }) {
+interface Place {
+  label: string;
+  city: string;
+  state: string;
+}
+
+function ResidenceRow({
+  r,
+  i,
+  up,
+  respondent,
+  places,
+}: {
+  r: Residence;
+  i: number;
+  up: (p: Partial<Residence>) => void;
+  respondent: string;
+  places: Place[];
+}) {
+  const picked = places.find((p) => p.city === r.city && p.state === r.state);
   return (
     <div className="space-y-4">
       <h4 className="text-base font-semibold text-slate-900">{i === 0 ? "Where they live now" : "Before that"}</h4>
@@ -61,16 +82,35 @@ function ResidenceRow({ r, i, up, respondent }: { r: Residence; i: number; up: (
           </Question>
         )}
       </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="sm:col-span-2">
-          <Question label="City" hint="Or tribal land.">
-            <Text value={r.city} onChange={(v) => up({ city: v })} />
+      {i === 0 && places.length > 0 && (
+        <Question label="Where?">
+          <Choice
+            value={picked ? `${picked.city}|${picked.state}` : r.city ? "__other" : ""}
+            onChange={(v) => {
+              if (v === "__other") return up({ city: " ", state: "CA" });
+              const [city, state] = v.split("|");
+              up({ city, state });
+            }}
+            columns
+            options={[
+              ...places.map((p) => ({ value: `${p.city}|${p.state}`, label: p.label, hint: `${p.city}, ${p.state}` })),
+              { value: "__other", label: "Somewhere else" },
+            ]}
+          />
+        </Question>
+      )}
+      {(i > 0 || !places.length || (!!r.city && !picked)) && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div className="sm:col-span-2">
+            <Question label="City" hint="Or tribal land.">
+              <Text value={r.city.trim()} onChange={(v) => up({ city: v || " " })} />
+            </Question>
+          </div>
+          <Question label="State">
+            <Text value={r.state} onChange={(v) => up({ state: v })} />
           </Question>
         </div>
-        <Question label="State">
-          <Text value={r.state} onChange={(v) => up({ state: v })} />
-        </Question>
-      </div>
+      )}
       {i === 0 && (
         <Check checked={r.private} onChange={(v) => up({ private: v })}>
           Keep this address private. The form will show only the state.
@@ -96,14 +136,24 @@ function ResidenceRow({ r, i, up, respondent }: { r: Residence; i: number; up: (
   );
 }
 
-function ResidenceList({ rows, onChange, respondent }: { rows: Residence[]; onChange: (v: Residence[]) => void; respondent: string }) {
+function ResidenceList({
+  rows,
+  onChange,
+  respondent,
+  places,
+}: {
+  rows: Residence[];
+  onChange: (v: Residence[]) => void;
+  respondent: string;
+  places: Place[];
+}) {
   return (
     <Rows<Residence>
       items={rows}
       onChange={onChange}
       make={emptyResidence}
       addLabel={rows.length ? "Add an earlier place" : "Add where they live now"}
-      render={(r, up, i) => <ResidenceRow r={r} i={i} up={up} respondent={respondent} />}
+      render={(r, up, i) => <ResidenceRow r={r} i={i} up={up} respondent={respondent} places={places} />}
     />
   );
 }
@@ -155,6 +205,18 @@ export function Children({ errors }: StepProps) {
   const d = derive(a);
   const kids = d.custodyKids;
   const respondent = a.R1 || "The other person";
+  const [editParents, setEditParents] = useState(a.PR11 !== "parent" || a.PR12 !== "parent");
+  // Addresses already given, offered as one-tap answers for where the children live now.
+  const places: Place[] = [];
+  const addPlace = (label: string, city: string, state: string) => {
+    if (city.trim() && !places.some((p) => p.city === city && p.state === state)) places.push({ label, city, state: state || "CA" });
+  };
+  addPlace("Where I live (my mailing address)", a.P6.city, a.P6.state);
+  if (a.RL4 === "together") addPlace(`With me and ${them(a)}`, a.R14.city, a.R14.state);
+  if (a.O13.address.trim()) {
+    const m = /,\s*([^,]+),\s*([A-Z]{2})\b/.exec(a.O13.address);
+    if (m) addPlace("The home in my move-out request", m[1], m[2]);
+  }
   return (
     <div className="space-y-8">
       <Group seen="public">
@@ -176,22 +238,33 @@ export function Children({ errors }: StepProps) {
             </ul>
           </div>
         )}
-        <GuardianQuestion
-          label="What is your relationship to the children?"
-          value={a.PR11}
-          other={a.PR11other}
-          onChange={(v) => set((x) => void (x.PR11 = v))}
-          onOther={(v) => set((x) => void (x.PR11other = v))}
-          error={errors.PR11}
-        />
-        <GuardianQuestion
-          label={`What is ${them(a)}'s relationship to the children?`}
-          value={a.PR12}
-          other={a.PR12other}
-          onChange={(v) => set((x) => void (x.PR12 = v))}
-          onOther={(v) => set((x) => void (x.PR12other = v))}
-          error={errors.PR12}
-        />
+        {!editParents ? (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4">
+            <p className="text-base text-slate-800">You and {them(a)} are the children&apos;s parents.</p>
+            <button type="button" onClick={() => setEditParents(true)} className="text-sm font-medium text-liz hover:underline">
+              Not right? Change
+            </button>
+          </div>
+        ) : (
+          <>
+            <GuardianQuestion
+              label="What is your relationship to the children?"
+              value={a.PR11}
+              other={a.PR11other}
+              onChange={(v) => set((x) => void (x.PR11 = v))}
+              onOther={(v) => set((x) => void (x.PR11other = v))}
+              error={errors.PR11}
+            />
+            <GuardianQuestion
+              label={`What is ${them(a)}'s relationship to the children?`}
+              value={a.PR12}
+              other={a.PR12other}
+              onChange={(v) => set((x) => void (x.PR12 = v))}
+              onOther={(v) => set((x) => void (x.PR12other = v))}
+              error={errors.PR12}
+            />
+          </>
+        )}
         <Question label="Is there another parent or legal guardian?" hint={`Besides you and ${them(a)}.`}>
           <YesNo value={a.PR13.has} onChange={(v) => set((x) => void (x.PR13.has = yn(v)))} />
         </Question>
@@ -220,12 +293,26 @@ export function Children({ errors }: StepProps) {
           hint="The judge needs five years of history to decide which court handles custody."
           error={errors.K1}
         >
-          <YesNo value={a.K1} onChange={(v) => set((x) => void (x.K1 = yn(v)))} />
+          <YesNo
+            value={a.K1}
+            onChange={(v) =>
+              set((x) => {
+                x.K1 = yn(v);
+                // Start the history with where they live now, from answers already given.
+                const now = x.K2[0];
+                if (x.K1 === "Y" && now && !now.city.trim() && places[0]) {
+                  now.city = places[0].city;
+                  now.state = places[0].state;
+                  if (!now.livedWith.length && kids.every((k) => k.livesWithYou === "Y")) now.livedWith = ["me"];
+                }
+              })
+            }
+          />
         </Question>
         {a.K1 === "Y" && (
           <>
             <p className="text-sm text-slate-600">Start with where they live now, then go back five years.</p>
-            <ResidenceList rows={a.K2} onChange={(v) => set((x) => void (x.K2 = v))} respondent={respondent} />
+            <ResidenceList rows={a.K2} onChange={(v) => set((x) => void (x.K2 = v))} respondent={respondent} places={places} />
           </>
         )}
         {a.K1 === "N" && (
@@ -247,7 +334,7 @@ export function Children({ errors }: StepProps) {
                       options={kids.map((k) => ({ value: k.id, label: k.name }))}
                     />
                   </Question>
-                  <ResidenceList rows={g.rows} onChange={(v) => up({ rows: v })} respondent={respondent} />
+                  <ResidenceList rows={g.rows} onChange={(v) => up({ rows: v })} respondent={respondent} places={places} />
                 </div>
               )}
             />
@@ -256,10 +343,20 @@ export function Children({ errors }: StepProps) {
       </Group>
 
       <Group title="Other cases and orders" seen="public">
-        {a.C3 === "Y" && a.C4.some((c) => c.kids === "Y") && (
-          <Note>We&apos;ll list the cases you marked as involving your children on the custody form too.</Note>
+        {a.C3 === "Y" && a.C4.length > 0 && (
+          <Question label="Which of the cases you listed earlier involve your children?" hint="Checked cases go on the custody form too.">
+            <div className="space-y-2">
+              {a.C4.map((c, i) => (
+                <Check key={i} checked={c.kids === "Y"} onChange={(v) => set((x) => void (x.C4[i].kids = v ? "Y" : "N"))}>
+                  {c.type === "other" ? c.kind || "Other" : c.type[0].toUpperCase() + c.type.slice(1)} case
+                  {[c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).length > 0 &&
+                    ` — ${[c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).join(", ")}`}
+                </Check>
+              ))}
+            </div>
+          </Question>
         )}
-        <Question label={`Is there any other court case about your children that doesn't involve ${them(a)}?`} hint="For example a juvenile court or guardianship case.">
+        <Question label={`Any ${a.C3 === "Y" && a.C4.length ? "other " : ""}court case about your children that doesn't involve ${them(a)}?`} hint="For example a juvenile court or guardianship case.">
           <YesNo value={a.C5} onChange={(v) => set((x) => void (x.C5 = yn(v)))} />
         </Question>
         {a.C5 === "Y" && <CaseRows items={a.C5cases} onChange={(v) => set((x) => void (x.C5cases = v))} />}

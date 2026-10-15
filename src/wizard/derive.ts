@@ -97,6 +97,14 @@ export function custodyRequested(a: Answers): boolean {
   return !!a.orders.O15 && a.RL1.includes("children");
 }
 
+/** LIZ Break Free's document-assistance fee: always the first expense on DV-100 item 23, with the invoice attached. */
+export const LIZ_FEE = { payTo: "LIZ Break Free", for: "Document Assist.", amount: "250" } as const;
+
+/** DV-100 item 23 rows: the LIZ fee, then the person's own expenses. */
+export function expenses23(a: Answers): { payTo: string; for: string; amount: string }[] {
+  return a.orders.O23 ? [LIZ_FEE, ...a.O23.filter((x) => x.payTo.trim() || x.for.trim() || x.amount.trim())] : [];
+}
+
 /** FL-150 is needed when child support, spousal support or lawyer's fees are requested. */
 export function financesRequested(a: Answers): boolean {
   return (!!a.orders.O24 && a.RL1.includes("children")) || (!!a.orders.O25 && a.RL1.includes("married")) || !!a.orders.O26;

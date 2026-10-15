@@ -137,6 +137,8 @@ export interface IncidentCard {
   A2: YND;
   A2names: string;
   A3: YN;
+  /** Which weapon (sets A3 and A3text): none, a gun, or another weapon described in A3text */
+  A3kind?: "" | "none" | "gun" | "other";
   A3text: string;
   A4: YN;
   A4text: string;
@@ -570,4 +572,7 @@ export interface Answers {
 
   // Step 11 · signing
   G1: string;
+  /** Drawn signatures (PNG data URLs); blank means sign the printed forms by hand. */
+  sig: string;
+  lawyerSig: string;
 }

@@ -181,7 +181,8 @@ export function sampleAnswers(): Answers {
   a.R21 = ["violent history", "military or first-responder training"];
   a.V3 = "He has a large dog in the backyard.";
 
-  a.orders = { O10: true, O11: true, O12: true, O13: true, O16: true, O18: true, O27: true };
+  a.orders = { O10: true, O11: true, O12: true, O13: true, O16: true, O18: true, O23: true, O27: true };
+  a.O23 = [{ payTo: "Valley Phone Repair", for: "Replace broken phone", amount: "180" }];
   a.O12.places = ["me", "my home", "my job", "protected people", "children's school or childcare"];
   a.O13 = { address: "742 Elm Street, Fresno, CA 93722", reasons: ["lease", "live there with my children", "lived there"], years: "4", months: "2", otherText: "" };
   a.O16 = {

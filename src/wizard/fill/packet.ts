@@ -4,7 +4,7 @@
  */
 import { PDFDocument } from "pdf-lib";
 
-import { custodyRequested, financesRequested } from "../derive";
+import { custodyRequested, financesRequested, fmtDate } from "../derive";
 import type { Answers } from "../types";
 import { fillForm, type FormSpec } from "./engine";
 import { buildSheetsPdf } from "./attachments";
@@ -118,6 +118,17 @@ export const ALL_FORMS: FormSpec[] = [
 
 export const fileNameFor = (spec: FormSpec) => `${spec.id}${spec.copy && spec.copy > 1 ? `-${spec.copy}` : ""}.pdf`;
 
+/** The LIZ Break Free invoice, filled with the petitioner's name and the signing date, flattened. */
+async function lizInvoice(a: Answers, load: TemplateLoader): Promise<Uint8Array> {
+  const doc = await PDFDocument.load(await load("/forms/LIZ-invoice.pdf"));
+  const form = doc.getForm();
+  form.getTextField("petitioner name").setText(a.P1);
+  form.getTextField("Date25_af_date").setText(fmtDate(a.G1));
+  form.updateFieldAppearances();
+  form.flatten();
+  return doc.save();
+}
+
 async function appendSheets(form: Uint8Array, sheetsPdf: Uint8Array): Promise<Uint8Array> {
   const doc = await PDFDocument.load(form);
   const extra = await PDFDocument.load(sheetsPdf);
@@ -142,6 +153,8 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
       });
       bytes = await appendSheets(bytes, sheetsPdf);
     }
+    // The LIZ invoice is the receipt for the first item 23 expense; it goes behind DV-100.
+    if (spec.id === "DV-100" && a.orders.O23) bytes = await appendSheets(bytes, await lizInvoice(a, load));
     files.push({
       id: spec.id,
       fileName: fileNameFor(spec),

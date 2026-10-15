@@ -299,6 +299,10 @@ export const FL150: FormSpec = {
   id: "FL-150",
   file: "/forms/FL-150.pdf",
   root: "FL-150[0]",
+  signatures: [
+    { page: 1, x: 365, top: 711, who: "petitioner" },
+    { page: 3, x: 365, top: 710, who: "lawyer", when: (a) => fees(a) },
+  ],
   bindings: F,
   sheets: (a) => [
     {

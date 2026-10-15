@@ -142,7 +142,8 @@ export function emptyAnswers(): Answers {
 
     cards: [emptyCard()],
 
-    orders: { O10: true },
+    // Stop the abuse, and the expenses order that carries the LIZ fee, start checked.
+    orders: { O10: true, O23: true },
     O12: {
       places: [],
       placesOther: "",
@@ -170,9 +171,9 @@ export function emptyAnswers(): Answers {
     O23: [],
     O28: [],
 
-    PR11: "",
+    PR11: "parent",
     PR11other: "",
-    PR12: "",
+    PR12: "parent",
     PR12other: "",
     PR13: { has: "", name: "", role: "" },
     C5: "",
@@ -295,5 +296,7 @@ export function emptyAnswers(): Answers {
     R22: "",
 
     G1: todayISO(),
+    sig: "",
+    lawyerSig: "",
   };
 }
