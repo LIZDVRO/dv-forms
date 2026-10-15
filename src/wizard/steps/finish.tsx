@@ -87,7 +87,7 @@ function howToUse(f: PacketFile, a: Answers): string {
     case "DV-130":
       return "Bring 3 copies to your court date. The judge fills in the orders.";
     case "LIZ-INVOICE":
-      return "Proof of the $250 expense in DV-100 item 23. Bring it to your court date and show the judge.";
+      return "Proof of the $250 expense in DV-100 item 23 (a copy is also behind DV-100). Bring it to your court date and show the judge.";
     case "DV-150":
       return "Bring to your court date with DV-130. The judge fills in the findings.";
     case "SER-001":
@@ -328,7 +328,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 )}
                 <li>
                   On your court date, bring 3 copies of DV-130{custodyRequested(a) ? " and DV-150" : ""}, your proof of service (DV-200),
-                  {a.orders.O23 ? " the LIZ invoice and receipts for any other expenses," : ""} and anything that supports what you wrote,
+                  {" the LIZ invoice and receipts for any other expenses,"} and anything that supports what you wrote,
                   like photos or texts.
                 </li>
                 {packet.files.some((f) => f.id === "INT-300") && (

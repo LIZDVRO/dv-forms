@@ -153,6 +153,8 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
       });
       bytes = await appendSheets(bytes, sheetsPdf);
     }
+    // The LIZ invoice goes behind DV-100 so it is filed and served with the request…
+    if (spec.id === "DV-100") bytes = await appendSheets(bytes, await lizInvoice(a, load));
     files.push({
       id: spec.id,
       fileName: fileNameFor(spec),
@@ -161,9 +163,8 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
       bytes,
       sheetTitles: filled.sheets.map((s) => s.title),
     });
-    // The LIZ invoice is the proof for the first item 23 expense. DV-100 says to bring proof
-    // of expenses to the court date, so it goes with DV-130 rather than in the filing.
-    if (spec.id === "DV-130" && a.orders.O23)
+    // …and as its own copy to bring to the court date, where DV-100 item 23 says to bring proof.
+    if (spec.id === "DV-130")
       files.push({
         id: "LIZ-INVOICE",
         fileName: "LIZ-Invoice.pdf",

@@ -351,7 +351,8 @@ add(
 );
 
 // 23 · expenses caused by abuse
-add(b("Page11.List23.Li1.CtyChildFreed_cb", (a) => on(a, "O23")));
+// Always checked: item 23 carries the LIZ fee.
+add(b("Page11.List23.Li1.CtyChildFreed_cb", () => true));
 [
   ["T47", "T50", "T53"],
   ["T56", "T59", "T62"],
@@ -426,7 +427,7 @@ function sheets(a: Answers, d: Derived) {
       title: "DV-100, Item 22 — Debts",
       text: rows(a.O22.debts, 3, (x, n) => `(${n}) Pay to: ${x.payTo} — For: ${x.for} — Amount: $${money(x.amount)} — Due: ${fmtDate(x.due)}`),
     });
-  if (on(a, "O23"))
+  if (expenses23(a).length)
     out.push({
       title: "DV-100, Item 23 — Expenses",
       text: rows(expenses23(a), 4, (x, n) => `(${n}) Pay to: ${x.payTo} — For: ${x.for} — Amount: $${money(x.amount)}`),
@@ -453,8 +454,8 @@ export const DV100: FormSpec = {
     // Incidents 4 and up go on DV-101, which counts as 2 extra pages here.
     b("Page5.List7.MultilineCheckBox", (a) => s.some((x) => x.title === "DV-100, Describe Abuse") || !!card(a, 3)),
     b("Page13.List32.Li1.T97", (a) => {
-      // Plus DV-101 (2 pages) when it is filed with DV-100.
-      const n = pages + (card(a, 3) ? 2 : 0);
+      // Plus DV-101 (2 pages) and the LIZ invoice (1 page) behind DV-100.
+      const n = pages + (card(a, 3) ? 2 : 0) + 1;
       return n ? String(n) : "";
     }),
   ],

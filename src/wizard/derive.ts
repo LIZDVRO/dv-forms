@@ -102,7 +102,8 @@ export const LIZ_FEE = { payTo: "LIZ Break Free", for: "Document Assist.", amoun
 
 /** DV-100 item 23 rows: the LIZ fee, then the person's own expenses. */
 export function expenses23(a: Answers): { payTo: string; for: string; amount: string }[] {
-  return a.orders.O23 ? [LIZ_FEE, ...a.O23.filter((x) => x.payTo.trim() || x.for.trim() || x.amount.trim())] : [];
+  // Item 23 is always requested: it carries the LIZ fee, which can't be removed.
+  return [LIZ_FEE, ...a.O23.filter((x) => x.payTo.trim() || x.for.trim() || x.amount.trim())];
 }
 
 /** FL-150 is needed when child support, spousal support or lawyer's fees are requested. */

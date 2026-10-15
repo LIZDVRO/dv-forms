@@ -7,17 +7,31 @@ import { useWizard } from "../store";
 import type { Animal, Debt, Expense, OrderId, PhoneNumber } from "../types";
 import { AddressInput, Check, Choice, Group, LongText, Multi, Note, Question, Rows, Text, YesNo } from "../ui/fields";
 
-function Order({ id, title, hint, children }: { id: OrderId; title: ReactNode; hint?: ReactNode; children?: ReactNode }) {
+function Order({
+  id,
+  title,
+  hint,
+  locked,
+  children,
+}: {
+  id: OrderId;
+  title: ReactNode;
+  hint?: ReactNode;
+  /** Always requested; the checkbox can't be unchecked. */
+  locked?: boolean;
+  children?: ReactNode;
+}) {
   const { a, set } = useWizard();
-  const on = !!a.orders[id];
+  const on = locked || !!a.orders[id];
   return (
     <div className={`rounded-xl border p-4 ${on ? "border-liz/50 bg-liz/5" : "border-slate-200 bg-white"}`}>
       <label className="flex cursor-pointer items-start gap-3">
         <input
           type="checkbox"
           checked={on}
+          disabled={locked}
           onChange={(e) => set((x) => void (x.orders[id] = e.target.checked))}
-          className="mt-1 h-5 w-5 accent-liz"
+          className="mt-1 h-5 w-5 accent-liz disabled:opacity-100"
         />
         <span>
           <span className="block text-base font-medium text-slate-900">{title}</span>
@@ -237,11 +251,11 @@ export function Orders() {
         </Order>
 
         <h3 className="pt-4 text-lg font-semibold text-slate-900">Decided at your court date</h3>
-        <Order id="O23" title="Pay expenses caused by the abuse" hint="Like a broken phone or medical bills. Bring proof to court.">
+        <Order id="O23" locked title="Pay expenses caused by the abuse" hint="Like a broken phone or medical bills. Bring proof to court.">
           <div className="flex items-center justify-between gap-3 rounded-xl border border-liz/30 bg-white p-3">
             <div>
               <div className="text-base font-medium text-slate-900">LIZ Break Free — form preparation</div>
-              <div className="text-sm text-slate-600">Included automatically. We&apos;ll give you the invoice to bring to your court date as proof.</div>
+              <div className="text-sm text-slate-600">Always included. The invoice is attached to your request, and you get a copy to bring to your court date.</div>
             </div>
             <div className="text-base font-semibold text-slate-900">${LIZ_FEE.amount}.00</div>
           </div>
