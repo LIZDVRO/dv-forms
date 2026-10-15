@@ -254,6 +254,24 @@ export function Orders() {
             )}
           />
         </Order>
+        {a.RL1.includes("children") && (
+          <Order id="O24" title="Child support" hint="For children under 18 you have with the other person. We'll ask about your income next.">
+            <Question label="Which applies to you?">
+              <Multi
+                value={a.O24status}
+                onChange={(v) => set((x) => void (x.O24status = v))}
+                options={[
+                  { value: "no order, want one", label: "I don't have a child support order and I want one" },
+                  { value: "change existing order", label: "I have a child support order and want it changed" },
+                  { value: "TANF/CalWORKs", label: "I get or applied for CalWORKs, TANF, or welfare" },
+                ]}
+              />
+            </Question>
+            {a.O24status.includes("change existing order") && <Note>Bring a copy of your current support order when you file.</Note>}
+          </Order>
+        )}
+        {married && <Order id="O25" title="Spousal support" hint="Only for married or registered partners. We'll ask about your income next." />}
+        <Order id="O26" title="They pay my lawyer's fees and costs" hint="We'll ask about your income next." />
         <Order id="O27" title="Batterer intervention program" hint="Usually a year-long program to stop abusive behavior. They pay for it." />
         <Order id="O28" title="Transfer my phone account" hint="If they hold the account for your phone or your child's phone. You'll be responsible for the bill.">
           <Rows<PhoneNumber>
@@ -290,10 +308,6 @@ export function Orders() {
             </Question>
           </div>
         </Order>
-        <Note>
-          Need child support, spousal support, or lawyer&apos;s fees? Those need financial forms this version doesn&apos;t make yet. Your
-          court&apos;s self-help center can help with them (selfhelp.courts.ca.gov/find).
-        </Note>
       </Group>
     </div>
   );

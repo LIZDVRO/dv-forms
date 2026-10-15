@@ -1,6 +1,6 @@
 /**
  * DV-100 (Rev. Jan 1, 2025) bindings. Mirrors docs/field-map, tab "DV-100".
- * Items 24–26 (support and fees) are not offered yet.
+ * All requestable items (10–28) are offered.
  */
 import type { FormSpec, Binding } from "../engine";
 import { b, caseNo, card, contact, idx, twoLines } from "../helpers";
@@ -261,6 +261,16 @@ add(
 );
 
 // 16 · animals
+// 24–26 · support and fees (details go on FL-150)
+add(
+  b("Page11.List24.CheckBoxRightCaption", (a) => on(a, "O24")),
+  b("Page11.List24.Li1.CheckBox3", (a) => on(a, "O24") && a.O24status.includes("no order, want one")),
+  b("Page11.List24.Li2.CheckBox3", (a) => on(a, "O24") && a.O24status.includes("change existing order")),
+  b("Page11.List24.Li3.CheckBox3", (a) => on(a, "O24") && a.O24status.includes("TANF/CalWORKs")),
+  b("Page11.List25.Li1.CheckBoxRightCaption", (a) => on(a, "O25")),
+  b("Page11.List26.Li1.CtyChildFreed_cb", (a) => on(a, "O26")),
+);
+
 // 15 · custody (details go on DV-105)
 add(b("Page8.LIST15.CtyChildFreed_cb", (a) => on(a, "O15")));
 

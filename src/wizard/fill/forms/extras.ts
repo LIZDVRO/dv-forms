@@ -4,7 +4,7 @@
  */
 import type { Binding, FormSpec } from "../engine";
 import { b, card, caseNo, contact, idx } from "../helpers";
-import { courtCaption, custodyRequested, fmtDate, oneLine } from "../../derive";
+import { courtCaption, custodyRequested, financesRequested, fmtDate, oneLine } from "../../derive";
 import { INT300_LANGUAGES } from "../../languages";
 import type { Answers, IncidentCard } from "../../types";
 
@@ -159,7 +159,8 @@ export function serviceList(a: Answers): string {
   if (custody) filed.push("DV-140");
   if (custody && a.K5 === "Y") filed.push("DV-145");
   if (a.orders.O28) filed.push("DV-900");
-  const blank = ["DV-120", "DV-120-INFO", "DV-250", ...(custody ? ["DV-125"] : []), ...(a.R18 === "Y" ? ["DV-800", "DV-800-INFO"] : [])];
+  if (financesRequested(a)) filed.push("FL-150");
+  const blank = ["DV-120", "DV-120-INFO", "DV-250", ...(financesRequested(a) ? ["FL-150"] : []), ...(custody ? ["DV-125"] : []), ...(a.R18 === "Y" ? ["DV-800", "DV-800-INFO"] : [])];
   return `Filed: ${filed.join(", ")}. Blank: ${blank.join(", ")}.`;
 }
 

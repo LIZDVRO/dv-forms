@@ -20,8 +20,8 @@ import { sampleAnswers, sampleAnswersB } from "../src/wizard/sample";
 const outDir = process.argv[2] ?? "tmp-packet";
 const map = JSON.parse(fs.readFileSync("docs/field-map/dvro_field_map.json", "utf8"));
 
-// DV-100 items not offered yet (child and spousal support, lawyer's fees).
-const SKIPPED = /^DV-100\[0\]\.Page11\[0\]\.List2[456]/;
+// Nothing is skipped now; kept for items deliberately left out later.
+const SKIPPED = /^$/;
 
 async function main() {
   let failed = false;

@@ -23,8 +23,13 @@ Also included when they apply:
 - SER-001 when the sheriff serves (not filed). The case number, court date and service
   deadline are left for the person to write in from the DV-109 the court returns.
 
-Not yet included (next branches): minor confidentiality (DV-160/DV-165), financial forms
-(support and fees), DV-200, and the stage-2/3 forms. Their field bindings
+- FL-150 when child support (O24), spousal support (O25) or lawyer's fees (O26) is requested,
+  with three steps: `Your income`, `Your expenses`, and `Child support details` (O24 only).
+  FL-155 (simplified) is not offered: FL-150 is accepted in every case, so the wizard never
+  has to choose. DV-570 is therefore not needed.
+
+Not yet included (next branches): minor confidentiality (DV-160/DV-165), DV-200, and the
+stage-2/3 forms. Their field bindings
 are already specified in `docs/field-map`.
 
 ## How it fits together

@@ -97,6 +97,11 @@ export function custodyRequested(a: Answers): boolean {
   return !!a.orders.O15 && a.RL1.includes("children");
 }
 
+/** FL-150 is needed when child support, spousal support or lawyer's fees are requested. */
+export function financesRequested(a: Answers): boolean {
+  return (!!a.orders.O24 && a.RL1.includes("children")) || (!!a.orders.O25 && a.RL1.includes("married")) || !!a.orders.O26;
+}
+
 /** True when the person is under 18, or when their age is unknown. */
 export function under18(p: RosterPerson, asOf: string): boolean {
   const age = personAge(p, asOf);

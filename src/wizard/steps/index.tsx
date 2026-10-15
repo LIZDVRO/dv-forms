@@ -3,9 +3,10 @@
 import type { ComponentType } from "react";
 
 import { COURTHOUSES } from "../courthouses";
-import { custodyRequested } from "../derive";
+import { custodyRequested, financesRequested } from "../derive";
 import type { Answers } from "../types";
 import { Abduction, Children, CustodyOrders } from "./custody";
+import { ChildSupport, Expenses, Income } from "./finances";
 import { Service } from "./service";
 import { History, Incidents, Weapons } from "./history";
 import { Orders } from "./orders";
@@ -138,6 +139,26 @@ export const STEPS: StepDef[] = [
     blurb: "Form DV-108 asks the judge for orders to keep the children from being taken.",
     Component: Abduction,
     when: (a) => custodyRequested(a) && a.K5 === "Y",
+  },
+  {
+    id: "income",
+    title: "Your income",
+    blurb: "For your support or fees request (form FL-150). Leave blank anything that doesn't apply.",
+    Component: Income,
+    when: financesRequested,
+  },
+  {
+    id: "expenses",
+    title: "Your expenses",
+    blurb: "Monthly amounts. Estimates are fine; leave blank anything that doesn't apply.",
+    Component: Expenses,
+    when: financesRequested,
+  },
+  {
+    id: "child-support",
+    title: "Child support details",
+    Component: ChildSupport,
+    when: (a) => financesRequested(a) && !!a.orders.O24 && a.RL1.includes("children"),
   },
   {
     id: "service",

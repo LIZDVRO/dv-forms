@@ -39,6 +39,9 @@ const ORDER_NAMES: Record<string, string> = {
   O21: "More time to serve",
   O22: "Pay debts",
   O23: "Pay expenses",
+  O24: "Child support",
+  O25: "Spousal support",
+  O26: "Lawyer's fees",
   O27: "Batterer program",
   O28: "Phone transfer",
 };
@@ -55,6 +58,7 @@ const FORM_NAMES: Record<string, string> = {
   "DV-145": "Order to Prevent Child Abduction",
   "CLETS-001": "Confidential Information for Law Enforcement",
   "INT-300": "Request for Interpreter",
+  "FL-150": "Income and Expense Declaration",
   "SER-001": "Request for Sheriff to Serve Court Papers",
   "DV-900": "Order Transferring Wireless Phone Account",
 };
@@ -216,6 +220,12 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                     </>
                   )}
                 </li>
+                {packet.files.some((f) => f.id === "FL-150") && (
+                  <li>
+                    Sign FL-150 (page 1). {a.R1 || "The other person"} must be served with it and a blank FL-150. Bring your last two pay
+                    stubs and latest tax return to court, with Social Security numbers blacked out.
+                  </li>
+                )}
                 {packet.files.some((f) => f.id === "INT-300") && (
                   <li>File your INT-300 with your other papers so the court can schedule an interpreter for your court date.</li>
                 )}

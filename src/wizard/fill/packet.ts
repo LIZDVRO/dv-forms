@@ -4,11 +4,12 @@
  */
 import { PDFDocument } from "pdf-lib";
 
-import { custodyRequested } from "../derive";
+import { custodyRequested, financesRequested } from "../derive";
 import type { Answers } from "../types";
 import { fillForm, type FormSpec } from "./engine";
 import { buildSheetsPdf } from "./attachments";
 import { DV100 } from "./forms/dv100";
+import { FL150 } from "./forms/fl150";
 import { DV105, DV108, DV140, DV145, dv105a, residenceGroups } from "./forms/custody";
 import { DV101, SER001, int300, int300Forms, needsDV101 } from "./forms/extras";
 import { CLETS001, DV109, DV110, DV900 } from "./forms/filing";
@@ -45,6 +46,7 @@ export function filingForms(a: Answers): FormSpec[] {
     if (a.K5 === "Y") forms.push(DV145);
   }
   if (a.orders.O28) forms.push(DV900);
+  if (financesRequested(a)) forms.push(FL150);
   forms.push(...int300Forms(a));
   forms.push(CLETS001);
   if (a.V1 === "sheriff") forms.push(SER001);
@@ -63,6 +65,7 @@ export const ALL_FORMS: FormSpec[] = [
   DV140,
   DV145,
   DV900,
+  FL150,
   int300(),
   CLETS001,
   SER001,

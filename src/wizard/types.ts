@@ -38,6 +38,9 @@ export interface RosterPerson {
   sharedChild: YN;
   /** PR8 should the order protect this person */
   protect: YN;
+  /** PR9 gross monthly income, and whether they pay part of household expenses (FL-150 item 12) */
+  income?: string;
+  paysExpenses?: YN;
 }
 
 /** C2: a restraining order in place or expired in the last 6 months */
@@ -197,7 +200,70 @@ export type RelationshipKind =
 
 export type OrderId =
   | "O10" | "O11" | "O12" | "O13" | "O14" | "O15" | "O16" | "O17" | "O18" | "O19"
-  | "O20" | "O21" | "O22" | "O23" | "O27" | "O28";
+  | "O20" | "O21" | "O22" | "O23" | "O24" | "O25" | "O26" | "O27" | "O28";
+
+/** FL-150 income types (F2), in item 5–6 order. */
+export const INCOME_TYPES = [
+  "wages",
+  "overtime",
+  "commissions or bonuses",
+  "public assistance",
+  "spousal support",
+  "partner support",
+  "pension",
+  "Social Security",
+  "disability",
+  "unemployment",
+  "workers' comp",
+  "other",
+  "interest or dividends",
+  "rental",
+  "trust",
+  "other investment",
+] as const;
+export type IncomeType = (typeof INCOME_TYPES)[number];
+
+export interface IncomeAmount {
+  lastMonth: string;
+  average: string;
+  /** spousal/partner support: from this or a different marriage/partnership */
+  from?: "this" | "different" | "";
+  /** spousal support: federally taxable */
+  taxable?: boolean;
+  /** disability: Social Security, SDI, private insurance */
+  kinds?: string[];
+  /** other / other investment: what it is */
+  describe?: string;
+}
+
+export interface InstallmentDebt {
+  paidTo: string;
+  for: string;
+  amount: string;
+  balance: string;
+  lastPayment: string;
+}
+
+/** FL-150 item 13 expense lines (F11), keyed as on the form. */
+export const EXPENSE_LINES = [
+  ["property tax", "Property taxes"],
+  ["home insurance", "Homeowner's or renter's insurance"],
+  ["maintenance", "Home maintenance and repair"],
+  ["health care", "Health care not paid by insurance"],
+  ["child care", "Child care"],
+  ["groceries", "Groceries and household supplies"],
+  ["eating out", "Eating out"],
+  ["utilities", "Utilities (gas, electric, water, trash)"],
+  ["telephone", "Phone, cell phone, and internet"],
+  ["laundry", "Laundry and cleaning"],
+  ["clothes", "Clothes"],
+  ["education", "Education"],
+  ["entertainment", "Entertainment, gifts, and vacation"],
+  ["auto", "Car payments, gas, repairs, insurance, and transit"],
+  ["other insurance", "Life, accident, and other insurance"],
+  ["savings", "Savings and investments"],
+  ["charity", "Charitable contributions"],
+] as const;
 
 export interface Answers {
   // Step 0 · setup
@@ -365,6 +431,88 @@ export interface Answers {
   W2: string;
   W3: string;
   W4: string;
+
+  // Step 10 · finances (FL-150) — shown when O24, O25 or O26
+  /** O24 child support: what applies */
+  O24status: string[];
+  /** L6 lawyer's hourly rate (O26 with a lawyer) */
+  L6: string;
+  /** F1 self-employed */
+  F1: YN;
+  F2: IncomeType[];
+  F3: Partial<Record<IncomeType, IncomeAmount>>;
+  F4: {
+    employed: YN;
+    employer: string;
+    employerAddress: string;
+    employerPhone: string;
+    occupation: string;
+    startDate: string;
+    endDate: string;
+    hoursPerWeek: string;
+    pay: string;
+    payPeriod: "" | "month" | "week" | "hour";
+  };
+  F5: {
+    highSchool: YN;
+    highestGrade: string;
+    collegeYears: string;
+    collegeDegrees: string;
+    gradYears: string;
+    gradDegrees: string;
+    licenses: string;
+    vocational: string;
+  };
+  F6: {
+    lastYearFiled: string;
+    status: "" | "single" | "head of household" | "married filing separately" | "married filing jointly";
+    jointFilerName: string;
+    state: string;
+    exemptions: string;
+  };
+  F7: { lastMonth: string; average: string; role: "" | "owner" | "partner" | "other"; roleOther: string; years: string; name: string; type: string };
+  F8: { oneTime: string; change: string };
+  /** F9 monthly deductions */
+  F9: {
+    unionDues: string;
+    retirement: string;
+    healthInsurance: string;
+    otherChildSupport: string;
+    spousalSupport: string;
+    spousalTaxDeductible: boolean;
+    partnerSupport: string;
+    jobExpenses: string;
+    jobExpensesWhy: string;
+  };
+  F10: { cash: string; stocks: string; property: string; real: boolean; personal: boolean };
+  F11: {
+    basis: "" | "estimated" | "actual" | "proposed";
+    housing: "" | "rent" | "mortgage";
+    rentOrMortgage: string;
+    mortgagePrincipal: string;
+    mortgageInterest: string;
+    lines: Partial<Record<(typeof EXPENSE_LINES)[number][0], string>>;
+    otherDescribe: string;
+    other: string;
+    paidByOthers: string;
+  };
+  F12: InstallmentDebt[];
+  F13: { paid: string; source: string; owed: string };
+  F14: { amount: string; basis: string };
+  F16: { percentMe: string; percentRespondent: string; schedule: string };
+  F17: { available: YN; company: string; address: string; cost: string };
+  F18: { childcare: string; health: string; travel: string; specialNeeds: string; specialNeedsDescribe: string };
+  F19: {
+    healthAmount: string;
+    healthMonths: string;
+    lossesAmount: string;
+    lossesMonths: string;
+    otherChildrenAmount: string;
+    otherChildrenMonths: string;
+    supportReceived: string;
+    why: string;
+  };
+  F20: string;
 
   // Interpreter (INT-300)
   I1: YN;

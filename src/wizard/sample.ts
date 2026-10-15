@@ -111,6 +111,47 @@ export function sampleAnswers(): Answers {
     more("2025-11-28", "He took the car keys and my wallet and left me at home with no money for two days.", { A7: "2-5" }),
   ];
 
+  // Child support and lawyer's fees (FL-150).
+  a.O24status = ["no order, want one"];
+  a.roster[4].livesWithYou = "Y";
+  a.roster[4].income = "1200";
+  a.roster[4].paysExpenses = "Y";
+  a.F4 = {
+    employed: "Y",
+    employer: "Valley Medical Group",
+    employerAddress: "200 Fresno St, Fresno, CA 93721",
+    employerPhone: "(559) 555-0150",
+    occupation: "Medical assistant",
+    startDate: "2021-03-15",
+    endDate: "",
+    hoursPerWeek: "32",
+    pay: "21.50",
+    payPeriod: "hour",
+  };
+  a.F5 = { ...a.F5, highSchool: "Y", collegeYears: "1", licenses: "Certified Medical Assistant" };
+  a.F6 = { lastYearFiled: "2025", status: "head of household", jointFilerName: "", state: "California", exemptions: "4" };
+  a.F2 = ["wages", "public assistance"];
+  a.F3 = { wages: { lastMonth: "2980", average: "2900" }, "public assistance": { lastMonth: "350", average: "350" } };
+  a.F9 = { ...a.F9, retirement: "120", healthInsurance: "210" };
+  a.F10 = { cash: "850", stocks: "", property: "4000", real: false, personal: true };
+  a.F11 = {
+    basis: "actual",
+    housing: "rent",
+    rentOrMortgage: "1450",
+    mortgagePrincipal: "",
+    mortgageInterest: "",
+    lines: { groceries: "700", utilities: "220", telephone: "120", "child care": "400", clothes: "100", auto: "380" },
+    otherDescribe: "School supplies",
+    other: "40",
+    paidByOthers: "300",
+  };
+  a.F12 = [{ paidTo: "Valley Credit Union", for: "Car loan", amount: "310", balance: "6200", lastPayment: "2026-10-01" }];
+  a.F14 = { amount: "5500", basis: "He told me he earns about $65,000 a year at the auto shop." };
+  a.F16 = { percentMe: "90", percentRespondent: "10", schedule: "Supervised visits on Saturdays, 2 hours." };
+  a.F17 = { available: "Y", company: "Blue Shield of California", address: "PO Box 272540, Chico, CA 95927", cost: "95" };
+  a.F18 = { childcare: "400", health: "60", travel: "", specialNeeds: "", specialNeedsDescribe: "" };
+  a.F20 = "The children have lived with me full time since he moved out.";
+
   // Interpreter for me and one witness; the sheriff serves.
   a.I1 = "Y";
   a.I1language = "Spanish";
@@ -139,6 +180,8 @@ export function sampleAnswers(): Answers {
 
   // Custody (supervised visits on the chart) and abduction.
   a.orders.O15 = true;
+  a.orders.O24 = true;
+  a.orders.O26 = true;
   a.C4[0].kids = "Y";
   a.PR11 = "parent";
   a.PR12 = "parent";
