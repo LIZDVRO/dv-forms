@@ -28,9 +28,21 @@ Also included when they apply:
   FL-155 (simplified) is not offered: FL-150 is accepted in every case, so the wizard never
   has to choose. DV-570 is therefore not needed.
 
-Not yet included (next branches): minor confidentiality (DV-160/DV-165), DV-200, and the
-stage-2/3 forms. Their field bindings
-are already specified in `docs/field-map`.
+- DV-160 with the proposed DV-165 and DV-170 when the person asks to keep a protected child's
+  information private (PR14, its own step). DV-175 is pre-filled for later filings.
+
+Every form the petitioner touches is now produced in one session. The finish screen (and the
+zip) sorts them into three groups:
+
+| Group | Forms |
+| --- | --- |
+| File now | DV-100, DV-101, DV-105, DV-105(A), DV-108, DV-109, DV-110, DV-140, DV-145, DV-900, FL-150, INT-300, DV-160, DV-165, DV-170, CLETS-001 (to the clerk, not filed) |
+| Bring to your court date | DV-130, DV-150 (with custody) |
+| Keep for later | SER-001, DV-200, DV-250 (with FL-150), DV-901 (with DV-900; confidential), DV-175, DV-210 |
+
+These are orders or proofs the court, a server or the phone company completes; the wizard fills
+only the parts the petitioner knows. The case number is left blank everywhere unless the person
+is updating an existing case. FL-155 and FL-351 are not used (see the build-decisions doc).
 
 ## How it fits together
 

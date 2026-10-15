@@ -5,6 +5,7 @@ import type { ComponentType } from "react";
 import { COURTHOUSES } from "../courthouses";
 import { custodyRequested, financesRequested } from "../derive";
 import type { Answers } from "../types";
+import { Confidential } from "./confidential";
 import { Abduction, Children, CustodyOrders } from "./custody";
 import { ChildSupport, Expenses, Income } from "./finances";
 import { Service } from "./service";
@@ -85,6 +86,17 @@ export const STEPS: StepDef[] = [
     title: "People to protect",
     blurb: "Your children and anyone else who needs protection.",
     Component: Roster,
+  },
+  {
+    id: "confidential",
+    title: "Keeping a child's information private",
+    blurb: "Form DV-160 asks the judge to keep a child's information out of the public file.",
+    Component: Confidential,
+    when: (a) => a.PR14 === "Y",
+    validate: (a) => ({
+      ...(!a.M1 && { M1: "Choose one." }),
+      ...(a.M1 !== "the minor" && a.M2.length === 0 && { M2: "Choose at least one child." }),
+    }),
   },
   {
     id: "history",

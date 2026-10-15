@@ -380,11 +380,12 @@ export function Roster() {
           </Question>
         )}
         {a.roster.some((p) => p.protect === "Y" && personIsMinor(p)) && (
-          <Note>
-            Worried about a child&apos;s information being public? Using a safe mailing address (not where the child lives) is
-            enough to protect an address. Keeping a child&apos;s name or other details private needs another form (DV-160),
-            which this version doesn&apos;t make yet.
-          </Note>
+          <Question
+            label="Do you want to keep a child's information private from the public?"
+            hint="Like their name, address, or school. If you only want to protect where they live, a safe mailing address is enough."
+          >
+            <YesNo value={a.PR14} onChange={(v) => set((x) => void (x.PR14 = v === "Y" ? "Y" : "N"))} />
+          </Question>
         )}
       </Group>
     </div>

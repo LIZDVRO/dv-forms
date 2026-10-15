@@ -152,6 +152,25 @@ export function sampleAnswers(): Answers {
   a.F18 = { childcare: "400", health: "60", travel: "", specialNeeds: "", specialNeedsDescribe: "" };
   a.F20 = "The children have lived with me full time since he moved out.";
 
+  // Keep the children's address and school private (DV-160, DV-165, DV-170, DV-175).
+  a.PR14 = "Y";
+  a.M1 = "parent";
+  a.M2 = a.roster.slice(0, 4).map((p) => p.id);
+  a.M3 = "Y";
+  a.M4 = ["address", "other"];
+  a.M5 = { street: "88 Hidden Lane", city: "Fresno", state: "CA", zip: "93720" };
+  a.M6 = [
+    { location: "DV-100, item 5f", text: "Name of Sofia's school (Roosevelt Elementary)" },
+    { location: "DV-105, item 4b", text: "Children's current city" },
+  ];
+  a.M7 = "He has threatened to take the children from school. If he learns where they live or go to school, he could find them.";
+  a.M8 = "He could show up at their school or home and take them or hurt them.";
+  a.M9 = "go forward";
+  a.M10 = { what: ["address"], otherText: "", why: "Same reasons as above.", whatWouldHappen: "He would come to the house.", ifDenied: "go forward" };
+  a.M11 = { who: ["school", "supervised visitation provider"], otherName: "", what: ["address"] };
+  a.W5 = "(559) 555-0177";
+  a.W8 = { street: "PO Box 1234", city: "Fresno", state: "CA", zip: "93721" };
+
   // Interpreter for me and one witness; the sheriff serves.
   a.I1 = "Y";
   a.I1language = "Spanish";

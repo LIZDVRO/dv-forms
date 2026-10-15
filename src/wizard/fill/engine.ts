@@ -47,6 +47,8 @@ export interface Binding {
 
 export interface FormSpec {
   id: string;
+  /** When the person uses it: filed now (default), brought to the hearing, or kept for later. */
+  group?: "file" | "hearing" | "later";
   /** For forms filed more than once (DV-105(A)): 1, 2 … */
   copy?: number;
   /** Template path under /public, e.g. "/forms/DV-100.pdf". */

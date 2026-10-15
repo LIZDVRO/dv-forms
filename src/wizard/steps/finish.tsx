@@ -4,8 +4,9 @@ import JSZip from "jszip";
 import { useState } from "react";
 
 import { custodyRequested, derive, fmtDate } from "../derive";
-import { buildFilingPacket, type Packet } from "../fill/packet";
+import { buildFilingPacket, type Packet, type PacketFile } from "../fill/packet";
 import { useWizard } from "../store";
+import type { Answers } from "../types";
 import { Group, Note, Question, Text } from "../ui/fields";
 
 const loadTemplate = async (path: string) => {
@@ -61,7 +62,55 @@ const FORM_NAMES: Record<string, string> = {
   "FL-150": "Income and Expense Declaration",
   "SER-001": "Request for Sheriff to Serve Court Papers",
   "DV-900": "Order Transferring Wireless Phone Account",
+  "DV-160": "Request to Keep Minor's Information Confidential",
+  "DV-165": "Order on Request to Keep Minor's Information Confidential",
+  "DV-170": "Notice of Order Protecting Information of Minor",
+  "DV-175": "Cover Sheet for Confidential Information",
+  "DV-130": "Restraining Order After Hearing",
+  "DV-150": "Supplemental Findings for Custody (DV Prevention)",
+  "DV-200": "Proof of Personal Service",
+  "DV-250": "Proof of Service by Mail",
+  "DV-901": "Attachment to Order Transferring Wireless Phone Account",
+  "DV-210": "Summons (for service by publication or posting)",
 };
+
+/** One line on what to do with each form, by where it goes and when. */
+function howToUse(f: PacketFile, a: Answers): string {
+  switch (f.id) {
+    case "CLETS-001":
+      return "Give to the clerk when you file. It is not filed in the public record.";
+    case "DV-160":
+    case "DV-165":
+    case "DV-170":
+      return "File with your other papers. These go in the court's confidential file.";
+    case "DV-130":
+      return "Bring 3 copies to your court date. The judge fills in the orders.";
+    case "DV-150":
+      return "Bring to your court date with DV-130. The judge fills in the findings.";
+    case "SER-001":
+      return "After the court returns your papers, give this and copies of them to the sheriff. Don't file it.";
+    case "DV-200":
+      return a.V1 === "sheriff"
+        ? "For the person who serves. The sheriff may use its own proof of service instead."
+        : "Give to the person who serves. They fill it in, sign it, and give it back to you to file before your court date.";
+    case "DV-250":
+      return "If FL-150 or other papers are mailed later, the person who mails them fills this in.";
+    case "DV-901":
+      return "Confidential. After the judge signs DV-900, send both to the phone company. Never file it or show it to the other person.";
+    case "DV-175":
+      return "Put on top of any later papers that include the child's private information, once the judge grants DV-165.";
+    case "DV-210":
+      return "Only if the judge lets you serve by newspaper or by posting because the other person can't be found.";
+    default:
+      return "File with the court.";
+  }
+}
+
+const GROUPS: { key: PacketFile["group"]; title: string; intro: string }[] = [
+  { key: "file", title: "File now", intro: "Take these to the court clerk." },
+  { key: "hearing", title: "Bring to your court date", intro: "The judge completes these orders at the hearing." },
+  { key: "later", title: "Keep for later", intro: "You'll need these after the court returns your papers." },
+];
 
 /** Step 11 · review, sign, and download. */
 export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
@@ -88,7 +137,9 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
   const zipAll = async () => {
     if (!packet) return;
     const zip = new JSZip();
-    packet.files.forEach((f) => zip.file(f.fileName, f.bytes));
+    // Same three groups as the screen, so the folders say what to do with each form.
+    const folder: Record<PacketFile["group"], string> = { file: "1 File now", hearing: "2 Bring to court date", later: "3 Keep for later" };
+    packet.files.forEach((f) => zip.file(`${folder[f.group]}/${f.fileName}`, f.bytes));
     download("DVRO-forms.zip", await zip.generateAsync({ type: "blob" }));
   };
 
@@ -159,32 +210,38 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
         {error && <p className="text-base font-medium text-red-700">{error}</p>}
         {packet && (
           <div className="space-y-4">
-            <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200">
-              {packet.files.map((f) => (
-                <li key={f.fileName} className="flex flex-wrap items-center justify-between gap-3 p-3">
-                  <div>
-                    <div className="text-base font-medium text-slate-900">
-                      {f.fileName.replace(/\.pdf$/, "")} · {FORM_NAMES[f.id]}
-                    </div>
-                    <div className="text-sm text-slate-600">
-                      {f.goesTo === "law enforcement"
-                        ? "Give to the clerk. Not filed in the public record."
-                        : f.goesTo === "sheriff"
-                          ? "Give to the sheriff with copies of your papers after the court returns them. Don't file it."
-                          : "File with the court."}
-                      {f.sheetTitles.length > 0 && ` Includes ${f.sheetTitles.length} attached sheet(s).`}
-                    </div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => download(f.fileName, f.bytes)}
-                    className="rounded-lg border border-liz px-4 py-2 text-sm font-medium text-liz hover:bg-liz/5"
-                  >
-                    Download
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {GROUPS.map((g) => {
+              const files = packet.files.filter((f) => f.group === g.key);
+              if (!files.length) return null;
+              return (
+                <section key={g.key} className="space-y-2">
+                  <h4 className="text-base font-semibold text-slate-900">{g.title}</h4>
+                  <p className="text-sm text-slate-600">{g.intro}</p>
+                  <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200">
+                    {files.map((f) => (
+                      <li key={f.fileName} className="flex flex-wrap items-center justify-between gap-3 p-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-base font-medium text-slate-900">
+                            {f.fileName.replace(/\.pdf$/, "")} · {FORM_NAMES[f.id]}
+                          </div>
+                          <div className="text-sm text-slate-600">
+                            {howToUse(f, a)}
+                            {f.sheetTitles.length > 0 && ` Includes ${f.sheetTitles.length} attached sheet(s).`}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => download(f.fileName, f.bytes)}
+                          className="rounded-lg border border-liz px-4 py-2 text-sm font-medium text-liz hover:bg-liz/5"
+                        >
+                          Download
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              );
+            })}
             <button type="button" onClick={zipAll} className="rounded-xl bg-liz px-6 py-3 text-base font-semibold text-white hover:bg-liz/90">
               Download all (zip)
             </button>
@@ -197,7 +254,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                   Print the forms, read them, and sign DV-100 (page 13). Don&apos;t sign the order forms (
                   {packet.files
                     .map((f) => f.id)
-                    .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900"].includes(id))
+                    .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900", "DV-165", "DV-130", "DV-150"].includes(id))
                     .join(", ")}
                   ); the judge does.
                 </li>
@@ -226,6 +283,10 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                     stubs and latest tax return to court, with Social Security numbers blacked out.
                   </li>
                 )}
+                <li>
+                  On your court date, bring 3 copies of DV-130{custodyRequested(a) ? " and DV-150" : ""}, your proof of service (DV-200),
+                  and anything that supports what you wrote, like photos or texts.
+                </li>
                 {packet.files.some((f) => f.id === "INT-300") && (
                   <li>File your INT-300 with your other papers so the court can schedule an interpreter for your court date.</li>
                 )}

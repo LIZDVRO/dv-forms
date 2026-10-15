@@ -13,14 +13,29 @@ import { FL150 } from "./forms/fl150";
 import { DV105, DV108, DV140, DV145, dv105a, residenceGroups } from "./forms/custody";
 import { DV101, SER001, int300, int300Forms, needsDV101 } from "./forms/extras";
 import { CLETS001, DV109, DV110, DV900 } from "./forms/filing";
+import {
+  DV130,
+  DV150,
+  DV160,
+  DV165,
+  DV170,
+  DV175,
+  DV200,
+  DV210,
+  DV250,
+  DV901,
+  confidentialityRequested,
+} from "./forms/later";
 
 export type TemplateLoader = (path: string) => Promise<ArrayBuffer | Uint8Array>;
 
 export interface PacketFile {
   id: string;
   fileName: string;
-  /** Where it goes: "court" (filed), "law enforcement" (CLETS-001, given to the clerk) or "sheriff" (SER-001); the last two are not filed. */
-  goesTo: "court" | "law enforcement" | "sheriff";
+  /** Where it goes. Only "court" forms are filed; the others are handed to someone and never filed. */
+  goesTo: "court" | "law enforcement" | "sheriff" | "phone company" | "server";
+  /** When it is used: filed now, brought to the hearing, or kept for later. */
+  group: "file" | "hearing" | "later";
   bytes: Uint8Array;
   sheetTitles: string[];
 }
@@ -48,10 +63,30 @@ export function filingForms(a: Answers): FormSpec[] {
   if (a.orders.O28) forms.push(DV900);
   if (financesRequested(a)) forms.push(FL150);
   forms.push(...int300Forms(a));
+  if (confidentialityRequested(a)) forms.push(DV160, DV165, DV170);
   forms.push(CLETS001);
-  if (a.V1 === "sheriff") forms.push(SER001);
+  // Bring to the hearing: the judge completes these orders.
+  forms.push(as(DV130, "hearing"));
+  if (custodyRequested(a)) forms.push(as(DV150, "hearing"));
+  // Keep for later.
+  if (a.V1 === "sheriff") forms.push(as(SER001, "later"));
+  forms.push(as(DV200, "later"));
+  if (financesRequested(a)) forms.push(as(DV250, "later"));
+  if (a.orders.O28) forms.push(as(DV901, "later"));
+  if (confidentialityRequested(a)) forms.push(as(DV175, "later"));
+  forms.push(as(DV210, "later"));
   return forms;
 }
+
+const as = (spec: FormSpec, group: FormSpec["group"]): FormSpec => ({ ...spec, group });
+
+const GOES_TO: Record<string, PacketFile["goesTo"]> = {
+  "CLETS-001": "law enforcement",
+  "SER-001": "sheriff",
+  "DV-901": "phone company",
+  "DV-200": "server",
+  "DV-250": "server",
+};
 
 /** Every form spec the wizard can produce (for checks). */
 export const ALL_FORMS: FormSpec[] = [
@@ -69,6 +104,16 @@ export const ALL_FORMS: FormSpec[] = [
   int300(),
   CLETS001,
   SER001,
+  DV160,
+  DV165,
+  DV170,
+  DV175,
+  DV130,
+  DV150,
+  DV200,
+  DV250,
+  DV901,
+  DV210,
 ];
 
 export const fileNameFor = (spec: FormSpec) => `${spec.id}${spec.copy && spec.copy > 1 ? `-${spec.copy}` : ""}.pdf`;
@@ -100,7 +145,8 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
     files.push({
       id: spec.id,
       fileName: fileNameFor(spec),
-      goesTo: spec.id === "CLETS-001" ? "law enforcement" : spec.id === "SER-001" ? "sheriff" : "court",
+      goesTo: GOES_TO[spec.id] ?? "court",
+      group: spec.group ?? "file",
       bytes,
       sheetTitles: filled.sheets.map((s) => s.title),
     });

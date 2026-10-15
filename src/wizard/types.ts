@@ -324,6 +324,24 @@ export interface Answers {
   roster: RosterPerson[];
   PR10: string;
 
+  /** PR14 keep a protected child's information confidential (adds DV-160, DV-165, DV-170, DV-175) */
+  PR14: YN;
+  /** M1 who is asking */
+  M1: "" | "parent" | "legal guardian" | "the minor";
+  /** M2 roster ids of the minors */
+  M2: string[];
+  /** M3 same information for every minor */
+  M3: YN;
+  /** M4 what to keep from the public: name, address, other */
+  M4: string[];
+  M5: Address;
+  M6: { location: string; text: string }[];
+  M7: string;
+  M8: string;
+  M9: "" | "cancel" | "go forward";
+  M10: { what: string[]; otherText: string; why: string; whatWouldHappen: string; ifDenied: "" | "cancel" | "go forward" };
+  M11: { who: string[]; otherName: string; what: string[] };
+
   // Step 5 · other cases and orders
   C1: YN;
   C2: OrderRecord[];
@@ -431,6 +449,11 @@ export interface Answers {
   W2: string;
   W3: string;
   W4: string;
+  /** DV-901: how the phone company can reach you (never shown to the respondent) */
+  W5: string;
+  W6: string;
+  W7: string;
+  W8: Address;
 
   // Step 10 · finances (FL-150) — shown when O24, O25 or O26
   /** O24 child support: what applies */

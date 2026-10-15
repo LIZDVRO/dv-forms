@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 
 import { useWizard } from "../store";
 import type { Animal, Debt, Expense, OrderId, PhoneNumber } from "../types";
-import { Check, Choice, Group, LongText, Multi, Note, Question, Rows, Text, YesNo } from "../ui/fields";
+import { AddressInput, Check, Choice, Group, LongText, Multi, Note, Question, Rows, Text, YesNo } from "../ui/fields";
 
 function Order({ id, title, hint, children }: { id: OrderId; title: ReactNode; hint?: ReactNode; children?: ReactNode }) {
   const { a, set } = useWizard();
@@ -307,6 +307,24 @@ export function Orders() {
               <Text value={a.W4} onChange={(v) => set((x) => void (x.W4 = v))} />
             </Question>
           </div>
+          <Note>
+            After the judge signs the transfer order, you&apos;ll send the phone company a confidential form (DV-901) so they can reach
+            you. {a.R1 || "The other person"} never sees it. Use contact details they don&apos;t control.
+          </Note>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Question label="Best phone for the company to reach you" optional hint="Leave blank to use your safe phone.">
+              <Text type="tel" value={a.W5} onChange={(v) => set((x) => void (x.W5 = v))} />
+            </Question>
+            <Question label="Another phone" optional>
+              <Text type="tel" value={a.W6} onChange={(v) => set((x) => void (x.W6 = v))} />
+            </Question>
+            <Question label="Email" optional hint="Leave blank to use your safe email.">
+              <Text type="email" value={a.W7} onChange={(v) => set((x) => void (x.W7 = v))} />
+            </Question>
+          </div>
+          <Question label="Mailing address for the company" optional hint="Leave blank to use your safe mailing address.">
+            <AddressInput value={a.W8} onChange={(v) => set((x) => void (x.W8 = v))} />
+          </Question>
         </Order>
       </Group>
     </div>
