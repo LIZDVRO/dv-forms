@@ -1,0 +1,120 @@
+/**
+ * Values that are calculated, never asked (map: "Derived, never asked").
+ */
+import { COURT_ADDRESSES } from "@/lib/courtAddresses";
+import type { Address, Answers, RosterPerson } from "./types";
+
+/** ISO date → MM/DD/YYYY, the Judicial Council format. Text passes through. */
+export function fmtDate(iso: string | undefined): string {
+  if (!iso) return "";
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso.trim());
+  return m ? `${m[2]}/${m[3]}/${m[1]}` : iso;
+}
+
+/** Whole years between an ISO date of birth and an ISO "as of" date. */
+export function ageFrom(dobIso: string, asOfIso: string): string {
+  const d = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dobIso ?? "");
+  const a = /^(\d{4})-(\d{2})-(\d{2})$/.exec(asOfIso ?? "");
+  if (!d || !a) return "";
+  let age = +a[1] - +d[1];
+  if (+a[2] < +d[2] || (+a[2] === +d[2] && +a[3] < +d[3])) age -= 1;
+  return age >= 0 ? String(age) : "";
+}
+
+export function personAge(p: RosterPerson, asOf: string): string {
+  return p.dob ? ageFrom(p.dob, asOf) : p.age;
+}
+
+/** Amount for a form that pre-prints "$": no currency sign, two decimals. */
+export function money(v: string): string {
+  const n = Number(String(v ?? "").replace(/[$,\s]/g, ""));
+  if (!v || Number.isNaN(n)) return v ?? "";
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+export function oneLine(a: Address | string): string {
+  if (typeof a === "string") return a.replace(/\s*\n\s*/g, ", ");
+  const cityLine = [a.city, [a.state, a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");
+  return [a.street, cityLine].filter(Boolean).join(", ");
+}
+
+/** Caption block: county name, then the courthouse street address (S1 + S2). */
+export function courtCaption(a: Answers): string {
+  const county = a.S1.trim();
+  if (!county) return "";
+  const addr = COURT_ADDRESSES[county];
+  return addr ? `${county}\n${addr.replace(/\n/g, ", ")}` : county;
+}
+
+/**
+ * DV-110 / DV-130 item 2 "Relationship to person in 1": a short phrase
+ * describing the respondent's relationship to the petitioner (from RL1–RL2).
+ */
+export function relationshipPhrase(a: Answers): string {
+  const parts: string[] = [];
+  const has = (k: string) => a.RL1.includes(k as never);
+  if (has("married")) parts.push("Spouse");
+  if (has("formerly married")) parts.push("Former spouse");
+  if (has("engaged")) parts.push("Engaged (now or before)");
+  if (has("dating")) parts.push("Dating (now or before)");
+  if (has("related")) {
+    const rel = a.RL2.map((r) => {
+      const map: Record<string, string> = {
+        "parent/step/in-law": "Parent",
+        "sibling/step/in-law": "Sibling",
+        "child/step/adopted": "Child",
+        grandparent: "Grandparent",
+        "child's spouse": "Child's spouse",
+        grandchild: "Grandchild",
+      };
+      return map[r] ?? r;
+    });
+    parts.push(rel.length ? rel.join(", ") : "Relative");
+  }
+  if (has("live together")) parts.push("Lived together");
+  if (has("children")) parts.push("Parent of our children");
+  return parts.join("; ");
+}
+
+export interface Derived {
+  /** Roster people the order should protect (PR8 = Y), roster order. */
+  protectedPeople: RosterPerson[];
+  /** Shared children (PR7 = Y), oldest first. */
+  sharedChildren: RosterPerson[];
+  hasChildren: boolean;
+  married: boolean;
+  asOf: string;
+  lawyer: boolean;
+}
+
+export function derive(a: Answers): Derived {
+  const protectedPeople = a.roster.filter((p) => p.protect === "Y" && p.name.trim());
+  const sharedChildren = a.roster
+    .filter((p) => p.sharedChild === "Y" && p.name.trim())
+    .sort((x, y) => (x.dob || "9999").localeCompare(y.dob || "9999"));
+  return {
+    protectedPeople,
+    sharedChildren,
+    hasChildren: a.RL1.includes("children"),
+    married: a.RL1.includes("married"),
+    asOf: a.G1,
+    lawyer: a.S5 === "Y",
+  };
+}
+
+/** Respondent's age: from R3 when given, else the estimate R4. */
+export function respondentAge(a: Answers): string {
+  return a.R3 ? ageFrom(a.R3, a.G1) : a.R4;
+}
+
+export function petitionerAge(a: Answers): string {
+  return a.P2 ? ageFrom(a.P2, a.G1) : a.P3;
+}
+
+export function firearmSummary(a: Answers, includeArmor: boolean): string {
+  const guns = a.R19.filter((r) => r.what.trim())
+    .map((r) => [r.count, r.what].filter(Boolean).join(" ") + (r.where ? ` (${r.where})` : ""))
+    .join("; ");
+  const armor = includeArmor && a.R20 === "Y" ? `body armor${a.R20details ? `: ${a.R20details}` : ""}` : "";
+  return [guns, armor].filter(Boolean).join("; ");
+}

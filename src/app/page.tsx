@@ -26,7 +26,7 @@ export default function Home() {
           </p>
           <div className="mt-10 flex justify-center">
             <Link
-              href="/form"
+              href="/wizard"
               className="inline-flex min-h-12 items-center justify-center rounded-xl bg-sky-600 px-10 py-3 text-base font-medium text-white shadow-md shadow-sky-600/25 transition hover:bg-sky-700 hover:shadow-lg hover:shadow-sky-600/30 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
             >
               Get Started
