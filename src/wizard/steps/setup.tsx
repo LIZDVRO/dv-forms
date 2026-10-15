@@ -37,8 +37,9 @@ export function Start() {
         button at any time. It clears everything.
       </Note>
       <p className="text-sm text-slate-600">
-        This version makes the filing forms (DV-100, DV-109, DV-110, CLETS-001, and DV-900 for a phone transfer). Child
-        custody and support requests need extra forms that are coming next.
+        This version makes the filing forms (DV-100, DV-109, DV-110, CLETS-001, DV-900 for a phone transfer) and, if you ask
+        for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction). Child and spousal
+        support requests need financial forms that are coming next.
       </p>
     </div>
   );

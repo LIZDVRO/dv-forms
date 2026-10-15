@@ -87,6 +87,11 @@ export function History() {
                     <Text value={c.caseNumber} onChange={(v) => up({ caseNumber: v })} />
                   </Question>
                 </div>
+                {a.RL1.includes("children") && (
+                  <Question label="Does this case involve your children?">
+                    <YesNo value={c.kids ?? ""} onChange={(v) => up({ kids: v === "Y" ? "Y" : "N" })} />
+                  </Question>
+                )}
               </div>
             )}
           />

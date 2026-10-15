@@ -64,7 +64,7 @@ export function Text({
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
-  type?: "text" | "date" | "tel" | "email";
+  type?: "text" | "date" | "month" | "time" | "tel" | "email";
   inputMode?: "text" | "numeric" | "decimal" | "tel" | "email";
   autoComplete?: string;
   className?: string;

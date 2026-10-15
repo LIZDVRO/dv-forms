@@ -1,6 +1,36 @@
-import type { Address, Answers, IncidentCard, RosterPerson } from "./types";
+import { WEEKDAYS } from "./types";
+import type { Address, Answers, IncidentCard, Residence, RosterPerson, Schedule, Supervisor, VisitDay, Weekday } from "./types";
 
 export const emptyAddress = (): Address => ({ street: "", city: "", state: "CA", zip: "" });
+
+export const emptyResidence = (): Residence => ({
+  from: "",
+  until: "",
+  city: "",
+  state: "CA",
+  private: false,
+  livedWith: [],
+  otherRelationship: "",
+});
+
+export const emptySupervisor = (): Supervisor => ({
+  type: "",
+  name: "",
+  feeMe: "",
+  feeRespondent: "",
+  feeOtherName: "",
+  feeOther: "",
+  agreed: false,
+});
+
+const emptyDay = (): VisitDay => ({ on: false, start: "", end: "", virtual: false, whoBrings: "", place: "" });
+
+export const emptySchedule = (): Schedule => ({
+  days: Object.fromEntries(WEEKDAYS.map((d) => [d, emptyDay()])) as Record<Weekday, VisitDay>,
+  repeat: "",
+  repeatOther: "",
+  startDate: "",
+});
 
 export const emptyCard = (): IncidentCard => ({
   A1: "",
@@ -125,6 +155,55 @@ export function emptyAnswers(): Answers {
     O22: { debts: [], why: "", finding: "", how: "" },
     O23: [],
     O28: [],
+
+    PR11: "",
+    PR11other: "",
+    PR12: "",
+    PR12other: "",
+    PR13: { has: "", name: "", role: "" },
+    C5: "",
+    C5cases: [],
+    C6: "",
+    C7: "",
+    C8: "",
+    K1: "",
+    K2: [emptyResidence()],
+    K2A: [],
+    K3: { on: "", places: [], countyName: "", otherPlaces: "" },
+    K4: { on: "", children: "all", named: [], records: [], otherText: "" },
+    K5: "",
+    K6: { on: "", legal: "", legalOther: "", physical: "", physicalOther: "" },
+    K7: "",
+    K8: "",
+    K9: emptySupervisor(),
+    K10: { kind: "", otherText: "" },
+    K11: { kind: "", hours: "", otherText: "" },
+    K12on: "",
+    K12: emptySupervisor(),
+    K13: "",
+    K14use: false,
+    K14: emptySchedule(),
+
+    B1: "",
+    B2: "",
+    B3: [],
+    B3other: "",
+    B4: [],
+    B5: "",
+    B6: [],
+    B6county: "",
+    B6state: "",
+    B6country: "",
+    B7: { citizen: "", countries: "", strongTies: "" },
+    B8: "",
+    B9: [],
+    B10: { documents: "", date: "", giveTo: "" },
+    B11: [],
+    B11other: "",
+    B12: "",
+    B13: { embassy: "", proofDate: "" },
+    B14: "",
+    B15: "",
 
     W1: "",
     W2: "",

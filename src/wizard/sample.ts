@@ -110,5 +110,98 @@ export function sampleAnswers(): Answers {
   };
   a.O28 = [{ whose: "mine", phone: "(559) 555-0101" }];
   a.W1 = "Example Wireless";
+
+  // Custody (supervised visits on the chart) and abduction.
+  a.orders.O15 = true;
+  a.C4[0].kids = "Y";
+  a.PR11 = "parent";
+  a.PR12 = "parent";
+  a.PR13 = { has: "N", name: "", role: "" };
+  a.C5 = "N";
+  a.C6 = "N";
+  a.K1 = "Y";
+  a.K2 = [
+    { from: "2022-06", until: "", city: "Fresno", state: "CA", private: true, livedWith: ["me"], otherRelationship: "" },
+    { from: "2019-01", until: "2022-06", city: "Clovis", state: "CA", private: false, livedWith: ["me", "respondent"], otherRelationship: "" },
+    { from: "2018-03", until: "2019-01", city: "Visalia", state: "CA", private: false, livedWith: ["me", "other"], otherRelationship: "Grandmother" },
+  ];
+  a.K3 = { on: "Y", places: ["this county", "California"], countyName: "", otherPlaces: "" };
+  a.K4 = { on: "Y", children: "all", named: [], records: ["medical", "school"], otherText: "" };
+  a.K5 = "Y";
+  a.K6 = { on: "Y", legal: "sole to me", legalOther: "", physical: "sole to me", physicalOther: "" };
+  a.K7 = "yes";
+  a.K8 = "Y";
+  a.K9 = { type: "professional", name: "Safe Visits Fresno", feeMe: "0", feeRespondent: "100", feeOtherName: "", feeOther: "", agreed: false };
+  a.K10 = { kind: "safe place", otherText: "" };
+  a.K11 = { kind: "schedule", hours: "", otherText: "" };
+  a.K14.days.Sat = { on: true, start: "10:00", end: "12:00", virtual: false, whoBrings: "Maria Elena Sample (petitioner)", place: "Safe Visits Fresno, 100 Center St" };
+  a.K14.days.Wed = { on: true, start: "18:30", end: "19:00", virtual: true, whoBrings: "Maria (makes children available)", place: "Video call" };
+  a.K14.repeat = "every week";
+  a.K14.startDate = "2026-11-07";
+
+  a.B1 = "N";
+  a.B2 = "Y";
+  a.B3 = ["quit a job", "applied for documents", "other"];
+  a.B3other = "Asked the school for the children's records.";
+  a.B4 = ["abusing you", "threatening to take the children"];
+  a.B5 = "Y";
+  a.B6 = ["another country"];
+  a.B6country = "Canada";
+  a.B7 = { citizen: "Y", countries: "Canada", strongTies: "Y" };
+  a.B8 = "He said he would take the kids to his brother in Toronto and I would never find them. He quit his job last month and asked for copies of their birth certificates.";
+  a.B9 = ["no move without permission", "surrender documents", "travel plan", "bond"];
+  a.B10 = { documents: "Children's passports and his passport", date: "2026-11-01", giveTo: "Fresno County Sheriff" };
+  a.B11 = ["schedule", "round-trip tickets"];
+  a.B15 = "5000";
+  return a;
+}
+
+/**
+ * A second case for checks: the children lived apart (DV-105(A), three groups so
+ * a second copy is made), unsupervised visits with supervised exchanges, and no abduction.
+ */
+export function sampleAnswersB(): Answers {
+  const a = sampleAnswers();
+  const [sofia, lucas, ana, mateo] = a.roster;
+  a.K1 = "N";
+  a.K2A = [
+    {
+      children: [sofia.id, lucas.id],
+      rows: [
+        { from: "2023-01", until: "", city: "Fresno", state: "CA", private: false, livedWith: ["me"], otherRelationship: "" },
+        { from: "2020-05", until: "2023-01", city: "Reno", state: "NV", private: false, livedWith: ["respondent"], otherRelationship: "" },
+      ],
+    },
+    {
+      children: [ana.id],
+      rows: [{ from: "2021-02", until: "", city: "Hanford", state: "CA", private: true, livedWith: ["other"], otherRelationship: "Aunt" }],
+    },
+    {
+      children: [mateo.id],
+      rows: [{ from: "2021-08", until: "", city: "Fresno", state: "CA", private: false, livedWith: ["me", "respondent"], otherRelationship: "" }],
+    },
+  ];
+  a.PR11 = "other";
+  a.PR11other = "Parent by adoption";
+  a.PR12 = "legal guardian";
+  a.PR13 = { has: "Y", name: "Carla Example", role: "legal guardian" };
+  a.C5 = "Y";
+  a.C5cases = [{ type: "juvenile", kind: "", where: "Kings County, CA", year: "2023", caseNumber: "23JV0042" }];
+  a.C6 = "Y";
+  a.C7 = "Joint legal custody; children live with me during the week and with him every other weekend.";
+  a.C8 = "He has been violent in front of the children, so the visits are no longer safe without changes.";
+  a.K4 = { on: "Y", children: "named", named: [sofia.id], records: ["activities", "other", "child's job"], otherText: "Church youth group" };
+  a.K5 = "N";
+  a.K6 = { on: "Y", legal: "joint", legalOther: "", physical: "other", physicalOther: "Primary to me" };
+  a.K7 = "yes";
+  a.K8 = "N";
+  a.K12on = "Y";
+  a.K12 = { type: "trusted person", name: "Rosa Sample", feeMe: "", feeRespondent: "", feeOtherName: "", feeOther: "", agreed: true };
+  a.K10 = { kind: "other", otherText: "Grandmother's home" };
+  a.K13 = "Every other weekend from Saturday 10 AM to Sunday 5 PM. Rosa drives the children both ways.";
+  a.K14use = true;
+  a.K14.repeat = "every other week";
+  a.K14.days.Wed.on = false;
+  a.K14.days.Sun = { on: true, start: "", end: "17:00", virtual: false, whoBrings: "Rosa Sample", place: "Rosa's home" };
   return a;
 }

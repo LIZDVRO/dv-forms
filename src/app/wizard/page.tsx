@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { sampleAnswers } from "@/wizard/sample";
-import { FINISH, STEPS } from "@/wizard/steps";
+import { FINISH, visibleSteps } from "@/wizard/steps";
 import { Finish } from "@/wizard/steps/finish";
 import { useWizard } from "@/wizard/store";
 
@@ -20,8 +20,12 @@ export default function WizardPage() {
   const { a, step, dirty, go, load } = useWizard();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const top = useRef<HTMLDivElement>(null);
-  const total = STEPS.length + 1;
-  const onFinish = step >= STEPS.length;
+  // Branch steps (custody, abduction) come after the answers that open them,
+  // so the index of the current step does not shift when they appear.
+  const STEPS = visibleSteps(a);
+  const count = STEPS.length;
+  const total = count + 1;
+  const onFinish = step >= count;
   const current = onFinish ? FINISH : STEPS[step];
 
   // Quick exit on Esc.
@@ -51,10 +55,10 @@ export default function WizardPage() {
   const moveTo = useCallback(
     (n: number) => {
       setErrors({});
-      go(Math.max(0, Math.min(STEPS.length, n)));
+      go(Math.max(0, Math.min(count, n)));
       top.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     },
-    [go],
+    [go, count],
   );
 
   const next = () => {

@@ -3,7 +3,9 @@
 import type { ComponentType } from "react";
 
 import { COURTHOUSES } from "../courthouses";
+import { custodyRequested } from "../derive";
 import type { Answers } from "../types";
+import { Abduction, Children, CustodyOrders } from "./custody";
 import { History, Incidents, Weapons } from "./history";
 import { Orders } from "./orders";
 import { Relationship, Respondent, Roster, You } from "./people";
@@ -16,6 +18,8 @@ export interface StepDef {
   /** One plain sentence on why we ask (from the info sheets). */
   blurb?: string;
   Component: ComponentType<StepProps>;
+  /** Shown only when this is true (branch steps such as custody). */
+  when?: (a: Answers) => boolean;
   /** Errors that block "Continue", keyed by question ID. Keep this list short. */
   validate?: (a: Answers) => Record<string, string>;
 }
@@ -105,7 +109,39 @@ export const STEPS: StepDef[] = [
     title: "Orders you want",
     Component: Orders,
   },
+  {
+    id: "children",
+    title: "Your children",
+    blurb: "For your custody request (form DV-105). The judge needs to know where the children have lived.",
+    Component: Children,
+    when: custodyRequested,
+    validate: (a) => ({
+      ...(!a.PR11 && { PR11: "Choose one." }),
+      ...(!a.PR12 && { PR12: "Choose one." }),
+      ...(!a.K1 && { K1: "Choose yes or no." }),
+    }),
+  },
+  {
+    id: "custody",
+    title: "Custody and visits",
+    blurb: "What you want the judge to order for your children until your court date.",
+    Component: CustodyOrders,
+    when: custodyRequested,
+    validate: (a) => ({
+      ...(!a.K7 && { K7: "Choose one." }),
+    }),
+  },
+  {
+    id: "abduction",
+    title: "Preventing abduction",
+    blurb: "Form DV-108 asks the judge for orders to keep the children from being taken.",
+    Component: Abduction,
+    when: (a) => custodyRequested(a) && a.K5 === "Y",
+  },
 ];
+
+/** The steps that apply to these answers, in order. */
+export const visibleSteps = (a: Answers): StepDef[] => STEPS.filter((s) => !s.when || s.when(a));
 
 /** The finish step is rendered by the page (it needs navigation). */
 export const FINISH = { id: "finish", title: "Review and get your forms" };

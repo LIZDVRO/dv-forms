@@ -3,7 +3,7 @@
 import JSZip from "jszip";
 import { useState } from "react";
 
-import { fmtDate } from "../derive";
+import { custodyRequested, derive, fmtDate } from "../derive";
 import { buildFilingPacket, type Packet } from "../fill/packet";
 import { useWizard } from "../store";
 import { Group, Note, Question, Text } from "../ui/fields";
@@ -30,6 +30,7 @@ const ORDER_NAMES: Record<string, string> = {
   O12: "Stay away",
   O13: "Move out",
   O14: "Other orders",
+  O15: "Child custody and visits",
   O16: "Animals",
   O17: "Property control",
   O18: "Insurance",
@@ -44,8 +45,13 @@ const ORDER_NAMES: Record<string, string> = {
 
 const FORM_NAMES: Record<string, string> = {
   "DV-100": "Request for Domestic Violence Restraining Order",
+  "DV-105": "Request for Child Custody and Visitation Orders",
+  "DV-105(A)": "City and State Where Children Lived",
+  "DV-108": "Request for Orders to Prevent Child Abduction",
   "DV-109": "Notice of Court Hearing",
   "DV-110": "Temporary Restraining Order",
+  "DV-140": "Child Custody and Visitation Order",
+  "DV-145": "Order to Prevent Child Abduction",
   "CLETS-001": "Confidential Information for Law Enforcement",
   "DV-900": "Order Transferring Wireless Phone Account",
 };
@@ -93,6 +99,15 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
         .join(", ") || "—",
       "orders",
     ],
+    ...(custodyRequested(a)
+      ? ([
+          [
+            "Custody",
+            `${derive(a).custodyKids.map((k) => k.name).join(", ") || "No children listed"}${a.K5 === "Y" ? " · abduction orders requested" : ""}`,
+            "children",
+          ],
+        ] as [string, string, string][])
+      : []),
   ];
 
   return (
@@ -139,10 +154,10 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
           <div className="space-y-4">
             <ul className="divide-y divide-slate-200 rounded-xl border border-slate-200">
               {packet.files.map((f) => (
-                <li key={f.id} className="flex flex-wrap items-center justify-between gap-3 p-3">
+                <li key={f.fileName} className="flex flex-wrap items-center justify-between gap-3 p-3">
                   <div>
                     <div className="text-base font-medium text-slate-900">
-                      {f.id} · {FORM_NAMES[f.id]}
+                      {f.fileName.replace(/\.pdf$/, "")} · {FORM_NAMES[f.id]}
                     </div>
                     <div className="text-sm text-slate-600">
                       {f.goesTo === "law enforcement" ? "Give to the clerk. Not filed in the public record." : "File with the court."}
@@ -167,10 +182,18 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
             </button>
             <Group title="What to do next">
               <ol className="list-decimal space-y-2 pl-5 text-base text-slate-700">
-                <li>Print the forms, read them, and sign DV-100 (page 13). Don&apos;t sign DV-109, DV-110, or DV-900; the judge does.</li>
+                <li>
+                  Print the forms, read them, and sign DV-100 (page 13). Don&apos;t sign the order forms (
+                  {packet.files
+                    .map((f) => f.id)
+                    .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900"].includes(id))
+                    .join(", ")}
+                  ); the judge does.
+                </li>
                 <li>
                   Take them to the {a.S1 ? `${a.S1} County` : "county"} Superior Court clerk, or e-file if your court allows it. Filing is
-                  free. Attach copies of any orders you listed.
+                  free. Attach copies of any orders you listed
+                  {a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""}.
                 </li>
                 <li>Get your papers back the same or next business day. Your court date is on DV-109.</li>
                 <li>

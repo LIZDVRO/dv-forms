@@ -1,6 +1,6 @@
 /**
  * DV-100 (Rev. Jan 1, 2025) bindings. Mirrors docs/field-map, tab "DV-100".
- * Items 15 and 24–26 (custody, support, fees) are not offered in wizard v1.
+ * Items 24–26 (support and fees) are not offered yet.
  */
 import type { FormSpec, Binding } from "../engine";
 import { b, caseNo, card, contact, idx, twoLines } from "../helpers";
@@ -261,6 +261,9 @@ add(
 );
 
 // 16 · animals
+// 15 · custody (details go on DV-105)
+add(b("Page8.LIST15.CtyChildFreed_cb", (a) => on(a, "O15")));
+
 add(b("Page9.List16.CheckBoxRightCaption", (a) => on(a, "O16")));
 const animalCols = [
   ["TextField1", "TextField2", "TextField3", "TextField4"],

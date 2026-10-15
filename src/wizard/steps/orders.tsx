@@ -28,7 +28,7 @@ function Order({ id, title, hint, children }: { id: OrderId; title: ReactNode; h
   );
 }
 
-/** Step 7 · the orders you want (DV-100 items 10–28, minus custody and support in v1). */
+/** Step 7 · the orders you want (DV-100 items 10–28, minus support and fees for now). */
 export function Orders() {
   const { a, set } = useWizard();
   const married = a.RL1.includes("married");
@@ -124,6 +124,20 @@ export function Orders() {
             </Question>
           )}
         </Order>
+        {a.RL1.includes("children") && (
+          <Order
+            id="O15"
+            title="Child custody and visitation"
+            hint="Temporary orders about who the children live with and visits. We'll ask about this next."
+          >
+            {!a.roster.some((p) => p.sharedChild === "Y") && (
+              <Note tone="warn">
+                Add your children on the <strong>People to protect</strong>{" "}step, and answer yes to &quot;Is this a child you have with the
+                other person?&quot;
+              </Note>
+            )}
+          </Order>
+        )}
         <Order id="O16" title="Protect my animals">
           <Rows<Animal>
             items={a.O16.animals}
@@ -277,8 +291,8 @@ export function Orders() {
           </div>
         </Order>
         <Note>
-          Need child custody, child support, spousal support, or lawyer&apos;s fees? Those need extra forms this version doesn&apos;t make
-          yet. Your court&apos;s self-help center can help with them (selfhelp.courts.ca.gov/find).
+          Need child support, spousal support, or lawyer&apos;s fees? Those need financial forms this version doesn&apos;t make yet. Your
+          court&apos;s self-help center can help with them (selfhelp.courts.ca.gov/find).
         </Note>
       </Group>
     </div>

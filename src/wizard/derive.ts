@@ -76,11 +76,40 @@ export function relationshipPhrase(a: Answers): string {
   return parts.join("; ");
 }
 
+/** "2024-03" → "03/2024" (DV-105 residence history). */
+export function fmtMonthYear(ym: string | undefined): string {
+  if (!ym) return "";
+  const m = /^(\d{4})-(\d{2})/.exec(ym.trim());
+  return m ? `${m[2]}/${m[1]}` : ym;
+}
+
+/** "14:30" → "2:30 PM" (visit schedule). */
+export function fmtTime(t: string | undefined): string {
+  if (!t) return "";
+  const m = /^(\d{1,2}):(\d{2})/.exec(t.trim());
+  if (!m) return t;
+  const h = +m[1];
+  return `${h % 12 || 12}:${m[2]} ${h < 12 ? "AM" : "PM"}`;
+}
+
+/** Custody forms are used only when custody is requested and the parties have children together. */
+export function custodyRequested(a: Answers): boolean {
+  return !!a.orders.O15 && a.RL1.includes("children");
+}
+
+/** True when the person is under 18, or when their age is unknown. */
+export function under18(p: RosterPerson, asOf: string): boolean {
+  const age = personAge(p, asOf);
+  return age === "" || Number(age) < 18;
+}
+
 export interface Derived {
   /** Roster people the order should protect (PR8 = Y), roster order. */
   protectedPeople: RosterPerson[];
   /** Shared children (PR7 = Y), oldest first. */
   sharedChildren: RosterPerson[];
+  /** Shared children under 18, oldest first (DV-105 item 3, DV-140 item 3). */
+  custodyKids: RosterPerson[];
   hasChildren: boolean;
   married: boolean;
   asOf: string;
@@ -95,6 +124,7 @@ export function derive(a: Answers): Derived {
   return {
     protectedPeople,
     sharedChildren,
+    custodyKids: sharedChildren.filter((p) => under18(p, a.G1)),
     hasChildren: a.RL1.includes("children"),
     married: a.RL1.includes("married"),
     asOf: a.G1,

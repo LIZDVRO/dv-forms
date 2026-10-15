@@ -47,6 +47,8 @@ export interface Binding {
 
 export interface FormSpec {
   id: string;
+  /** For forms filed more than once (DV-105(A)): 1, 2 … */
+  copy?: number;
   /** Template path under /public, e.g. "/forms/DV-100.pdf". */
   file: string;
   /** XFA root, e.g. "DV-100[0]". */

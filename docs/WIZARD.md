@@ -9,9 +9,16 @@ The stage-1 filing packet: DV-100, DV-109, DV-110, CLETS-001 (not filed; given t
 and DV-900 when a phone transfer is requested. Rows or text that don't fit go on attached
 sheets appended to that form's PDF, and DV-100 item 32 counts the pages.
 
-Not yet included (next branches): custody (DV-105/DV-140), abduction (DV-108/DV-145),
-minor confidentiality (DV-160/DV-165), DV-101, financial forms, INT-300, SER-001, and the
-stage-2/3 forms. Their field bindings are already specified in `docs/field-map`.
+When custody is requested (DV-100 item 15, O15) the packet adds DV-105 and the proposed
+DV-140 (parties and children only). If the children have not all lived in the same places
+for five years (K1 = No), each pair of residence groups gets its own DV-105(A)
+(`DV-105(A).pdf`, `DV-105(A)-2.pdf` …). If the petitioner fears abduction (K5 = Yes), it
+adds DV-108 and the proposed DV-145 (parties only). These steps (`Your children`,
+`Custody and visits`, `Preventing abduction`) appear only when they apply.
+
+Not yet included (next branches): minor confidentiality (DV-160/DV-165), DV-101, financial
+forms (support and fees), INT-300, SER-001, and the stage-2/3 forms. Their field bindings
+are already specified in `docs/field-map`.
 
 ## How it fits together
 
@@ -39,7 +46,9 @@ npm run check-wizard -- tmp-packet   # fills a sample case and checks every bind
 ```
 
 `check-wizard` fails if a binding names a field that doesn't exist, or if a petitioner
-field in the map has no binding. `/wizard?sample` fills in a made-up case for testing.
+field in the map has no binding. It writes two sample packets: `a/` (supervised visits on
+the weekly chart, abduction) and `b/` (children lived apart, so two DV-105(A) copies;
+unsupervised visits with supervised exchanges). `/wizard?sample` fills in case `a` for testing.
 
 ## Known gaps
 

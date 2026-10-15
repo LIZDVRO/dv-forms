@@ -58,13 +58,74 @@ export type CaseType =
   | "child support"
   | "other";
 
-/** C4: another court case with the respondent */
+/** C4: another court case with the respondent (C5: a case about the children without them) */
 export interface CaseRecord {
   type: CaseType;
   kind: string;
   where: string;
   year: string;
   caseNumber: string;
+  /** Does the case involve your children? (prints on DV-105 item 5a when Y) */
+  kids?: YN;
+}
+
+// ---------------------------------------------------------------- custody (Step 8)
+
+export type Guardian = "" | "parent" | "legal guardian" | "other";
+export type LivedWith = "me" | "respondent" | "other";
+
+/** K2 / K2B: one place the children lived. Row 0 is where they live now. */
+export interface Residence {
+  /** YYYY-MM */
+  from: string;
+  /** YYYY-MM (not asked for row 0) */
+  until: string;
+  city: string;
+  state: string;
+  /** Row 0 only: keep the address private (prints the state only). */
+  private: boolean;
+  livedWith: LivedWith[];
+  otherRelationship: string;
+}
+
+/** K2A: children who lived in the same places, with their history (K2B). */
+export interface ResidenceGroup {
+  /** Roster ids */
+  children: string[];
+  rows: Residence[];
+}
+
+/** K9 / K12: who supervises visits or exchanges. */
+export interface Supervisor {
+  type: "" | "professional" | "trusted person";
+  name: string;
+  feeMe: string;
+  feeRespondent: string;
+  feeOtherName: string;
+  feeOther: string;
+  agreed: boolean;
+}
+
+export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"] as const;
+export type Weekday = (typeof WEEKDAYS)[number];
+
+export interface VisitDay {
+  on: boolean;
+  /** HH:MM (24-hour, from <input type="time">) */
+  start: string;
+  end: string;
+  virtual: boolean;
+  whoBrings: string;
+  place: string;
+}
+
+/** K14: the weekly visit chart on DV-105 item 12 or 13. */
+export interface Schedule {
+  days: Record<Weekday, VisitDay>;
+  repeat: "" | "every week" | "every other week" | "other";
+  repeatOther: string;
+  /** ISO date */
+  startDate: string;
 }
 
 /** Step 6 incident card (A1–A7) */
@@ -125,7 +186,7 @@ export type RelationshipKind =
   | "live together";
 
 export type OrderId =
-  | "O10" | "O11" | "O12" | "O13" | "O14" | "O16" | "O17" | "O18" | "O19"
+  | "O10" | "O11" | "O12" | "O13" | "O14" | "O15" | "O16" | "O17" | "O18" | "O19"
   | "O20" | "O21" | "O22" | "O23" | "O27" | "O28";
 
 export interface Answers {
@@ -224,6 +285,70 @@ export interface Answers {
   O22: { debts: Debt[]; why: string; finding: YN; how: string };
   O23: Expense[];
   O28: PhoneNumber[];
+
+  // Step 8 · custody (DV-105, DV-105(A), DV-140) — shown when O15
+  /** PR11 your relationship to the shared children */
+  PR11: Guardian;
+  PR11other: string;
+  /** PR12 the respondent's relationship to them */
+  PR12: Guardian;
+  PR12other: string;
+  /** PR13 another parent or legal guardian */
+  PR13: { has: YN; name: string; role: "" | "parent" | "legal guardian" };
+  /** C5 other cases about the children that don't involve the respondent */
+  C5: YN;
+  C5cases: CaseRecord[];
+  /** C6 custody or visitation order in effect now; C7 what it says; C8 why change it */
+  C6: YN;
+  C7: string;
+  C8: string;
+  /** K1 all the children lived in the same places for the last 5 years */
+  K1: YN;
+  K2: Residence[];
+  K2A: ResidenceGroup[];
+  /** K3 limit where the respondent can take the children */
+  K3: { on: YN; places: string[]; countyName: string; otherPlaces: string };
+  /** K4 block the respondent from the children's records (the form asks the reverse) */
+  K4: { on: YN; children: "" | "all" | "named"; named: string[]; records: string[]; otherText: string };
+  /** K5 worried they might take the children */
+  K5: YN;
+  /** K6 custody orders */
+  K6: { on: YN; legal: string; legalOther: string; physical: string; physicalOther: string };
+  K7: "" | "no visits" | "yes" | "virtual only";
+  /** K8 supervised visits */
+  K8: YN;
+  K9: Supervisor;
+  K10: { kind: "" | "safe place" | "virtual" | "other"; otherText: string };
+  K11: { kind: "" | "once a week" | "twice a week" | "other" | "schedule"; hours: string; otherText: string };
+  /** K12 supervised exchanges (unsupervised visits) */
+  K12on: YN;
+  K12: Supervisor;
+  K13: string;
+  /** Use the weekly chart for unsupervised visits */
+  K14use: boolean;
+  K14: Schedule;
+
+  // Step 9 · abduction (DV-108, DV-145) — shown when K5 = Y
+  B1: YN;
+  B2: YN;
+  B3: string[];
+  B3other: string;
+  B4: string[];
+  B5: YN;
+  B6: string[];
+  B6county: string;
+  B6state: string;
+  B6country: string;
+  B7: { citizen: YN; countries: string; strongTies: YN };
+  B8: string;
+  B9: string[];
+  B10: { documents: string; date: string; giveTo: string };
+  B11: string[];
+  B11other: string;
+  B12: string;
+  B13: { embassy: string; proofDate: string };
+  B14: string;
+  B15: string;
 
   // Step 7a · wireless transfer (DV-900)
   W1: string;
