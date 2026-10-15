@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "dump-fields": "tsx scripts/dump-tier2-fields.ts"
+    "dump-fields": "tsx scripts/dump-tier2-fields.ts",
+    "check-wizard": "tsx scripts/check-wizard.ts"
   },
   "dependencies": {
     "jszip": "^3.10.1",

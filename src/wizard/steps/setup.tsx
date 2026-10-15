@@ -1,0 +1,136 @@
+"use client";
+
+import { COURTHOUSES } from "../courthouses";
+import { useWizard } from "../store";
+import { AddressInput, Choice, Group, Note, Question, Text, YesNo } from "../ui/fields";
+import type { StepProps } from "./types";
+
+export const COUNTIES = [
+  "Alameda", "Alpine", "Amador", "Butte", "Calaveras", "Colusa", "Contra Costa", "Del Norte", "El Dorado", "Fresno",
+  "Glenn", "Humboldt", "Imperial", "Inyo", "Kern", "Kings", "Lake", "Lassen", "Los Angeles", "Madera", "Marin",
+  "Mariposa", "Mendocino", "Merced", "Modoc", "Mono", "Monterey", "Napa", "Nevada", "Orange", "Placer", "Plumas",
+  "Riverside", "Sacramento", "San Benito", "San Bernardino", "San Diego", "San Francisco", "San Joaquin",
+  "San Luis Obispo", "San Mateo", "Santa Barbara", "Santa Clara", "Santa Cruz", "Shasta", "Sierra", "Siskiyou",
+  "Solano", "Sonoma", "Stanislaus", "Sutter", "Tehama", "Trinity", "Tulare", "Tuolumne", "Ventura", "Yolo", "Yuba",
+];
+
+/** Phase 0 (DV-500-INFO): what this is, before any questions. */
+export function Start() {
+  return (
+    <div className="space-y-5 text-base leading-relaxed text-slate-700">
+      <p>
+        This will help you fill out the court forms to ask for a <strong>domestic violence restraining order</strong>{" "}in
+        California. We ask each question once and fill in every form for you.
+      </p>
+      <ul className="list-disc space-y-2 pl-5">
+        <li>It&apos;s free to file. A judge usually decides on temporary orders the same day or the next business day.</li>
+        <li>Your court date is usually about three weeks later. A long-term order can last up to five years.</li>
+        <li>You can ask for an order even if you are not a U.S. citizen.</li>
+        <li>You must be 12 or older to ask on your own. These forms do not end a marriage.</li>
+      </ul>
+      <Note>
+        <strong>Nothing is saved.</strong>{" "}Your answers stay on this screen only. If you close or refresh the page, they
+        are gone. At the end you&apos;ll download your forms.
+      </Note>
+      <Note tone="warn">
+        <strong>Need to leave fast?</strong>{" "}Press{" "}<kbd className="rounded border bg-white px-1">Esc</kbd>{" "}or the Quick exit
+        button at any time. It clears everything.
+      </Note>
+      <p className="text-sm text-slate-600">
+        This version makes the filing forms (DV-100, DV-109, DV-110, CLETS-001, DV-900 for a phone transfer) and, if you ask
+        for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction). Child and spousal
+        support requests need financial forms that are coming next.
+      </p>
+    </div>
+  );
+}
+
+export function CourtAndLawyer({ errors }: StepProps) {
+  const { a, set } = useWizard();
+  return (
+    <div className="space-y-8">
+      <Group>
+        <Question label="Which county are you filing in?" hint="Where you live, or where the abuse happened." error={errors.S1}>
+          <select
+            value={a.S1}
+            onChange={(e) =>
+              set((x) => {
+                x.S1 = e.target.value;
+                x.S2 = "";
+              })
+            }
+            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base focus:border-liz focus:outline-none focus:ring-2 focus:ring-liz/25 sm:w-80"
+          >
+            <option value="">Choose a county…</option>
+            {COUNTIES.map((c) => (
+              <option key={c} value={c}>
+                {c}
+              </option>
+            ))}
+          </select>
+        </Question>
+        {(COURTHOUSES[a.S1]?.length ?? 0) > 1 && (
+          <Question label="Which courthouse?" hint="Choose the one closest to you, or where your court told you to file." error={errors.S2}>
+            <Choice
+              value={a.S2}
+              onChange={(v) => set((x) => void (x.S2 = v))}
+              columns
+              options={COURTHOUSES[a.S1].map((c) => ({ value: c.id, label: c.name, hint: `${c.street}, ${c.city}` }))}
+            />
+          </Question>
+        )}
+        <Question label="Is this a new request?">
+          <Choice
+            value={a.S3}
+            onChange={(v) => set((x) => void (x.S3 = v))}
+            options={[
+              { value: "new", label: "Yes, it's new" },
+              { value: "update", label: "No, I already have a case" },
+            ]}
+          />
+        </Question>
+        {a.S3 === "update" && (
+          <Question label="Case number">
+            <Text value={a.S4} onChange={(v) => set((x) => void (x.S4 = v))} className="sm:w-80" />
+          </Question>
+        )}
+      </Group>
+
+      <Group>
+        <Question label="Is a lawyer helping you with this case?">
+          <YesNo value={a.S5} onChange={(v) => set((x) => void (x.S5 = v === "Y" ? "Y" : "N"))} />
+        </Question>
+        {a.S5 === "Y" && (
+          <div className="space-y-5 rounded-xl border border-slate-200 p-4">
+            <p className="text-sm text-slate-600">The forms will use your lawyer&apos;s address and contact details instead of yours.</p>
+            <Question label="Lawyer's name" error={errors.L1}>
+              <Text value={a.L1} onChange={(v) => set((x) => void (x.L1 = v))} />
+            </Question>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Question label="State Bar number">
+                <Text value={a.L2} onChange={(v) => set((x) => void (x.L2 = v))} inputMode="numeric" />
+              </Question>
+              <Question label="Firm name" optional>
+                <Text value={a.L3} onChange={(v) => set((x) => void (x.L3 = v))} />
+              </Question>
+            </div>
+            <Question label="Firm mailing address">
+              <AddressInput value={a.L4} onChange={(v) => set((x) => void (x.L4 = v))} />
+            </Question>
+            <div className="grid gap-5 sm:grid-cols-3">
+              <Question label="Phone">
+                <Text type="tel" value={a.L5.phone} onChange={(v) => set((x) => void (x.L5.phone = v))} />
+              </Question>
+              <Question label="Fax" optional>
+                <Text type="tel" value={a.L5.fax} onChange={(v) => set((x) => void (x.L5.fax = v))} />
+              </Question>
+              <Question label="Email">
+                <Text type="email" value={a.L5.email} onChange={(v) => set((x) => void (x.L5.email = v))} />
+              </Question>
+            </div>
+          </div>
+        )}
+      </Group>
+    </div>
+  );
+}
