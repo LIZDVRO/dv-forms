@@ -453,8 +453,8 @@ export const DV100: FormSpec = {
     // Incidents 4 and up go on DV-101, which counts as 2 extra pages here.
     b("Page5.List7.MultilineCheckBox", (a) => s.some((x) => x.title === "DV-100, Describe Abuse") || !!card(a, 3)),
     b("Page13.List32.Li1.T97", (a) => {
-      // Plus DV-101 (2 pages) and the LIZ invoice (1 page) when attached.
-      const n = pages + (card(a, 3) ? 2 : 0) + (a.orders.O23 ? 1 : 0);
+      // Plus DV-101 (2 pages) when it is filed with DV-100.
+      const n = pages + (card(a, 3) ? 2 : 0);
       return n ? String(n) : "";
     }),
   ],

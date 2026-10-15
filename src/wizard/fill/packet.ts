@@ -153,8 +153,6 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
       });
       bytes = await appendSheets(bytes, sheetsPdf);
     }
-    // The LIZ invoice is the receipt for the first item 23 expense; it goes behind DV-100.
-    if (spec.id === "DV-100" && a.orders.O23) bytes = await appendSheets(bytes, await lizInvoice(a, load));
     files.push({
       id: spec.id,
       fileName: fileNameFor(spec),
@@ -163,6 +161,17 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
       bytes,
       sheetTitles: filled.sheets.map((s) => s.title),
     });
+    // The LIZ invoice is the proof for the first item 23 expense. DV-100 says to bring proof
+    // of expenses to the court date, so it goes with DV-130 rather than in the filing.
+    if (spec.id === "DV-130" && a.orders.O23)
+      files.push({
+        id: "LIZ-INVOICE",
+        fileName: "LIZ-Invoice.pdf",
+        goesTo: "court",
+        group: "hearing",
+        bytes: await lizInvoice(a, load),
+        sheetTitles: [],
+      });
   }
   return { files, problems };
 }

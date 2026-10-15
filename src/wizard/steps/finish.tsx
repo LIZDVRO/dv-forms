@@ -72,6 +72,7 @@ const FORM_NAMES: Record<string, string> = {
   "DV-250": "Proof of Service by Mail",
   "DV-901": "Attachment to Order Transferring Wireless Phone Account",
   "DV-210": "Summons (for service by publication or posting)",
+  "LIZ-INVOICE": "LIZ Break Free invoice (proof for item 23)",
 };
 
 /** One line on what to do with each form, by where it goes and when. */
@@ -85,6 +86,8 @@ function howToUse(f: PacketFile, a: Answers): string {
       return "File with your other papers. These go in the court's confidential file.";
     case "DV-130":
       return "Bring 3 copies to your court date. The judge fills in the orders.";
+    case "LIZ-INVOICE":
+      return "Proof of the $250 expense in DV-100 item 23. Bring it to your court date and show the judge.";
     case "DV-150":
       return "Bring to your court date with DV-130. The judge fills in the findings.";
     case "SER-001":
@@ -325,7 +328,8 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 )}
                 <li>
                   On your court date, bring 3 copies of DV-130{custodyRequested(a) ? " and DV-150" : ""}, your proof of service (DV-200),
-                  and anything that supports what you wrote, like photos or texts.
+                  {a.orders.O23 ? " the LIZ invoice and receipts for any other expenses," : ""} and anything that supports what you wrote,
+                  like photos or texts.
                 </li>
                 {packet.files.some((f) => f.id === "INT-300") && (
                   <li>File your INT-300 with your other papers so the court can schedule an interpreter for your court date.</li>

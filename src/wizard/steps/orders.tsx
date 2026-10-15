@@ -241,7 +241,7 @@ export function Orders() {
           <div className="flex items-center justify-between gap-3 rounded-xl border border-liz/30 bg-white p-3">
             <div>
               <div className="text-base font-medium text-slate-900">LIZ Break Free — form preparation</div>
-              <div className="text-sm text-slate-600">Included automatically. The invoice is attached to your request as the receipt.</div>
+              <div className="text-sm text-slate-600">Included automatically. We&apos;ll give you the invoice to bring to your court date as proof.</div>
             </div>
             <div className="text-base font-semibold text-slate-900">${LIZ_FEE.amount}.00</div>
           </div>

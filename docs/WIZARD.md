@@ -37,7 +37,7 @@ zip) sorts them into three groups:
 | Group | Forms |
 | --- | --- |
 | File now | DV-100, DV-101, DV-105, DV-105(A), DV-108, DV-109, DV-110, DV-140, DV-145, DV-900, FL-150, INT-300, DV-160, DV-165, DV-170, CLETS-001 (to the clerk, not filed) |
-| Bring to your court date | DV-130, DV-150 (with custody) |
+| Bring to your court date | DV-130, DV-150 (with custody), LIZ invoice (with item 23) |
 | Keep for later | SER-001, DV-200, DV-250 (with FL-150), DV-901 (with DV-900; confidential), DV-175, DV-210 |
 
 These are orders or proofs the court, a server or the phone company completes; the wizard fills
@@ -53,7 +53,8 @@ is updating an existing case. FL-155 and FL-351 are not used (see the build-deci
   and the children's insurance address (your employer's).
 - Parents default to "parent" for both people; a "Change" link opens the question.
 - Item 23 always starts with the LIZ Break Free document-assistance fee ($250), locked, with
-  the LIZ invoice (`public/forms/LIZ-invoice.pdf`) appended behind DV-100 and counted in item 32.
+  the LIZ invoice (`public/forms/LIZ-invoice.pdf`) produced as its own file in "Bring to your
+  court date": DV-100 item 23 says to bring proof of expenses to the hearing.
 - A drawn signature (and the lawyer's, if any) is placed on DV-100, FL-150, DV-160, INT-300
   and SER-001 (`signatures` in each form spec). Blank means sign by hand.
 - The finish page can be printed or saved as PDF; only the instructions print.
