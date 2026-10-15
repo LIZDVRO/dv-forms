@@ -131,6 +131,8 @@ export type OrderId =
 export interface Answers {
   // Step 0 · setup
   S1: string;
+  /** Courthouse id when the county has more than one (see courthouses.ts). */
+  S2: string;
   S3: "new" | "update";
   S4: string;
   S5: YN;

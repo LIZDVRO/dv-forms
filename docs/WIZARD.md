@@ -43,5 +43,5 @@ field in the map has no binding. `/wizard?sample` fills in a made-up case for te
 
 ## Known gaps
 
-- Court street addresses exist only for Fresno, Kings and Tulare (`src/lib/courtAddresses.ts`);
-  other counties print the county name only.
+- Courthouse addresses exist for Fresno, Kings, Madera, Merced and Tulare (two branches) in
+  `src/wizard/courthouses.ts`; other counties print the county name only.

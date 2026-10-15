@@ -2,6 +2,7 @@
 
 import type { ComponentType } from "react";
 
+import { COURTHOUSES } from "../courthouses";
 import type { Answers } from "../types";
 import { History, Incidents, Weapons } from "./history";
 import { Orders } from "./orders";
@@ -35,6 +36,7 @@ export const STEPS: StepDef[] = [
     Component: CourtAndLawyer,
     validate: (a) => ({
       ...(!a.S1 && { S1: "Choose a county." }),
+      ...((COURTHOUSES[a.S1]?.length ?? 0) > 1 && !a.S2 && { S2: "Choose a courthouse." }),
       ...(a.S5 === "Y" && !a.L1.trim() && { L1: "Enter your lawyer's name." }),
     }),
   },

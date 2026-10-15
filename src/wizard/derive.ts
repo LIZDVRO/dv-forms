@@ -1,7 +1,7 @@
 /**
  * Values that are calculated, never asked (map: "Derived, never asked").
  */
-import { COURT_ADDRESSES } from "@/lib/courtAddresses";
+import { courthouseFor } from "./courthouses";
 import type { Address, Answers, RosterPerson } from "./types";
 
 /** ISO date → MM/DD/YYYY, the Judicial Council format. Text passes through. */
@@ -42,8 +42,8 @@ export function oneLine(a: Address | string): string {
 export function courtCaption(a: Answers): string {
   const county = a.S1.trim();
   if (!county) return "";
-  const addr = COURT_ADDRESSES[county];
-  return addr ? `${county}\n${addr.replace(/\n/g, ", ")}` : county;
+  const c = courthouseFor(county, a.S2);
+  return c ? [county, c.name, c.street, `${c.city}, CA ${c.zip}`].join("\n") : county;
 }
 
 /**

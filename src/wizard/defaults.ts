@@ -40,6 +40,7 @@ export function todayISO(): string {
 export function emptyAnswers(): Answers {
   return {
     S1: "",
+    S2: "",
     S3: "new",
     S4: "",
     S5: "",

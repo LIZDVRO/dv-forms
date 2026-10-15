@@ -1,5 +1,6 @@
 "use client";
 
+import { COURTHOUSES } from "../courthouses";
 import { useWizard } from "../store";
 import { AddressInput, Choice, Group, Note, Question, Text, YesNo } from "../ui/fields";
 import type { StepProps } from "./types";
@@ -51,7 +52,12 @@ export function CourtAndLawyer({ errors }: StepProps) {
         <Question label="Which county are you filing in?" hint="Where you live, or where the abuse happened." error={errors.S1}>
           <select
             value={a.S1}
-            onChange={(e) => set((x) => void (x.S1 = e.target.value))}
+            onChange={(e) =>
+              set((x) => {
+                x.S1 = e.target.value;
+                x.S2 = "";
+              })
+            }
             className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-base focus:border-liz focus:outline-none focus:ring-2 focus:ring-liz/25 sm:w-80"
           >
             <option value="">Choose a county…</option>
@@ -62,6 +68,16 @@ export function CourtAndLawyer({ errors }: StepProps) {
             ))}
           </select>
         </Question>
+        {(COURTHOUSES[a.S1]?.length ?? 0) > 1 && (
+          <Question label="Which courthouse?" hint="Choose the one closest to you, or where your court told you to file." error={errors.S2}>
+            <Choice
+              value={a.S2}
+              onChange={(v) => set((x) => void (x.S2 = v))}
+              columns
+              options={COURTHOUSES[a.S1].map((c) => ({ value: c.id, label: c.name, hint: `${c.street}, ${c.city}` }))}
+            />
+          </Question>
+        )}
         <Question label="Is this a new request?">
           <Choice
             value={a.S3}
