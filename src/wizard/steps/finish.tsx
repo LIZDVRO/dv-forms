@@ -12,6 +12,9 @@ import { Group, Note, Question, SignaturePad, Text } from "../ui/fields";
 /** LIZ's e-filing portal. Opened in a new tab: nothing in the wizard is saved, so leaving would lose the forms. */
 const EFILE_URL = "https://efile.lizbreakfree.org/";
 
+/** The send-to-sheriff page, opened on the county the sheriff serves in. */
+const sheriffUrl = (county: string) => `/sheriff${county ? `?county=${encodeURIComponent(county)}` : ""}`;
+
 const loadTemplate = async (path: string) => {
   const res = await fetch(path);
   if (!res.ok) throw new Error(`Could not load ${path}`);
@@ -94,7 +97,7 @@ function howToUse(f: PacketFile, a: Answers): string {
     case "DV-150":
       return "Bring to your court date with DV-130. The judge fills in the findings.";
     case "SER-001":
-      return "After the court returns your papers, give this and copies of them to the sheriff. Don't file it.";
+      return "After the court returns your papers, send this and them to the sheriff at forms.lizbreakfree.org/sheriff. Don't file it.";
     case "DV-200":
       return a.V1 === "sheriff"
         ? "For the person who serves. The sheriff may use its own proof of service instead."
@@ -331,8 +334,13 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 <li>
                   {a.V1 === "sheriff" ? (
                     <>
-                      Take SER-001 and copies of your papers to the {a.V2 || a.S1} County sheriff. First write the case number on each
-                      page and, in item 5, the court date and service deadline from your DV-109. Service is free.
+                      Send SER-001 and the papers the court gave back to the {a.V2 || a.S1} County sheriff, from your phone or computer.
+                      Use our{" "}
+                      <a href={sheriffUrl(a.V2 || a.S1)} className="font-medium text-liz underline">
+                        send-to-sheriff page
+                      </a>{" "}
+                      (forms.lizbreakfree.org/sheriff): it adds the case number, court date and deadline to SER-001 and puts everything
+                      in one email. Service is free.
                     </>
                   ) : (
                     <>
