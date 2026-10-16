@@ -54,7 +54,7 @@ export function ConsentBoxes({ error }: { error?: string }) {
         <p>LIZ is not a law firm and can&apos;t give you legal advice. This tool fills out court forms from your answers; you decide what to file.</p>
         <p>
           Your forms are made on your device. To study abuse and improve help for survivors, we collect a statistical record of how you use
-          this tool and your answers, <strong className="font-semibold text-slate-900">without</strong> names, addresses, contact details or your description of what happened. It is sent even if you
+          this tool and your answers, <strong className="font-semibold text-slate-900">without</strong>{" "}names, addresses, contact details or your description of what happened. It is sent even if you
           don&apos;t finish.
         </p>
       </div>
