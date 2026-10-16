@@ -2,6 +2,8 @@
 
 import type { ComponentType } from "react";
 
+import { consentGiven } from "@/legal/consent";
+
 import { COURTHOUSES } from "../courthouses";
 import { custodyRequested, financesRequested } from "../derive";
 import type { Answers } from "../types";
@@ -35,7 +37,12 @@ export function notEligible(a: Answers): boolean {
 }
 
 export const STEPS: StepDef[] = [
-  { id: "start", title: "Before you start", Component: Start },
+  {
+    id: "start",
+    title: "Before you start",
+    Component: Start,
+    validate: (): Record<string, string> => (consentGiven() ? {} : { consent: "Check all three boxes to continue." }),
+  },
   {
     id: "court",
     title: "Court and lawyer",
