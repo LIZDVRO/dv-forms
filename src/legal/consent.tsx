@@ -49,7 +49,7 @@ export function ConsentBoxes({ error }: { error?: string }) {
   const [open, setOpen] = useState(false);
   return (
     <section className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-      <h2 className="text-lg font-semibold text-slate-900">Before you start</h2>
+      <h2 className="text-lg font-semibold text-slate-900">Your agreement with LIZ</h2>
       <div className="space-y-2 text-base text-slate-700">
         <p>LIZ is not a law firm and can&apos;t give you legal advice. This tool fills out court forms from your answers; you decide what to file.</p>
         <p>
