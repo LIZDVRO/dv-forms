@@ -3,6 +3,8 @@
 import JSZip from "jszip";
 import { useState } from "react";
 
+import { noteForms, notePrint, noteZip } from "@/stats/tracker";
+
 import { custodyRequested, derive, fmtDate } from "../derive";
 import { buildFilingPacket, type Packet, type PacketFile } from "../fill/packet";
 import { useWizard } from "../store";
@@ -132,6 +134,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
       const p = await buildFilingPacket(a, loadTemplate);
       if (p.problems.length) console.warn("Fill problems", p.problems);
       setPacket(p);
+      noteForms(p.files.map((f) => f.id));
     } catch (e) {
       console.error(e);
       setError("Something went wrong making your forms. Please try again.");
@@ -147,6 +150,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
     const folder: Record<PacketFile["group"], string> = { file: "1 File now", hearing: "2 Bring to court date", later: "3 Keep for later" };
     packet.files.forEach((f) => zip.file(`${folder[f.group]}/${f.fileName}`, f.bytes));
     download("DVRO-forms.zip", await zip.generateAsync({ type: "blob" }));
+    noteZip();
   };
 
   const summary: [string, string, string][] = [
@@ -283,7 +287,10 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
               <p className="text-base text-slate-800">This page has your instructions. Keep a copy.</p>
               <button
                 type="button"
-                onClick={() => window.print()}
+                onClick={() => {
+                  notePrint();
+                  window.print();
+                }}
                 className="mt-2 rounded-lg border border-liz bg-white px-4 py-2 text-sm font-semibold text-liz hover:bg-liz/5"
               >
                 Print or save these instructions

@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { TERMS_URL, useConsent } from "@/legal/consent";
+import { enterStep, noteEdit, noteErrors, sendStats, startTracking } from "@/stats/tracker";
 import { sampleAnswers } from "@/wizard/sample";
 import { FINISH, visibleSteps } from "@/wizard/steps";
 import { Finish } from "@/wizard/steps/finish";
@@ -11,8 +12,16 @@ import { useWizard } from "@/wizard/store";
 
 const QUICK_EXIT_URL = "https://us.shein.com/";
 
+/** Worth recording: the person did more than open the start screen. */
+const worthSending = () => {
+  const { dirty, step } = useWizard.getState();
+  return dirty || step > 0;
+};
+
 /** Clear everything and leave. replace() keeps the wizard out of the Back button's history. */
 function quickExit() {
+  // The statistics record goes first (sendBeacon finishes after the page is gone), then the answers are cleared.
+  sendStats("quick_exit", useWizard.getState().a, true);
   useWizard.getState().reset();
   window.location.replace(QUICK_EXIT_URL);
 }
@@ -29,6 +38,26 @@ export default function WizardPage() {
   const total = count + 1;
   const onFinish = step >= count;
   const current = onFinish ? FINISH : STEPS[step];
+
+  // Statistics record (Privacy Policy section 2; sent only after the agreement is accepted).
+  // Staff test runs (?sample) are not recorded.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has("sample")) return;
+    startTracking();
+    const unsubscribe = useWizard.subscribe((s, prev) => {
+      if (s.a !== prev.a) noteEdit();
+    });
+    const onHide = () => sendStats("left_page", useWizard.getState().a, worthSending());
+    window.addEventListener("pagehide", onHide);
+    return () => {
+      unsubscribe();
+      window.removeEventListener("pagehide", onHide);
+    };
+  }, []);
+
+  useEffect(() => {
+    enterStep(current.id);
+  }, [current.id]);
 
   // Quick exit on Esc.
   useEffect(() => {
@@ -67,6 +96,7 @@ export default function WizardPage() {
     const errs = onFinish ? {} : (STEPS[step].validate?.(a) ?? {});
     if (Object.keys(errs).length) {
       setErrors(errs);
+      noteErrors(Object.keys(errs).length);
       return;
     }
     moveTo(step + 1);
