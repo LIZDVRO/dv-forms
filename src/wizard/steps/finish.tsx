@@ -9,6 +9,9 @@ import { useWizard } from "../store";
 import type { Answers } from "../types";
 import { Group, Note, Question, SignaturePad, Text } from "../ui/fields";
 
+/** LIZ's e-filing portal. Opened in a new tab: nothing in the wizard is saved, so leaving would lose the forms. */
+const EFILE_URL = "https://efile.lizbreakfree.org/";
+
 const loadTemplate = async (path: string) => {
   const res = await fetch(path);
   if (!res.ok) throw new Error(`Could not load ${path}`);
@@ -287,6 +290,25 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
               </button>
               <p className="mt-1 text-sm text-slate-600">To save, choose &quot;Save as PDF&quot; in the print window.</p>
             </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm print:hidden">
+              <h4 className="text-lg font-semibold text-slate-900">File online with LIZ</h4>
+              <p className="mt-1 text-base text-slate-700">
+                Skip the trip to the courthouse. E-file your forms with the {a.S1 ? `${a.S1} County` : "your"} court through the LIZ
+                e-filing portal, from anywhere.
+              </p>
+              <p className="mt-1 text-sm text-slate-600">
+                Download your forms first. The portal opens in a new tab so this page and your forms stay open.
+              </p>
+              <a
+                href={EFILE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-liz px-5 py-3 text-base font-semibold text-white hover:bg-liz/90"
+              >
+                Go to e-filing
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
             <Group title="What to do next">
               <ol className="list-decimal space-y-2 pl-5 text-base text-slate-700">
                 <li>
@@ -301,8 +323,8 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                   ); the judge does.
                 </li>
                 <li>
-                  Take them to the {a.S1 ? `${a.S1} County` : "county"} Superior Court clerk, or e-file if your court allows it. Filing is
-                  free. Attach copies of any orders you listed
+                  E-file them through LIZ at efile.lizbreakfree.org, or take them to the {a.S1 ? `${a.S1} County` : "county"} Superior
+                  Court clerk. Filing is free. Attach copies of any orders you listed
                   {a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""}.
                 </li>
                 <li>Get your papers back the same or next business day. Your court date is on DV-109.</li>
