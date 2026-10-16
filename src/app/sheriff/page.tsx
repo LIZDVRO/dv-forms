@@ -261,9 +261,17 @@ export default function SheriffPage() {
         <Group title="4. The papers the court gave back">
           <p className="text-base text-slate-700">
             Add the copies with the court&apos;s stamp and the judge&apos;s signature: DV-109, DV-110 (if the judge signed it), DV-100,
-            and any others the court returned (like DV-105 and DV-140). Also add the blank DV-120 and DV-120-INFO. Add a PDF if the court
-            emailed them, or take a clear photo of every page.
+            and any others the court returned (like DV-105 and DV-140). Also add the blank DV-120 and DV-120-INFO.
           </p>
+          <ul className="list-disc space-y-1 pl-5 text-base text-slate-700">
+            <li>
+              <strong>E-filed through LIZ?</strong> The court emailed the stamped copies to the address on your e-filing account. Save the
+              PDFs from that email, then add them here.
+            </li>
+            <li>
+              <strong>Filed at the courthouse?</strong> Take a clear photo of every page the clerk gave you.
+            </li>
+          </ul>
           <FilePick accept={ACCEPT} multiple label="Add PDFs or photos" onFiles={(fs) => setPapers((p) => [...p, ...fs.map((file) => ({ id: newId(), file }))])} />
           <FilePick accept="image/*" capture label="Take a photo of a page" onFiles={(fs) => setPapers((p) => [...p, ...fs.map((file) => ({ id: newId(), file }))])} subtle />
           {papers.length > 0 && (

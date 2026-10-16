@@ -12,9 +12,6 @@ import { Group, Note, Question, SignaturePad, Text } from "../ui/fields";
 /** LIZ's e-filing portal. Opened in a new tab: nothing in the wizard is saved, so leaving would lose the forms. */
 const EFILE_URL = "https://efile.lizbreakfree.org/";
 
-/** The send-to-sheriff page, opened on the county the sheriff serves in. */
-const sheriffUrl = (county: string) => `/sheriff${county ? `?county=${encodeURIComponent(county)}` : ""}`;
-
 const loadTemplate = async (path: string) => {
   const res = await fetch(path);
   if (!res.ok) throw new Error(`Could not load ${path}`);
@@ -97,7 +94,7 @@ function howToUse(f: PacketFile, a: Answers): string {
     case "DV-150":
       return "Bring to your court date with DV-130. The judge fills in the findings.";
     case "SER-001":
-      return "After the court returns your papers, send this and them to the sheriff at forms.lizbreakfree.org/sheriff. Don't file it.";
+      return "Keep this. Once you have your stamped papers back, send it and them to the sheriff from lizbreakfree.org (\"I need to serve my papers\"). Don't file it.";
     case "DV-200":
       return a.V1 === "sheriff"
         ? "For the person who serves. The sheriff may use its own proof of service instead."
@@ -330,17 +327,17 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                   Court clerk. Filing is free. Attach copies of any orders you listed
                   {a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""}.
                 </li>
-                <li>Get your papers back the same or next business day. Your court date is on DV-109.</li>
+                <li>
+                  Get your stamped papers back, usually the same or next business day. If you e-file through LIZ, the court emails them to
+                  the address on your e-filing account. If you file at the courthouse, the clerk gives them to you. Your court date is on
+                  DV-109.
+                </li>
                 <li>
                   {a.V1 === "sheriff" ? (
                     <>
-                      Send SER-001 and the papers the court gave back to the {a.V2 || a.S1} County sheriff, from your phone or computer.
-                      Use our{" "}
-                      <a href={sheriffUrl(a.V2 || a.S1)} className="font-medium text-liz underline">
-                        send-to-sheriff page
-                      </a>{" "}
-                      (forms.lizbreakfree.org/sheriff): it adds the case number, court date and deadline to SER-001 and puts everything
-                      in one email. Service is free.
+                      Have the {a.V2 || a.S1} County sheriff serve them. Service is free. Go to lizbreakfree.org and choose{" "}
+                      <strong>I need to serve my papers</strong>. You&apos;ll add SER-001 and your stamped papers (the court&apos;s PDFs,
+                      or photos of the pages), and send them to the sheriff from your own email. Keep SER-001 until then.
                     </>
                   ) : (
                     <>
