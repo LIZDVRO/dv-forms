@@ -10,6 +10,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { ConsentBoxes, TERMS_URL, useConsent } from "@/legal/consent";
 import { fmtDate } from "@/wizard/derive";
 import { Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
 import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type SheriffOffice } from "@/sheriff/offices";
@@ -56,6 +57,8 @@ export default function SheriffPage() {
   const [error, setError] = useState("");
   const [copied, setCopied] = useState("");
   const [canShareFiles, setCanShareFiles] = useState(false);
+  const agreed = useConsent((c) => c.age && c.lawyer && c.terms);
+  const [started, setStarted] = useState(false);
 
   const office: SheriffOffice | undefined = SHERIFF_OFFICES[county];
   const deadline = useMemo(() => deadlineFrom(hearingDate, Number(days)), [hearingDate, days]);
@@ -178,6 +181,26 @@ export default function SheriffPage() {
       </header>
 
       <main className="mx-auto max-w-3xl space-y-10 px-4 pb-24 pt-8">
+        {!started ? (
+          <div className="space-y-6">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Send your papers to the sheriff</h1>
+              <p className="mt-2 text-base text-slate-600">
+                Have the sheriff serve your restraining order papers, for free. First, please read and agree to how this service works.
+              </p>
+            </div>
+            <ConsentBoxes />
+            <button
+              type="button"
+              onClick={() => setStarted(true)}
+              disabled={!agreed}
+              className="w-full rounded-xl bg-liz px-6 py-4 text-lg font-semibold text-white shadow hover:bg-liz/90 disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+            >
+              Start
+            </button>
+          </div>
+        ) : (
+          <>
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Send your papers to the sheriff</h1>
           <p className="mt-2 text-base text-slate-600">
@@ -336,8 +359,14 @@ export default function SheriffPage() {
 
         {made && <Send office={office} made={made} mailto={mailto} canShareFiles={canShareFiles} onShare={share} copy={copy} copied={copied} subject={mail?.subject ?? ""} />}
 
+          </>
+        )}
+
         <p className="text-center text-xs text-slate-500">
-          Not legal advice. In danger? Call 911. National Domestic Violence Hotline 1-800-799-7233 (TTY 1-800-787-3224).
+          Not legal advice. In danger? Call 911. National Domestic Violence Hotline 1-800-799-7233 (TTY 1-800-787-3224).{" "}
+          <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="underline">
+            User Agreement
+          </a>
         </p>
       </main>
     </div>

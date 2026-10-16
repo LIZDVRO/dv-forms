@@ -36,7 +36,10 @@ export default function Home() {
         <p className="mt-10 max-w-md text-center text-sm leading-relaxed text-slate-500">
           This site provides general help with forms only. It does not give
           legal advice. If you are in immediate danger, call 911 or your local
-          emergency number.
+          emergency number.{" "}
+          <a href="/terms" className="underline">
+            User Agreement and Privacy Policy
+          </a>
         </p>
       </main>
     </div>

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { TERMS_URL, useConsent } from "@/legal/consent";
 import { sampleAnswers } from "@/wizard/sample";
 import { FINISH, visibleSteps } from "@/wizard/steps";
 import { Finish } from "@/wizard/steps/finish";
@@ -18,6 +19,7 @@ function quickExit() {
 
 export default function WizardPage() {
   const { a, step, dirty, go, load } = useWizard();
+  const agreed = useConsent((c) => c.age && c.lawyer && c.terms);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const top = useRef<HTMLDivElement>(null);
   // Branch steps (custody, abduction) come after the answers that open them,
@@ -128,13 +130,17 @@ export default function WizardPage() {
             ← Back
           </button>
           <p className="hidden text-center text-xs text-slate-500 sm:block">
-            Not legal advice. In danger? Call 911. Hotline 1-800-799-7233 (TTY 1-800-787-3224).
+            Not legal advice. In danger? Call 911. Hotline 1-800-799-7233 (TTY 1-800-787-3224).{" "}
+            <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="underline">
+              User Agreement
+            </a>
           </p>
           {!onFinish && (
             <button
               type="button"
               onClick={next}
-              className="rounded-lg bg-liz px-6 py-2.5 text-base font-semibold text-white shadow hover:bg-liz/90"
+              disabled={step === 0 && !agreed}
+              className="rounded-lg bg-liz px-6 py-2.5 text-base font-semibold text-white shadow hover:bg-liz/90 disabled:cursor-not-allowed disabled:opacity-40"
             >
               {step === 0 ? "Start" : "Continue →"}
             </button>

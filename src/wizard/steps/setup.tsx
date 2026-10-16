@@ -4,6 +4,7 @@ import { COURTHOUSES } from "../courthouses";
 import { useWizard } from "../store";
 import { AddressInput, Choice, Group, Note, Question, Text, YesNo } from "../ui/fields";
 import type { StepProps } from "./types";
+import { ConsentBoxes } from "@/legal/consent";
 
 export const COUNTIES = [
   "Alameda", "Alpine", "Amador", "Butte", "Calaveras", "Colusa", "Contra Costa", "Del Norte", "El Dorado", "Fresno",
@@ -15,7 +16,7 @@ export const COUNTIES = [
 ];
 
 /** Phase 0 (DV-500-INFO): what this is, before any questions. */
-export function Start() {
+export function Start({ errors }: StepProps) {
   return (
     <div className="space-y-5 text-base leading-relaxed text-slate-700">
       <p>
@@ -41,6 +42,7 @@ export function Start() {
         for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction). Child and spousal
         support requests need financial forms that are coming next.
       </p>
+      <ConsentBoxes error={errors.consent} />
     </div>
   );
 }
