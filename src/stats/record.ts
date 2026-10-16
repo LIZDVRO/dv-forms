@@ -37,6 +37,8 @@ export interface DeviceInfo {
 
 export interface StatsMeta {
   version: string;
+  /** User Agreement version the person accepted */
+  agreementVersion: string;
   /** ms since epoch */
   startedAt: number;
   now: number;
@@ -313,6 +315,7 @@ export function buildStatsRecord(a: Answers, m: StatsMeta): StatsRecord {
   const session: Record<string, unknown> = {
     // Session
     wizard_version: m.version,
+    agreement_version: m.agreementVersion,
     session_date: sessionDate,
     start_hour: started.getHours(),
     day_of_week: ((started.getDay() + 6) % 7) + 1,
@@ -349,7 +352,6 @@ export function buildStatsRecord(a: Answers, m: StatsMeta): StatsRecord {
     p_english: yesNo(a.P9),
     p_language: pLanguage || null,
     p_interpreter: yesNo(a.I1),
-    p_origin_town: a.I1 === "Y" ? txt(a.I2) : null,
     witness_interpreters: witnessLanguages.length,
     witness_languages: witnessLanguages.filter(Boolean).join(", ") || null,
     p_mail_zip: zip5(a.P6.zip) ?? (lawyer && !mailStreet ? zip5(a.L4.zip) : null),
@@ -470,7 +472,6 @@ export function buildStatsRecord(a: Answers, m: StatsMeta): StatsRecord {
     prior_criminal: orderType(criminalRe),
     prior_civil: orderType(civilRe),
     prior_other: a.C1 === "Y" ? priorOrders.some((x) => ![policeRe, criminalRe, civilRe].some((re) => re.test(x.type.toLowerCase()))) : a.C1 === "N" ? false : null,
-    prior_order_expires: priorOrders.map((x) => x.expires).filter(isIso).sort().at(-1) ?? null,
     case_custody: caseFlag("custody"),
     case_divorce: caseFlag("divorce"),
     case_juvenile: caseFlag("juvenile"),

@@ -30,6 +30,7 @@ const all = (rule: Rule, ...keys: string[]) => Object.fromEntries(keys.map((k) =
 
 export const SESSION: Record<string, Rule> = {
   wizard_version: T,
+  agreement_version: T,
   session_date: D,
   start_hour: range(0, 23),
   day_of_week: range(1, 7),
@@ -74,7 +75,6 @@ export const SESSION: Record<string, Rule> = {
   p_english: B,
   p_language: T,
   p_interpreter: B,
-  p_origin_town: T,
   witness_interpreters: N,
   witness_languages: T,
   p_mail_zip: ZIP,
@@ -155,7 +155,6 @@ export const SESSION: Record<string, Rule> = {
   proximity: one("no", "together", "building", "neighborhood", "other"),
   prior_orders: N,
   ...all(B, "prior_police_epo", "prior_criminal", "prior_civil", "prior_other"),
-  prior_order_expires: D,
   ...all(B, "case_custody", "case_divorce", "case_juvenile", "case_guardianship", "case_criminal", "case_child_support", "case_other"),
   custody_order_exists: B,
 

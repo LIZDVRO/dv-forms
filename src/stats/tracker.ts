@@ -4,6 +4,7 @@
  * person leaves: at the finish screen, when the page is closed, or on Quick
  * Exit. Each page load sends at most once. Nothing is stored in the browser.
  */
+import { AGREEMENT_VERSION, consentGiven } from "@/legal/consent";
 import type { Answers } from "@/wizard/types";
 
 import { buildStatsRecord, type DeviceInfo, type StepStat, type Trigger } from "./record";
@@ -25,6 +26,7 @@ const t = {
   zip: false,
   printed: false,
   sent: false,
+  sheriffSent: false,
 };
 
 function deviceInfo(): DeviceInfo {
@@ -130,22 +132,23 @@ export function noteForms(ids: string[]) {
 export const noteZip = () => void (t.zip = true);
 export const notePrint = () => void (t.printed = true);
 
-/** Send the record once. Returns false when nothing was sent. */
+/** Send the record once, and only after the person accepted the User Agreement. Returns false when nothing was sent. */
 export function sendStats(trigger: Trigger, a: Answers, worthSending: boolean): boolean {
-  if (!t.started || t.sent || !worthSending) return false;
+  if (!t.started || t.sent || !worthSending || !consentGiven()) return false;
   t.sent = true;
   const now = Date.now();
   closeCurrent(now);
   try {
     const record = buildStatsRecord(a, {
       version: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA?.slice(0, 7) || "dev",
+      agreementVersion: AGREEMENT_VERSION,
       startedAt: t.startedAt,
       now,
       trigger: trigger === "left_page" && t.finished ? "finish" : trigger,
       completed: t.finished,
       lastStep: t.current,
       quickExitStep: trigger === "quick_exit" ? t.current : undefined,
-      steps: [...t.steps.values()].map(({ enteredAt: _e, ...x }) => x),
+      steps: [...t.steps.values()].map((x) => ({ step: x.step, seq: x.seq, seconds: x.seconds, visits: x.visits, edits: x.edits, errors: x.errors })),
       forms: t.forms,
       zipDownloaded: t.zip,
       instructionsPrinted: t.printed,
@@ -158,8 +161,10 @@ export function sendStats(trigger: Trigger, a: Answers, worthSending: boolean): 
   }
 }
 
-/** One row for the sheriff page (not linked to any wizard session). */
+/** One row per sheriff-page visit, on the first send action (not linked to any wizard session). */
 export function sendSheriffStats(row: { county: string; channel: "share_sheet" | "mailto" | "civil_connect" | "fax_shown"; photo_count: number; pdf_count: number }) {
+  if (t.sheriffSent || !consentGiven()) return false;
+  t.sheriffSent = true;
   return post({ kind: "sheriff", sheriff: row, website: "" });
 }
 
