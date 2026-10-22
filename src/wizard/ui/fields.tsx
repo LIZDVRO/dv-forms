@@ -252,7 +252,7 @@ export function Rows<T>({
           onClick={() => onChange([...items, make()])}
           className="rounded-lg border border-dashed border-liz/50 px-4 py-2.5 text-base font-medium text-liz hover:bg-liz/5"
         >
-          + {addLabel}
+          {`+ ${addLabel}`}
         </button>
       )}
     </div>
@@ -272,7 +272,7 @@ const AUDIENCE: Record<Audience, { label: string; cls: string }> = {
 /** "Who will see this" label (UX guide principle 1). */
 export function Seen({ by }: { by: Audience }) {
   const a = AUDIENCE[by];
-  return <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${a.cls}`}>👁 {a.label}</span>;
+  return <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium ${a.cls}`}>{`👁 ${a.label}`}</span>;
 }
 
 export function Group({ title, seen, children }: { title?: ReactNode; seen?: Audience; children: ReactNode }) {

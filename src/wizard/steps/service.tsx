@@ -212,9 +212,9 @@ export function Service() {
           </Question>
           {(a.R18 === "Y" || a.R17 === "N") && (
             <Note>
-              We&apos;ll also tell the sheriff{a.R18 === "Y" ? " that they have guns" : ""}
-              {a.R18 === "Y" && a.R17 === "N" ? " and" : ""}
-              {a.R17 === "N" ? " that they don't speak English" : ""}, from your earlier answers.
+              {`We'll also tell the sheriff${a.R18 === "Y" ? " that they have guns" : ""}${a.R18 === "Y" && a.R17 === "N" ? " and" : ""}${
+                a.R17 === "N" ? " that they don't speak English" : ""
+              }, from your earlier answers.`}
             </Note>
           )}
           <Check checked={a.R22 === "Y"} onChange={(v) => set((x) => void (x.R22 = v ? "Y" : "N"))}>

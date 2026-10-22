@@ -222,7 +222,7 @@ export function Children({ errors }: StepProps) {
       <Group seen="public">
         {kids.length === 0 ? (
           <Note tone="warn">
-            We don&apos;t have any children under 18 that you share with {them(a)}. Go back to <strong>People to protect</strong>{" "}
+            {`We don't have any children under 18 that you share with ${them(a)}. Go back to `}<strong>People to protect</strong>{" "}
             and add them, answering yes to &quot;Is this a child you have with the other person?&quot;
           </Note>
         ) : (
@@ -232,7 +232,7 @@ export function Children({ errors }: StepProps) {
               {kids.map((k) => (
                 <li key={k.id}>
                   {k.name}
-                  {k.dob && <span className="text-slate-500"> · born {fmtDate(k.dob)}</span>}
+                  {k.dob && <span className="text-slate-500">{` · born ${fmtDate(k.dob)}`}</span>}
                 </li>
               ))}
             </ul>
@@ -240,7 +240,7 @@ export function Children({ errors }: StepProps) {
         )}
         {!editParents ? (
           <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4">
-            <p className="text-base text-slate-800">You and {them(a)} are the children&apos;s parents.</p>
+            <p className="text-base text-slate-800">{`You and ${them(a)} are the children's parents.`}</p>
             <button type="button" onClick={() => setEditParents(true)} className="text-sm font-medium text-liz hover:underline">
               Not right? Change
             </button>
@@ -348,9 +348,11 @@ export function Children({ errors }: StepProps) {
             <div className="space-y-2">
               {a.C4.map((c, i) => (
                 <Check key={i} checked={c.kids === "Y"} onChange={(v) => set((x) => void (x.C4[i].kids = v ? "Y" : "N"))}>
-                  {c.type === "other" ? c.kind || "Other" : c.type[0].toUpperCase() + c.type.slice(1)} case
-                  {[c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).length > 0 &&
-                    ` — ${[c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).join(", ")}`}
+                  {`${c.type === "other" ? c.kind || "Other" : c.type[0].toUpperCase() + c.type.slice(1)} case${
+                    [c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).length > 0
+                      ? ` — ${[c.where, c.year, c.caseNumber && `no. ${c.caseNumber}`].filter(Boolean).join(", ")}`
+                      : ""
+                  }`}
                 </Check>
               ))}
             </div>

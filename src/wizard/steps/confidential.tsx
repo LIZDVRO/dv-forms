@@ -28,8 +28,7 @@ export function Confidential({ errors }: StepProps) {
     <div className="space-y-8">
       <Group seen="court-confidential">
         <Note>
-          This request (DV-160) is kept in the court&apos;s confidential file. The public can&apos;t see it.{" "}
-          {them(a)} can, unless you also ask to keep information from them below.
+          {`This request (DV-160) is kept in the court's confidential file. The public can't see it. ${them(a)} can, unless you also ask to keep information from them below.`}
         </Note>
         <Question label="Who is asking?" error={errors.M1}>
           <Choice

@@ -44,7 +44,7 @@ const ORDER_NAMES: Record<string, string> = {
   O20: "Property restraint",
   O21: "More time to serve",
   O22: "Pay debts",
-  O23: "Pay expenses",
+  O23: "Pay expenses — $250 LIZ invoice (we ask the other person to pay; you owe nothing)",
   O24: "Child support",
   O25: "Spousal support",
   O26: "Lawyer's fees",
@@ -92,7 +92,7 @@ function howToUse(f: PacketFile, a: Answers): string {
     case "DV-130":
       return "Bring 3 copies to your court date. The judge fills in the orders.";
     case "LIZ-INVOICE":
-      return "Proof of the $250 expense in DV-100 item 23 (a copy is also behind DV-100). Bring it to your court date and show the judge.";
+      return "Your $250 LIZ invoice — proof for item 23. We ask the judge to order the other person to pay our $250 preparation cost. It's how our nonprofit stays free for survivors. You owe nothing, ever: if the judge doesn't order it, we write it off.";
     case "DV-150":
       return "Bring to your court date with DV-130. The judge fills in the findings.";
     case "SER-001":
@@ -257,11 +257,10 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                       <li key={f.fileName} className="flex flex-wrap items-center justify-between gap-3 p-3">
                         <div className="min-w-0 flex-1">
                           <div className="text-base font-medium text-slate-900">
-                            {f.fileName.replace(/\.pdf$/, "")} · {FORM_NAMES[f.id]}
+                            {`${f.fileName.replace(/\.pdf$/, "")} · ${FORM_NAMES[f.id]}`}
                           </div>
                           <div className="text-sm text-slate-600">
-                            {howToUse(f, a)}
-                            {f.sheetTitles.length > 0 && ` Includes ${f.sheetTitles.length} attached sheet(s).`}
+                            {`${howToUse(f, a)}${f.sheetTitles.length > 0 ? ` Includes ${f.sheetTitles.length} attached sheet(s).` : ""}`}
                           </div>
                         </div>
                         <button
@@ -300,8 +299,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
             <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm print:hidden">
               <h4 className="text-lg font-semibold text-slate-900">File online with LIZ</h4>
               <p className="mt-1 text-base text-slate-700">
-                Skip the trip to the courthouse. E-file your forms with the {a.S1 ? `${a.S1} County` : "your"} court through the LIZ
-                e-filing portal, from anywhere.
+                {`Skip the trip to the courthouse. E-file your forms with ${a.S1 ? `the ${a.S1} County` : "your"} court through the LIZ e-filing portal, from anywhere.`}
               </p>
               <p className="mt-1 text-sm text-slate-600">
                 Download your forms first. The portal opens in a new tab so this page and your forms stay open.
@@ -319,20 +317,19 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
             <Group title="What to do next">
               <ol className="list-decimal space-y-2 pl-5 text-base text-slate-700">
                 <li>
-                  {a.sig
-                    ? "Print the forms and read them. Your signature is already on them. "
-                    : "Print the forms, read them, and sign DV-100 (page 13) and any other form with a signature line. "}
-                  Don&apos;t sign the order forms (
-                  {packet.files
+                  {`${
+                    a.sig
+                      ? "Print the forms and read them. Your signature is already on them."
+                      : "Print the forms, read them, and sign DV-100 (page 13) and any other form with a signature line."
+                  } Don't sign the order forms (${packet.files
                     .map((f) => f.id)
                     .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900", "DV-165", "DV-130", "DV-150"].includes(id))
-                    .join(", ")}
-                  ); the judge does.
+                    .join(", ")}); the judge does.`}
                 </li>
                 <li>
-                  E-file them through LIZ at efile.lizbreakfree.org, or take them to the {a.S1 ? `${a.S1} County` : "county"} Superior
-                  Court clerk. Filing is free. Attach copies of any orders you listed
-                  {a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""}.
+                  {`E-file them through LIZ at efile.lizbreakfree.org, or take them to the ${a.S1 ? `${a.S1} County` : "county"} Superior Court clerk. Filing is free. Attach copies of any orders you listed${
+                    a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""
+                  }.`}
                 </li>
                 <li>
                   Get your stamped papers back, usually the same or next business day. If you e-file through LIZ, the court emails them to
@@ -342,35 +339,30 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 <li>
                   {a.V1 === "sheriff" ? (
                     <>
-                      Have the {a.V2 || a.S1} County sheriff serve them. Service is free. Go to lizbreakfree.org and choose{" "}
-                      <strong>I need to serve my papers</strong>. You&apos;ll add SER-001 and your stamped papers (the court&apos;s PDFs,
-                      or photos of the pages), and send them to the sheriff from your own email. Keep SER-001 until then.
+                      {`Have the ${a.V2 || a.S1} County sheriff serve them. Service is free. Go to lizbreakfree.org and choose `}
+                      <strong>I need to serve my papers</strong>
+                      {". You'll add SER-001 and your stamped papers (the court's PDFs, or photos of the pages), and send them to the sheriff from your own email. Keep SER-001 until then."}
                     </>
                   ) : (
                     <>
-                      Have someone 18 or older (not you) give copies to {a.R1 || "the other person"} before the deadline on DV-109. The
-                      sheriff does this for free.
+                      {`Have someone 18 or older (not you) give copies to ${a.R1 || "the other person"} before the deadline on DV-109. The sheriff does this for free.`}
                     </>
                   )}
                 </li>
                 {packet.files.some((f) => f.id === "FL-150") && (
                   <li>
-                    {a.sig ? "" : "Sign FL-150 (page 1). "}
-                    {a.R1 || "The other person"} must be served with it and a blank FL-150. Bring your last two pay
-                    stubs and latest tax return to court, with Social Security numbers blacked out.
+                    {`${a.sig ? "" : "Sign FL-150 (page 1). "}${a.R1 || "The other person"} must be served with it and a blank FL-150. Bring your last two pay stubs and latest tax return to court, with Social Security numbers blacked out.`}
                   </li>
                 )}
                 <li>
-                  On your court date, bring 3 copies of DV-130{custodyRequested(a) ? " and DV-150" : ""}, your proof of service (DV-200),
-                  {" the LIZ invoice and receipts for any other expenses,"} and anything that supports what you wrote,
-                  like photos or texts.
+                  {`On your court date, bring 3 copies of DV-130${custodyRequested(a) ? " and DV-150" : ""}, your proof of service (DV-200), the LIZ invoice and receipts for any other expenses, and anything that supports what you wrote, like photos or texts.`}
                 </li>
                 {packet.files.some((f) => f.id === "INT-300") && (
                   <li>File your INT-300 with your other papers so the court can schedule an interpreter for your court date.</li>
                 )}
               </ol>
             </Group>
-            <p className="text-sm text-slate-500">Signing date on the forms: {fmtDate(a.G1)}.</p>
+            <p className="text-sm text-slate-500">{`Signing date on the forms: ${fmtDate(a.G1)}.`}</p>
           </div>
         )}
       </Group>
