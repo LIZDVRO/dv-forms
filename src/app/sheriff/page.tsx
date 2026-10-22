@@ -16,7 +16,7 @@ import { ConsentBoxes, TERMS_URL, useConsent } from "@/legal/consent";
 import { fmtDate } from "@/wizard/derive";
 import { Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
 import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type Portal, type SheriffOffice } from "@/sheriff/offices";
-import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
+import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, ser001Signed, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
 import { Ser001Form } from "@/sheriff/Ser001Form";
 import type { Ser001Details } from "@/sheriff/ser001";
 
@@ -51,6 +51,11 @@ export default function SheriffPage() {
   /** SER-001 came from the short form on this page (so it still needs a signature). */
   const [serHere, setSerHere] = useState(false);
   const [showSerForm, setShowSerForm] = useState(false);
+  /** Whether the added SER-001 already carries a drawn signature: null while unknown, or for a photo. */
+  const [serSigned, setSerSigned] = useState<boolean | null>(null);
+  const serIsPdf = !!ser && (ser.type === "application/pdf" || /\.pdf$/i.test(ser.name));
+  /** SER-001 must be signed. A PDF without a drawn signature is signed on this page. */
+  const needsSignature = serIsPdf && serSigned === false;
   const [order, setOrder] = useState<Added[]>([]);
   const [papers, setPapers] = useState<Added[]>([]);
   const [caseNumber, setCaseNumber] = useState("");
@@ -68,7 +73,8 @@ export default function SheriffPage() {
   const office: SheriffOffice | undefined = SHERIFF_OFFICES[county];
   const separate = !!office?.portal?.separateFiles;
   const deadline = useMemo(() => deadlineFrom(hearingDate, Number(days)), [hearingDate, days]);
-  const details = { caseNumber, hearingDate, deadline, signature };
+  // A signature drawn here only goes on a SER-001 that needs one.
+  const details = { caseNumber, hearingDate, deadline, signature: needsSignature ? signature : "" };
   const dirty = !!(ser || order.length || papers.length);
 
   // ?county=Fresno from the wizard's finish screen.
@@ -108,6 +114,15 @@ export default function SheriffPage() {
     return () => window.removeEventListener("beforeunload", onLeave);
   }, [dirty]);
 
+  // Check whether the SER-001 added is already signed.
+  useEffect(() => {
+    let live = true;
+    setSerSigned(null);
+    if (ser && serIsPdf) ser.arrayBuffer().then(ser001Signed).then((v) => live && setSerSigned(v));
+    return () => {
+      live = false;
+    };
+  }, [ser, serIsPdf]);
   // Any change means the PDF has to be made again.
   useEffect(() => setMade(null), [county, ser, order, papers, caseNumber, hearingDate, days, signature]);
 
@@ -116,7 +131,8 @@ export default function SheriffPage() {
   const make = async () => {
     setError("");
     if (!ser) return setError("Add your SER-001 first, or fill one out in step 2. The sheriff can't accept the request without it.");
-    if (serHere && !signature) return setError("Sign your SER-001 in step 2.");
+    if (serIsPdf && serSigned === null) return setError("Still checking your SER-001. Try again in a moment.");
+    if (needsSignature && !signature) return setError("Sign your SER-001 in step 2. The sheriff can't serve your papers without your signature.");
     if (separate && !order.length) return setError("Add your signed temporary restraining order (DV-110).");
     if (!order.length && !papers.length) return setError("Add the papers the court gave back to you.");
     if (!caseNumber.trim()) return setError("Enter the case number from your papers.");
@@ -296,17 +312,18 @@ export default function SheriffPage() {
             </div>
           )}
           {showSerForm && (!county || county === "other") && <Note tone="warn">Choose the county in step 1 first.</Note>}
-          {ser && (
+          {needsSignature && (
             <SignaturePad
-              label={serHere ? "Sign your SER-001" : "Sign SER-001"}
-              hint={
-                serHere
-                  ? "Draw your signature with your finger or mouse. The sheriff must accept an electronic signature."
-                  : "Only if you didn't sign it when you made your forms. The sheriff must accept an electronic signature."
-              }
+              label="Sign your SER-001"
+              hint="Draw your signature with your finger or mouse. The sheriff must accept an electronic signature."
               value={signature}
               onChange={setSignature}
+              optional={false}
             />
+          )}
+          {serIsPdf && serSigned === true && <p className="text-sm text-slate-700">✓ Your SER-001 is already signed.</p>}
+          {ser && !serIsPdf && (
+            <Note tone="warn">Make sure your SER-001 is signed on page 4. The sheriff can&apos;t serve your papers without your signature.</Note>
           )}
         </Group>
 

@@ -11,7 +11,7 @@ import { PDFCheckBox, PDFDocument, PDFTextField } from "pdf-lib";
 
 import { buildFilingPacket } from "../src/wizard/fill/packet";
 import { sampleAnswers } from "../src/wizard/sample";
-import { buildSheriffFiles, buildSheriffPdf, completeSer001, deadlineFrom, emailText } from "../src/sheriff/packet";
+import { buildSheriffFiles, buildSheriffPdf, completeSer001, deadlineFrom, emailText, ser001Signed } from "../src/sheriff/packet";
 import { newSer001Draft, papersText, readSer001Details } from "../src/sheriff/ser001";
 import { SER001 } from "../src/wizard/fill/forms/extras";
 import { fillOneForm } from "../src/wizard/fill/packet";
@@ -110,6 +110,16 @@ async function main() {
     ["short form: details", shortDetails?.name === "Ana Test" && shortDetails?.phone === "559-555-0100" && shortDetails?.caseNumber === c.caseNumber],
   );
   fs.writeFileSync(path.join(outDir, "short-form-SER-001.pdf"), shortDone.bytes);
+
+  // Signature: an unsigned SER-001 is detected, and one signed on the page is then seen as signed.
+  const PNG = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==";
+  const signedHere = await completeSer001(shortForm.buffer.slice(0) as ArrayBuffer, { ...c, signature: PNG });
+  checks.push(
+    ["signature: blank SER-001 is unsigned", !(await ser001Signed(shortForm))],
+    ["signature: signed on the page", await ser001Signed(signedHere.bytes)],
+  );
+  const wizardSigned = await buildFilingPacket({ ...a, sig: PNG }, load);
+  checks.push(["signature: wizard-signed SER-001 detected", await ser001Signed(wizardSigned.files.find((f) => f.id === "SER-001")!.bytes)]);
 
   const mail = emailText(c, "Tulare");
   checks.push(["subject", mail.subject.includes("26FL01234")], ["body has no address", !mail.body.includes(a.R14.street || "@@")]);
