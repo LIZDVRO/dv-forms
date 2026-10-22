@@ -77,12 +77,13 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
   Kings: {
     county: "Kings",
     name: "Kings County Sheriff's Office, Civil Division",
-    email: null,
+    // Not on Kings' website. The Civil Division gave this address for DV restraining orders by phone, Oct 22, 2026.
+    email: "kcso.civil@co.kings.ca.us",
     fax: "559-852-2841",
     phone: "559-852-2888",
     address: "1550 Kings County Drive, Hanford, CA 93230",
     notes: ["Kings asks for your papers at least 10 business days before the service deadline. Send them as soon as you get them."],
-    checked: "2026-10-16",
+    checked: "2026-10-22",
   },
   Madera: {
     county: "Madera",
