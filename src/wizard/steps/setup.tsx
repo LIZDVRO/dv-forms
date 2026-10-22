@@ -39,8 +39,7 @@ export function Start({ errors }: StepProps) {
       </Note>
       <p className="text-sm text-slate-600">
         This version makes the filing forms (DV-100, DV-109, DV-110, CLETS-001, DV-900 for a phone transfer) and, if you ask
-        for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction). Child and spousal
-        support requests need financial forms that are coming next.
+        for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction).
       </p>
       <ConsentBoxes error={errors.consent} />
     </div>

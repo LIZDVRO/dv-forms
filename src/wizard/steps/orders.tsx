@@ -12,6 +12,7 @@ function Order({
   title,
   hint,
   locked,
+  note,
   children,
 }: {
   id: OrderId;
@@ -19,6 +20,8 @@ function Order({
   hint?: ReactNode;
   /** Always requested; the checkbox can't be unchecked. */
   locked?: boolean;
+  /** Shown directly under the checkbox, whether or not the order is checked. */
+  note?: ReactNode;
   children?: ReactNode;
 }) {
   const { a, set } = useWizard();
@@ -38,6 +41,7 @@ function Order({
           {hint && <span className="block text-sm text-slate-600">{hint}</span>}
         </span>
       </label>
+      {note && <p className="ml-8 mt-2 rounded-lg bg-white p-3 text-base text-slate-800 ring-1 ring-liz/30">{note}</p>}
       {on && children && <div className="mt-4 space-y-5 border-t border-liz/15 pt-4">{children}</div>}
     </div>
   );
@@ -251,13 +255,19 @@ export function Orders() {
         </Order>
 
         <h3 className="pt-4 text-lg font-semibold text-slate-900">Decided at your court date</h3>
-        <Order id="O23" locked title="Pay expenses caused by the abuse" hint="Like a broken phone or medical bills. Bring proof to court.">
+        <Order
+          id="O23"
+          locked
+          title="Pay expenses caused by the abuse"
+          hint="Like a broken phone or medical bills. Bring proof to court."
+          note="LIZ is a nonprofit, and preparing your forms costs $250. We ask the judge to order the other person to pay it — this is never your bill. If the judge doesn't order it, we write it off completely. You owe nothing, ever."
+        >
           <div className="flex items-center justify-between gap-3 rounded-xl border border-liz/30 bg-white p-3">
             <div>
               <div className="text-base font-medium text-slate-900">LIZ Break Free — form preparation</div>
               <div className="text-sm text-slate-600">Always included. The invoice is attached to your request, and you get a copy to bring to your court date.</div>
             </div>
-            <div className="text-base font-semibold text-slate-900">${LIZ_FEE.amount}.00</div>
+            <div className="text-base font-semibold text-slate-900">{`$${LIZ_FEE.amount}.00`}</div>
           </div>
           <p className="text-sm text-slate-600">Add any other costs the abuse caused you:</p>
           <Rows<Expense>

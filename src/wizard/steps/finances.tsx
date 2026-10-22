@@ -73,8 +73,7 @@ export function Income() {
   return (
     <div className="space-y-8">
       <Note>
-        The judge uses this to decide support and fees. It goes on form FL-150, which {them(a)} will get a copy of. Bring your last two
-        pay stubs and your latest tax return to court (black out your Social Security number).
+        {`The judge uses this to decide support and fees. It goes on form FL-150, which ${them(a)} will get a copy of. Bring your last two pay stubs and your latest tax return to court (black out your Social Security number).`}
       </Note>
 
       <Group title="Your job" seen="public">
@@ -327,7 +326,8 @@ export function Expenses() {
           {home.map(([p, i]) => (
             <div key={p.id} className="grid items-center gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-[1fr_10rem_auto]">
               <div className="text-base text-slate-900">
-                {p.name} <span className="text-sm text-slate-500">· {p.relationship}</span>
+                {p.name}
+                <span className="text-sm text-slate-500">{` · ${p.relationship}`}</span>
               </div>
               <Money value={p.income ?? ""} onChange={(v) => set((x) => void (x.roster[i].income = v))} placeholder="Monthly income" />
               <Check checked={p.paysExpenses === "Y"} onChange={(v) => set((x) => void (x.roster[i].paysExpenses = v ? "Y" : "N"))}>
@@ -380,7 +380,7 @@ export function Expenses() {
           </MoneyRow>
           <div className="flex justify-between py-3 text-base font-semibold text-slate-900">
             <span>Total (with debt payments below)</span>
-            <span>${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+            <span>{`$${total.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</span>
           </div>
           <MoneyRow label="Amount others pay toward these expenses" value={a.F11.paidByOthers} onChange={(v) => set((x) => void (x.F11.paidByOthers = v))} />
         </div>
@@ -480,7 +480,7 @@ export function ChildSupport() {
     <div className="space-y-8">
       <Group title="Time with each parent" seen="public">
         <p className="text-base text-slate-700">
-          You have {kids} child{kids === 1 ? "" : "ren"} under 18 with {them(a)}. About how much of their time do they spend with each of you?
+          {`You have ${kids} child${kids === 1 ? "" : "ren"} under 18 with ${them(a)}. About how much of their time do they spend with each of you?`}
         </p>
         <div className="grid grid-cols-2 gap-4 sm:w-96">
           <Question label="With me (%)">
