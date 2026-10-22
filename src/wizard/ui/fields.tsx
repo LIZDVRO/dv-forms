@@ -302,7 +302,20 @@ export function Note({ children, tone = "info" }: { children: ReactNode; tone?: 
 }
 
 /** Draw a signature; stores a trimmed PNG data URL ("" when cleared). */
-export function SignaturePad({ label, hint, value, onChange }: { label: string; hint?: string; value: string; onChange: (v: string) => void }) {
+/** Draw a signature. `optional` (default true) shows "(optional)" by the label; pass false where a signature is required. */
+export function SignaturePad({
+  label,
+  hint,
+  value,
+  onChange,
+  optional = true,
+}: {
+  label: string;
+  hint?: string;
+  value: string;
+  onChange: (v: string) => void;
+  optional?: boolean;
+}) {
   const ref = useRef<SignatureCanvas>(null);
   // Show a saved signature again when coming back to this step.
   useEffect(() => {
@@ -311,7 +324,7 @@ export function SignaturePad({ label, hint, value, onChange }: { label: string; 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (
-    <Question label={label} hint={hint} optional>
+    <Question label={label} hint={hint} optional={optional}>
       <div className="rounded-xl border-2 border-dashed border-liz/50 bg-white">
         <SignatureCanvas
           ref={ref}

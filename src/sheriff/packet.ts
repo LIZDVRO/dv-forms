@@ -3,7 +3,7 @@
  * court-endorsed papers) for sheriffs that take email, or separate PDFs for portals with
  * one upload box per document. Runs entirely in the browser; nothing is uploaded.
  */
-import { PDFDocument, PDFTextField, PDFCheckBox } from "pdf-lib";
+import { PDFCheckBox, PDFDict, PDFDocument, PDFName, PDFTextField } from "pdf-lib";
 
 import { fmtDate } from "@/wizard/derive";
 
@@ -30,6 +30,21 @@ const HEARING = (i: number) => `${SER}.Page3[0].List5[0].Li5c[0].Hearing[${i}]`;
 const HEARING_DATE = `${SER}.Page3[0].List5[0].Li5c[0].hearingDate[0]`;
 const DEADLINE = (i: number) => `${SER}.Page4[0].List5Continued[0].Li5d[0].deadline[${i}]`;
 const DEADLINE_DATE = `${SER}.Page4[0].List5Continued[0].Li5d[0].deadlineDate[0]`;
+
+/**
+ * Whether a SER-001 PDF already has a drawn signature. pdf-lib names the images it draws
+ * "Image-…", and the blank SER-001 only has its own printed images (Im0, Im1), so a drawn
+ * signature on page 4 shows up as an extra "Image-" entry there.
+ */
+export async function ser001Signed(bytes: ArrayBuffer | Uint8Array): Promise<boolean> {
+  try {
+    const page = (await PDFDocument.load(bytes, { ignoreEncryption: true })).getPages()[3];
+    const xobjects = page?.node.Resources()?.lookup(PDFName.of("XObject"), PDFDict);
+    return !!xobjects?.keys().some((k) => k.toString().startsWith("/Image-"));
+  } catch {
+    return false;
+  }
+}
 
 /** Hearing date minus the days on DV-109 item 6, as an ISO date. */
 export function deadlineFrom(hearingIso: string, daysBefore: number): string {
