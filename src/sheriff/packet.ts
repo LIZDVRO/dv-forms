@@ -1,6 +1,7 @@
 /**
- * Builds the one PDF the survivor sends to the sheriff: SER-001 first, then the
- * court-endorsed papers. Runs entirely in the browser; nothing is uploaded.
+ * Builds what the survivor sends to the sheriff: one PDF (SER-001 first, then the
+ * court-endorsed papers) for sheriffs that take email, or separate PDFs for portals with
+ * one upload box per document. Runs entirely in the browser; nothing is uploaded.
  */
 import { PDFDocument, PDFTextField, PDFCheckBox } from "pdf-lib";
 
@@ -86,12 +87,20 @@ export async function completeSer001(bytes: ArrayBuffer, c: CaseDetails): Promis
   return { bytes: await doc.save(), status: "filled" };
 }
 
-const MAX_SIDE = 2000;
+/** How photos of pages are shrunk. The smaller setting is used when a file is over a size limit. */
+interface PhotoQuality {
+  maxSide: number;
+  quality: number;
+}
+const NORMAL: PhotoQuality = { maxSide: 2000, quality: 0.82 };
+const SMALLER: PhotoQuality = { maxSide: 1400, quality: 0.6 };
+
+const isPdf = (f: File) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
 
 /** A photo of a page, shrunk and re-encoded as JPEG (this also turns iPhone HEIC into JPEG). */
-async function photoToJpeg(file: File): Promise<{ bytes: Uint8Array; width: number; height: number }> {
+async function photoToJpeg(file: File, q: PhotoQuality): Promise<{ bytes: Uint8Array; width: number; height: number }> {
   const bitmap = await createImageBitmap(file);
-  const scale = Math.min(1, MAX_SIDE / Math.max(bitmap.width, bitmap.height));
+  const scale = Math.min(1, q.maxSide / Math.max(bitmap.width, bitmap.height));
   const width = Math.round(bitmap.width * scale);
   const height = Math.round(bitmap.height * scale);
   const canvas = document.createElement("canvas");
@@ -103,17 +112,17 @@ async function photoToJpeg(file: File): Promise<{ bytes: Uint8Array; width: numb
   ctx.fillRect(0, 0, width, height);
   ctx.drawImage(bitmap, 0, 0, width, height);
   bitmap.close();
-  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.82));
+  const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", q.quality));
   if (!blob) throw new Error("Could not read the photo.");
   return { bytes: new Uint8Array(await blob.arrayBuffer()), width, height };
 }
 
 const LETTER = { w: 612, h: 792 };
 
-/** Add each file's pages to `out`: PDFs page by page, photos one per letter-size page. */
-async function appendFile(out: PDFDocument, file: { name: string; bytes: ArrayBuffer | Uint8Array; type: string }, photo?: File) {
-  if (file.type === "application/pdf" || /\.pdf$/i.test(file.name)) {
-    const src = await PDFDocument.load(file.bytes, { ignoreEncryption: true });
+/** Add a file's pages to `out`: a PDF page by page (or `pdfBytes` in its place), a photo on one letter-size page. */
+async function appendFile(out: PDFDocument, file: File, q: PhotoQuality, pdfBytes?: ArrayBuffer | Uint8Array) {
+  if (pdfBytes || isPdf(file)) {
+    const src = await PDFDocument.load(pdfBytes ?? (await file.arrayBuffer()), { ignoreEncryption: true });
     // Keep what was typed into any fields; flatten so every reader shows it the same way.
     try {
       src.getForm().flatten();
@@ -124,8 +133,7 @@ async function appendFile(out: PDFDocument, file: { name: string; bytes: ArrayBu
     pages.forEach((p) => out.addPage(p));
     return;
   }
-  if (!photo) throw new Error(`${file.name} is not a PDF or a photo.`);
-  const jpg = await photoToJpeg(photo);
+  const jpg = await photoToJpeg(file, q);
   const img = await out.embedJpg(jpg.bytes);
   const page = out.addPage([LETTER.w, LETTER.h]);
   const margin = 18;
@@ -140,26 +148,80 @@ export interface Added {
   file: File;
 }
 
-/** SER-001 (completed) followed by the papers, in the order given. */
-export async function buildSheriffPdf(ser: File, papers: Added[], c: CaseDetails): Promise<{ bytes: Uint8Array; pages: number; serStatus: SerStatus }> {
+/** One PDF from SER-001 (when given, completed first) and the files after it, in order. */
+async function buildPart(title: string, ser: File | null, files: File[], c: CaseDetails, q: PhotoQuality) {
   const out = await PDFDocument.create();
-  out.setTitle(`Request for sheriff service${c.caseNumber ? ` - case ${c.caseNumber.trim()}` : ""}`);
-
+  out.setTitle(title);
   let serStatus: SerStatus = "as-is";
-  if (ser.type === "application/pdf" || /\.pdf$/i.test(ser.name)) {
-    const done = await completeSer001(await ser.arrayBuffer(), c);
-    serStatus = done.status;
-    await appendFile(out, { name: ser.name, bytes: done.bytes, type: "application/pdf" });
-  } else {
-    await appendFile(out, { name: ser.name, bytes: new ArrayBuffer(0), type: ser.type }, ser);
+  if (ser) {
+    if (isPdf(ser)) {
+      const done = await completeSer001(await ser.arrayBuffer(), c);
+      serStatus = done.status;
+      await appendFile(out, ser, q, done.bytes);
+    } else {
+      await appendFile(out, ser, q);
+    }
   }
+  for (const f of files) await appendFile(out, f, q);
+  return { bytes: await out.save(), pages: out.getPageCount(), serStatus };
+}
 
-  for (const p of papers) {
-    const isPdf = p.file.type === "application/pdf" || /\.pdf$/i.test(p.file.name);
-    await appendFile(out, { name: p.file.name, bytes: isPdf ? await p.file.arrayBuffer() : new ArrayBuffer(0), type: p.file.type }, isPdf ? undefined : p.file);
+/** Build a part; if it is over `maxBytes` and has photos, build it again with smaller photos. */
+async function buildWithin(title: string, ser: File | null, files: File[], c: CaseDetails, maxBytes: number) {
+  const first = await buildPart(title, ser, files, c, NORMAL);
+  const hasPhotos = [ser, ...files].some((f) => f && !isPdf(f));
+  if (first.bytes.length <= maxBytes || !hasPhotos) return first;
+  return buildPart(title, ser, files, c, SMALLER);
+}
+
+const caseTitle = (c: CaseDetails) => (c.caseNumber.trim() ? ` - case ${c.caseNumber.trim()}` : "");
+
+/**
+ * Everything in one PDF, for sheriffs that take email: SER-001 (completed), then the
+ * signed order, then the other papers.
+ */
+export async function buildSheriffPdf(
+  ser: File,
+  papers: Added[],
+  c: CaseDetails,
+  maxBytes = Infinity,
+): Promise<{ bytes: Uint8Array; pages: number; serStatus: SerStatus }> {
+  return buildWithin(`Request for sheriff service${caseTitle(c)}`, ser, papers.map((p) => p.file), c, maxBytes);
+}
+
+export interface SheriffFile {
+  /** Which upload box it goes in. */
+  slot: "ser" | "order" | "other";
+  fileName: string;
+  bytes: Uint8Array;
+  pages: number;
+}
+
+/**
+ * Separate PDFs for portals with one upload box per document (Fresno's Civil Connect):
+ * SER-001, the signed restraining order, and the other papers (left out when there are none).
+ * Each is kept under `maxBytes` where photos can be shrunk.
+ */
+export async function buildSheriffFiles(
+  ser: File,
+  order: Added[],
+  others: Added[],
+  c: CaseDetails,
+  maxBytes: number,
+): Promise<{ files: SheriffFile[]; serStatus: SerStatus }> {
+  const tag = c.caseNumber.trim().replace(/[^\w-]+/g, "");
+  const name = (n: number, what: string) => `${n}-${what}${tag ? `-${tag}` : ""}.pdf`;
+  const serPart = await buildWithin(`SER-001${caseTitle(c)}`, ser, [], c, maxBytes);
+  const orderPart = await buildWithin(`Signed restraining order${caseTitle(c)}`, null, order.map((p) => p.file), c, maxBytes);
+  const files: SheriffFile[] = [
+    { slot: "ser", fileName: name(1, "SER-001"), bytes: serPart.bytes, pages: serPart.pages },
+    { slot: "order", fileName: name(2, "Signed-order"), bytes: orderPart.bytes, pages: orderPart.pages },
+  ];
+  if (others.length) {
+    const otherPart = await buildWithin(`Other papers to serve${caseTitle(c)}`, null, others.map((p) => p.file), c, maxBytes);
+    files.push({ slot: "other", fileName: name(3, "Other-papers"), bytes: otherPart.bytes, pages: otherPart.pages });
   }
-  const bytes = await out.save();
-  return { bytes, pages: out.getPageCount(), serStatus };
+  return { files, serStatus: serPart.serStatus };
 }
 
 /** Subject and message for the email to the sheriff. Kept short: SER-001 carries the details. */

@@ -3,9 +3,11 @@
 /**
  * Send the papers to the sheriff for service (SER-001 + court-endorsed papers).
  *
- * Everything happens in this browser tab: the files are combined into one PDF here and
- * never uploaded to LIZ. The survivor sends it from their own email (or the county's
- * portal). Gov. Code § 26666.5 requires every sheriff to accept requests by email.
+ * Everything happens in this browser tab: the files are put together here and never
+ * uploaded to LIZ. The survivor sends them from their own email, or uploads them to the
+ * county's portal (Fresno's Civil Connect takes SER-001, the signed order and the other
+ * papers as separate files). Gov. Code § 26666.5 requires every sheriff to accept requests
+ * electronically.
  */
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -13,8 +15,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ConsentBoxes, TERMS_URL, useConsent } from "@/legal/consent";
 import { fmtDate } from "@/wizard/derive";
 import { Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
-import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type SheriffOffice } from "@/sheriff/offices";
-import { buildSheriffPdf, deadlineFrom, emailText, type Added, type SerStatus } from "@/sheriff/packet";
+import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type Portal, type SheriffOffice } from "@/sheriff/offices";
+import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
 
 const QUICK_EXIT_URL = "https://us.shein.com/";
 const WIZARD_URL = "/wizard";
@@ -37,16 +39,15 @@ function save(name: string, bytes: Uint8Array) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-interface Made {
-  bytes: Uint8Array;
-  pages: number;
-  serStatus: SerStatus;
-  fileName: string;
-}
+/** One combined PDF (sheriffs that take email), or separate files (one per portal upload box). */
+type Made =
+  | { kind: "one"; bytes: Uint8Array; pages: number; serStatus: SerStatus; fileName: string }
+  | { kind: "separate"; files: SheriffFile[]; serStatus: SerStatus };
 
 export default function SheriffPage() {
   const [county, setCounty] = useState("");
   const [ser, setSer] = useState<File | null>(null);
+  const [order, setOrder] = useState<Added[]>([]);
   const [papers, setPapers] = useState<Added[]>([]);
   const [caseNumber, setCaseNumber] = useState("");
   const [hearingDate, setHearingDate] = useState("");
@@ -61,9 +62,10 @@ export default function SheriffPage() {
   const [started, setStarted] = useState(false);
 
   const office: SheriffOffice | undefined = SHERIFF_OFFICES[county];
+  const separate = !!office?.portal?.separateFiles;
   const deadline = useMemo(() => deadlineFrom(hearingDate, Number(days)), [hearingDate, days]);
   const details = { caseNumber, hearingDate, deadline, signature };
-  const dirty = !!(ser || papers.length);
+  const dirty = !!(ser || order.length || papers.length);
 
   // ?county=Fresno from the wizard's finish screen.
   useEffect(() => {
@@ -75,6 +77,7 @@ export default function SheriffPage() {
   const stateReset = useRef(() => {});
   stateReset.current = () => {
     setSer(null);
+    setOrder([]);
     setPapers([]);
     setSignature("");
     setMade(null);
@@ -100,23 +103,29 @@ export default function SheriffPage() {
   }, [dirty]);
 
   // Any change means the PDF has to be made again.
-  useEffect(() => setMade(null), [county, ser, papers, caseNumber, hearingDate, days, signature]);
+  useEffect(() => setMade(null), [county, ser, order, papers, caseNumber, hearingDate, days, signature]);
 
   const fileName = `Sheriff-request${caseNumber.trim() ? `-${caseNumber.trim().replace(/[^\w-]+/g, "")}` : ""}.pdf`;
 
   const make = async () => {
     setError("");
     if (!ser) return setError("Add your SER-001 first. The sheriff can't accept the request without it.");
-    if (!papers.length) return setError("Add the papers the court gave back to you.");
+    if (separate && !order.length) return setError("Add your signed temporary restraining order (DV-110).");
+    if (!order.length && !papers.length) return setError("Add the papers the court gave back to you.");
     if (!caseNumber.trim()) return setError("Enter the case number from your papers.");
     setBusy(true);
     try {
-      const out = await buildSheriffPdf(ser, papers, details);
-      const name = fileName;
-      setMade({ ...out, fileName: name });
-      if (typeof navigator !== "undefined" && "canShare" in navigator) {
-        const f = new File([out.bytes as BlobPart], name, { type: "application/pdf" });
-        setCanShareFiles(navigator.canShare({ files: [f] }));
+      const maxBytes = (office?.portal?.maxFileMb ?? Infinity) * 1024 * 1024;
+      if (separate) {
+        const out = await buildSheriffFiles(ser, order, papers, details, maxBytes);
+        setMade({ kind: "separate", ...out });
+      } else {
+        const out = await buildSheriffPdf(ser, [...order, ...papers], details, Math.min(maxBytes, EMAIL_LIMIT));
+        setMade({ kind: "one", ...out, fileName });
+        if (typeof navigator !== "undefined" && "canShare" in navigator) {
+          const f = new File([out.bytes as BlobPart], fileName, { type: "application/pdf" });
+          setCanShareFiles(navigator.canShare({ files: [f] }));
+        }
       }
     } catch (e) {
       console.error(e);
@@ -126,7 +135,7 @@ export default function SheriffPage() {
     }
   };
 
-  const mail = office && made ? emailText(details, office.county) : null;
+  const mail = office && made?.kind === "one" ? emailText(details, office.county) : null;
   const mailto =
     office?.email && mail ? `mailto:${office.email}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}` : "";
 
@@ -141,7 +150,7 @@ export default function SheriffPage() {
   };
 
   const share = async () => {
-    if (!made || !office?.email || !mail) return;
+    if (made?.kind !== "one" || !office?.email || !mail) return;
     // The share sheet can attach the file but can't fill in the "To" line, so copy the address first.
     await copy(office.email, "address");
     const file = new File([made.bytes as BlobPart], made.fileName, { type: "application/pdf" });
@@ -151,15 +160,6 @@ export default function SheriffPage() {
       // Closed the share sheet: nothing to do.
     }
   };
-
-  const move = (i: number, by: number) =>
-    setPapers((list) => {
-      const next = [...list];
-      const j = i + by;
-      if (j < 0 || j >= next.length) return list;
-      [next[i], next[j]] = [next[j], next[i]];
-      return next;
-    });
 
   return (
     <div className="min-h-full flex-1 bg-gradient-to-b from-violet-50/60 via-white to-white">
@@ -204,8 +204,9 @@ export default function SheriffPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Send your papers to the sheriff</h1>
           <p className="mt-2 text-base text-slate-600">
-            The sheriff serves restraining orders for free, and must accept your request by email. Do this as soon as the court gives
-            you back your signed papers. We put everything into one file, and you send it from your own email.
+            The sheriff serves restraining orders for free, and must accept your request electronically. Do this as soon as the court
+            gives you back your signed papers. We put your papers together, and you send them yourself, by email or on the
+            sheriff&apos;s website.
           </p>
           <p className="mt-2 text-sm text-slate-500">
             Your files stay on this device. Nothing is sent to LIZ. Press <kbd className="rounded border bg-white px-1">Esc</kbd> or
@@ -233,7 +234,7 @@ export default function SheriffPage() {
             <Note>
               We don&apos;t have that sheriff&apos;s details yet. Every California sheriff must accept SER-001 and your papers by email. Call that
               county sheriff&apos;s civil unit and ask for the email address for restraining order service requests. You can still make
-              the combined file below.
+              the file below.
             </Note>
           )}
         </Group>
@@ -282,10 +283,6 @@ export default function SheriffPage() {
         </Group>
 
         <Group title="4. The papers the court gave back">
-          <p className="text-base text-slate-700">
-            Add the copies with the court&apos;s stamp and the judge&apos;s signature: DV-109, DV-110 (if the judge signed it), DV-100,
-            and any others the court returned (like DV-105 and DV-140). Also add the blank DV-120 and DV-120-INFO.
-          </p>
           <ul className="list-disc space-y-1 pl-5 text-base text-slate-700">
             <li>
               <strong>E-filed through LIZ?</strong> The court emailed the stamped copies to the address on your e-filing account. Save the
@@ -295,37 +292,30 @@ export default function SheriffPage() {
               <strong>Filed at the courthouse?</strong> Take a clear photo of every page the clerk gave you.
             </li>
           </ul>
-          <FilePick accept={ACCEPT} multiple label="Add PDFs or photos" onFiles={(fs) => setPapers((p) => [...p, ...fs.map((file) => ({ id: newId(), file }))])} />
-          <FilePick accept="image/*" capture label="Take a photo of a page" onFiles={(fs) => setPapers((p) => [...p, ...fs.map((file) => ({ id: newId(), file }))])} subtle />
-          {papers.length > 0 && (
-            <ol className="divide-y divide-slate-200 rounded-xl border border-slate-200">
-              {papers.map((p, i) => (
-                <li key={p.id} className="flex items-center justify-between gap-2 p-3">
-                  <span className="min-w-0 flex-1 truncate text-sm text-slate-800">
-                    {i + 1}. {p.file.name}
-                  </span>
-                  <span className="flex shrink-0 gap-1">
-                    <IconBtn label="Move up" onClick={() => move(i, -1)} disabled={i === 0}>
-                      ↑
-                    </IconBtn>
-                    <IconBtn label="Move down" onClick={() => move(i, 1)} disabled={i === papers.length - 1}>
-                      ↓
-                    </IconBtn>
-                    <IconBtn label="Remove" onClick={() => setPapers((list) => list.filter((x) => x.id !== p.id))}>
-                      ✕
-                    </IconBtn>
-                  </span>
-                </li>
-              ))}
-            </ol>
-          )}
+          <Question
+            label="Your signed temporary restraining order (DV-110)"
+            hint={
+              separate
+                ? `${office?.county} County needs this as its own file. It shows the sheriff the judge granted your order, so service is free.`
+                : "The order with the judge's signature. Add every page."
+            }
+            optional={!separate}
+          >
+            <PaperList items={order} onChange={setOrder} pickLabel="Add DV-110" />
+          </Question>
+          <Question
+            label="Everything else the court gave back"
+            hint="DV-109, DV-100 and any others the court returned (like DV-105 and DV-140), plus the blank DV-120 and DV-120-INFO."
+          >
+            <PaperList items={papers} onChange={setPapers} pickLabel="Add PDFs or photos" />
+          </Question>
           <Note tone="warn">
             The sheriff only serves papers with the court&apos;s seal and the judge&apos;s signature. Send the copies the court returned, not
             the ones you printed before filing.
           </Note>
         </Group>
 
-        <Group title="5. Make one file">
+        <Group title={separate ? "5. Make your files" : "5. Make one file"}>
           <button
             type="button"
             onClick={make}
@@ -335,17 +325,11 @@ export default function SheriffPage() {
             {busy ? "Putting it together…" : "Make my sheriff request"}
           </button>
           {error && <p className="text-base font-medium text-red-700">{error}</p>}
-          {made && (
+          {made?.kind === "one" && (
             <div className="space-y-2">
               <p className="text-base text-slate-800">
                 ✓ {made.fileName}: {made.pages} pages, {mb(made.bytes.length)}. SER-001 is first.
               </p>
-              {made.serStatus === "as-is" && (
-                <Note tone="warn">
-                  We couldn&apos;t fill in this SER-001, so make sure it has the case number on each page, and the court date (item 5c) and
-                  deadline (item 5d) written in.
-                </Note>
-              )}
               <button
                 type="button"
                 onClick={() => save(made.fileName, made.bytes)}
@@ -355,9 +339,23 @@ export default function SheriffPage() {
               </button>
             </div>
           )}
+          {made?.kind === "separate" && (
+            <p className="text-base text-slate-800">
+              ✓ {made.files.length} files are ready. Download them in step 6.
+            </p>
+          )}
+          {made?.serStatus === "as-is" && (
+            <Note tone="warn">
+              We couldn&apos;t fill in this SER-001, so make sure it has the case number on each page, and the court date (item 5c) and
+              deadline (item 5d) written in.
+            </Note>
+          )}
         </Group>
 
-        {made && <Send office={office} made={made} mailto={mailto} canShareFiles={canShareFiles} onShare={share} copy={copy} copied={copied} subject={mail?.subject ?? ""} />}
+        {made?.kind === "one" && (
+          <Send office={office} made={made} mailto={mailto} canShareFiles={canShareFiles} onShare={share} copy={copy} copied={copied} subject={mail?.subject ?? ""} />
+        )}
+        {made?.kind === "separate" && office?.portal && <PortalUpload office={office} portal={office.portal} files={made.files} />}
 
           </>
         )}
@@ -384,7 +382,7 @@ function Send({
   subject,
 }: {
   office?: SheriffOffice;
-  made: Made;
+  made: Extract<Made, { kind: "one" }>;
   mailto: string;
   canShareFiles: boolean;
   onShare: () => void;
@@ -518,6 +516,150 @@ function Send({
           <li>Watch for a reply. If you don&apos;t hear back in 2 business days, call {office ? office.phone : "the sheriff's civil unit"}.</li>
           <li>The sheriff sends you a proof of service. File it with the court before your court date.</li>
           <li>Keep your own copy of the temporary order with you. Any officer can serve it if you call 911 and the other person is there.</li>
+        </ul>
+      </Group>
+    </Group>
+  );
+}
+
+/** A list of added papers (PDFs or photos of pages) that can be reordered and removed. */
+function PaperList({ items, onChange, pickLabel }: { items: Added[]; onChange: (v: Added[]) => void; pickLabel: string }) {
+  const add = (fs: File[]) => onChange([...items, ...fs.map((file) => ({ id: newId(), file }))]);
+  const move = (i: number, by: number) => {
+    const j = i + by;
+    if (j < 0 || j >= items.length) return;
+    const next = [...items];
+    [next[i], next[j]] = [next[j], next[i]];
+    onChange(next);
+  };
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        <FilePick accept={ACCEPT} multiple label={pickLabel} onFiles={add} />
+        <FilePick accept="image/*" capture label="Take a photo of a page" onFiles={add} subtle />
+      </div>
+      {items.length > 0 && (
+        <ol className="divide-y divide-slate-200 rounded-xl border border-slate-200">
+          {items.map((p, i) => (
+            <li key={p.id} className="flex items-center justify-between gap-2 p-3">
+              <span className="min-w-0 flex-1 truncate text-sm text-slate-800">
+                {i + 1}. {p.file.name}
+              </span>
+              <span className="flex shrink-0 gap-1">
+                <IconBtn label="Move up" onClick={() => move(i, -1)} disabled={i === 0}>
+                  ↑
+                </IconBtn>
+                <IconBtn label="Move down" onClick={() => move(i, 1)} disabled={i === items.length - 1}>
+                  ↓
+                </IconBtn>
+                <IconBtn label="Remove" onClick={() => onChange(items.filter((x) => x.id !== p.id))}>
+                  ✕
+                </IconBtn>
+              </span>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+/** Which upload box each file goes in on Fresno's Civil Connect. */
+const SLOT_BOX: Record<SheriffFile["slot"], string> = {
+  ser: "the SER-001 box",
+  order: "the box for your granted restraining order",
+  other: "the box for other (supporting) documents",
+};
+
+/**
+ * Step-by-step for a portal with one upload box per document (Fresno's Civil Connect).
+ * Its screens are Personal, File Type, Upload and Receipt.
+ */
+function PortalUpload({ office, portal, files }: { office: SheriffOffice; portal: Portal; files: SheriffFile[] }) {
+  const limit = (portal.maxFileMb ?? Infinity) * 1024 * 1024;
+  const tooBig = files.filter((f) => f.bytes.length > limit);
+  const primary = "inline-flex items-center justify-center gap-2 rounded-xl bg-liz px-5 py-3 text-base font-semibold text-white hover:bg-liz/90";
+  const secondary = "inline-flex items-center justify-center rounded-lg border border-liz bg-white px-4 py-2 text-sm font-semibold text-liz hover:bg-liz/5";
+
+  return (
+    <Group title={`6. Upload them to ${portal.label}`}>
+      <p className="text-base text-slate-700">
+        {office.name} takes requests online through {portal.label}. It has a separate box for each file, so we made {files.length} files.
+      </p>
+      {tooBig.length > 0 && (
+        <Note tone="warn">
+          {tooBig.map((f) => f.fileName).join(" and ")} {tooBig.length > 1 ? "are" : "is"} over {portal.maxFileMb} MB, which{" "}
+          {portal.label} won&apos;t take. Retake those photos a little farther away, then make your files again.
+        </Note>
+      )}
+      <ol className="list-decimal space-y-4 pl-5 text-base text-slate-700">
+        <li>
+          <p>Download your files.</p>
+          <ul className="mt-2 space-y-2">
+            {files.map((f) => (
+              <li key={f.fileName} className="flex flex-wrap items-center gap-2">
+                <button type="button" onClick={() => save(f.fileName, f.bytes)} className={secondary}>
+                  Download {f.fileName}
+                </button>
+                <span className="text-sm text-slate-500">
+                  {f.pages} pages, {mb(f.bytes.length)}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </li>
+        <li>
+          <a href={portal.url} target="_blank" rel="noopener noreferrer" className={primary}>
+            Open {portal.label} <span aria-hidden="true">→</span>
+          </a>
+          <p className="mt-1 text-sm text-slate-600">It opens in a new tab, so this page stays open.</p>
+        </li>
+        <li>Read their notice, type your initials, check the box, and choose <strong>Get started</strong>.</li>
+        <li>
+          <strong>Personal:</strong> enter your name and contact details. Use a phone number and email the other person can&apos;t see.
+        </li>
+        <li>
+          <strong>File Type:</strong> choose a restraining order. When it asks how you&apos;re paying, choose the option for a{" "}
+          <strong>granted restraining order</strong>. Serving a granted restraining order is free.
+        </li>
+        <li>
+          <strong>Upload:</strong> put each file in its own box:
+          <ul className="mt-1 list-disc space-y-1 pl-5">
+            {files.map((f) => (
+              <li key={f.fileName}>
+                {f.fileName} goes in {SLOT_BOX[f.slot]}.
+              </li>
+            ))}
+          </ul>
+          Then submit.
+        </li>
+        <li>
+          <strong>Receipt:</strong> write down the ticket number, or take a screenshot. You&apos;ll need it if you call about your request.
+        </li>
+      </ol>
+      <Note>
+        {portal.label} shows a notice about a printing charge of $1.25 a page. By law, serving a granted restraining order is free. If
+        they ask you to pay, call the Civil Unit at{" "}
+        <a href={`tel:${office.phone}`} className="font-medium text-liz underline">
+          {office.phone}
+        </a>
+        .
+      </Note>
+      {office.notes.length > 0 && (
+        <ul className="list-disc space-y-1 pl-5 text-sm text-slate-700">
+          {office.notes.map((n) => (
+            <li key={n}>{n}</li>
+          ))}
+        </ul>
+      )}
+      <Group title="After you submit">
+        <ul className="list-disc space-y-1 pl-5 text-base text-slate-700">
+          <li>
+            If you don&apos;t hear back in 2 business days, call {office.phone} and give your ticket number.
+          </li>
+          <li>The sheriff sends you a proof of service. File it with the court before your court date.</li>
+          <li>Keep your own copy of the temporary order with you. Any officer can serve it if you call 911 and the other person is there.</li>
+          <li>On a shared device, delete the downloaded files when you&apos;re done.</li>
         </ul>
       </Group>
     </Group>

@@ -11,7 +11,7 @@ import { PDFCheckBox, PDFDocument, PDFTextField } from "pdf-lib";
 
 import { buildFilingPacket } from "../src/wizard/fill/packet";
 import { sampleAnswers } from "../src/wizard/sample";
-import { buildSheriffPdf, completeSer001, deadlineFrom, emailText } from "../src/sheriff/packet";
+import { buildSheriffFiles, buildSheriffPdf, completeSer001, deadlineFrom, emailText } from "../src/sheriff/packet";
 
 const outDir = process.argv[2] ?? "tmp-sheriff";
 const load = async (p: string) => {
@@ -46,6 +46,7 @@ async function main() {
     ["name kept", txt("SER-001[0].Page1[0].List2[0].Li2a[0].Yourname[0]") === a.P1],
   ];
 
+  fs.mkdirSync(outDir, { recursive: true });
   const out = await buildSheriffPdf(asFile("SER-001.pdf", ser.bytes), [
     { id: "1", file: asFile("DV-109.pdf", dv109.bytes) },
     { id: "2", file: asFile("DV-110.pdf", dv110.bytes) },
@@ -54,10 +55,29 @@ async function main() {
   const expected = (await pageCount(ser.bytes)) + (await pageCount(dv109.bytes)) + (await pageCount(dv110.bytes));
   checks.push(["combined pages", out.pages === expected], ["status", out.serStatus === "filled"]);
 
+  // Fresno's Civil Connect: SER-001, the signed order and the other papers as separate files, each under 10 MB.
+  const sep = await buildSheriffFiles(
+    asFile("SER-001.pdf", ser.bytes),
+    [{ id: "o", file: asFile("DV-110.pdf", dv110.bytes) }],
+    [{ id: "p", file: asFile("DV-109.pdf", dv109.bytes) }],
+    c,
+    10 * 1024 * 1024,
+  );
+  const slots = sep.files.map((f) => f.slot).join(",");
+  checks.push(
+    ["separate: three files in order", slots === "ser,order,other"],
+    ["separate: names carry case number", sep.files.every((f) => f.fileName.includes("26FL01234"))],
+    ["separate: SER-001 filled", sep.serStatus === "filled"],
+    ["separate: page counts", sep.files[0].pages === (await pageCount(ser.bytes)) && sep.files[1].pages === (await pageCount(dv110.bytes)) && sep.files[2].pages === (await pageCount(dv109.bytes))],
+    ["separate: each under 10 MB", sep.files.every((f) => f.bytes.length <= 10 * 1024 * 1024)],
+  );
+  const sepNoOthers = await buildSheriffFiles(asFile("SER-001.pdf", ser.bytes), [{ id: "o", file: asFile("DV-110.pdf", dv110.bytes) }], [], c, 10 * 1024 * 1024);
+  checks.push(["separate: no empty third file", sepNoOthers.files.length === 2]);
+  sep.files.forEach((f) => fs.writeFileSync(path.join(outDir, f.fileName), f.bytes));
+
   const mail = emailText(c, "Tulare");
   checks.push(["subject", mail.subject.includes("26FL01234")], ["body has no address", !mail.body.includes(a.R14.street || "@@")]);
 
-  fs.mkdirSync(outDir, { recursive: true });
   fs.writeFileSync(path.join(outDir, "Sheriff-request.pdf"), out.bytes);
   let failed = false;
   for (const [name, ok] of checks) {
