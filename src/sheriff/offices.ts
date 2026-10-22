@@ -62,12 +62,17 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
   Tulare: {
     county: "Tulare",
     name: "Tulare County Sheriff's Office, Civil Unit",
+    // Rechecked Oct 22, 2026: still the address on the civil page; no portal, and nothing says email submissions changed.
     email: "SheriffsCivil@tularecounty.ca.gov",
     fax: "559-713-3794",
     phone: "559-636-5090",
-    address: "221 S. Mooney Blvd., Room 102, Visalia, CA 93291",
-    notes: [],
-    checked: "2026-10-16",
+    address: "221 S. Mooney Blvd., Room 102, Visalia, CA 93291 (Visalia Courthouse; open Mon 8 a.m.–noon, Tue–Fri 8 a.m.–4 p.m.)",
+    notes: [
+      // Tulare's site also posts a "SER-001 Supplemental Questionnaire". It's built for evictions, and a sheriff
+      // can't require any form besides the Judicial Council's (Gov. Code § 26666.10(d)), so it isn't asked for here.
+      "Tulare's website also has a SER-001 Supplemental Questionnaire. You don't need it for a restraining order: your SER-001 has everything the sheriff needs.",
+    ],
+    checked: "2026-10-22",
   },
   Kings: {
     county: "Kings",
