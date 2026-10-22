@@ -128,8 +128,12 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
   const [error, setError] = useState("");
 
   const make = async () => {
-    setBusy(true);
     setError("");
+    if (!a.sig) {
+      setError("Sign above first. Your signature goes on DV-100 and every other form you sign.");
+      return;
+    }
+    setBusy(true);
     try {
       const p = await buildFilingPacket(a, loadTemplate);
       if (p.problems.length) console.warn("Fill problems", p.problems);
@@ -201,7 +205,7 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
 
       <div className="print:hidden">
       <Group title="Signing">
-        <Question label="Date you're signing" hint="You'll sign the printed forms by hand.">
+        <Question label="Date you're signing" hint="It goes next to your signature on each form.">
           <Text type="date" value={a.G1} onChange={(v) => set((x) => void (x.G1 = v))} className="sm:w-56" />
         </Question>
         <Note>
@@ -209,7 +213,8 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
         </Note>
         <SignaturePad
           label="Your signature"
-          hint="Draw with your finger or mouse. It goes on DV-100 and every other form you sign. Or leave it blank and sign the printed forms by hand."
+          hint="Draw with your finger or mouse. It goes on DV-100 and every other form you sign."
+          optional={false}
           value={a.sig}
           onChange={(v) => {
             set((x) => void (x.sig = v));
