@@ -51,7 +51,14 @@
         justify-content: space-between;
         gap: 24px;
         padding: 26px clamp(24px, 5.5vw, 88px);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: var(--bg);
+        border-bottom: 1px solid transparent;
+        transition: border-color 160ms ease;
       }
+      header.scrolled { border-bottom-color: var(--line); }
       .wordmark {
         text-decoration: none;
         white-space: nowrap;
@@ -177,8 +184,13 @@
         padding: clamp(64px, 10vh, 120px) clamp(24px, 5.5vw, 88px);
       }
       .section-label {
-        color: var(--ink-faint);
+        color: var(--ink-soft);
         margin: 0 0 clamp(36px, 6vh, 64px);
+        font-size: clamp(21px, 2.6vw, 34px);
+        font-weight: 400;
+        letter-spacing: -0.015em;
+        line-height: 1.25;
+        text-transform: none;
       }
       .section-head {
         margin: 0 0 clamp(28px, 4vh, 44px);
@@ -408,7 +420,7 @@
       <nav aria-label="Primary">
         <a class="nav-item" href="https://forms.lizbreakfree.org">Forms</a>
         <a class="nav-item" href="https://efile.lizbreakfree.org/ca/">E-file</a>
-        <a class="nav-item" href="https://lizbreakfree.org">About</a>
+        <a class="nav-item" href="https://forms.lizbreakfree.org/sheriff">Serve</a>
         <a class="exit-link" href="https://www.weather.com" id="exitLink">Exit &#8599;</a>
         <a class="pill" href="https://forms.lizbreakfree.org">Start</a>
       </nav>
@@ -628,6 +640,13 @@
     </footer>
 
     <script>
+      // Sticky header: show a hairline under it once the page scrolls.
+      (function () {
+        var h = document.querySelector("header");
+        function onScroll() { h.classList.toggle("scrolled", window.scrollY > 4); }
+        window.addEventListener("scroll", onScroll, { passive: true });
+        onScroll();
+      })();
       // Quick exit: Esc leaves immediately for a neutral site.
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") {
