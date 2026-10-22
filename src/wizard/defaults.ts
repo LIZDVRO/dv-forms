@@ -279,6 +279,7 @@ export function emptyAnswers(): Answers {
     V1: "",
     V2: "",
     V3: "",
+    V4: "",
     R15: {
       kind: "home",
       address: emptyAddress(),

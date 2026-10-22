@@ -253,7 +253,7 @@ const S: Binding[] = [
   // 5 · the papers. The hearing date and service deadline are on the DV-109 the court
   // returns, so 5c and 5d are left for the person to complete then.
   b("Page3.List5.Li5a.typePapers", () => "Domestic violence restraining order"),
-  b("Page3.List5.Li5b.listForms", (a) => ({ long: serviceList(a), sheet: "SER-001, Item 5b" })),
+  b("Page3.List5.Li5b.listForms", (a) => ({ long: a.V4.trim() || serviceList(a), sheet: "SER-001, Item 5b" })),
   ...[0, 1, 2].map((i) => b(idx("Page3.List5.Li5c.Hearing", i), () => false)),
   b("Page3.List5.Li5c.hearingDate", () => ""),
   ...[0, 1, 2].map((i) => b(idx("Page4.List5Continued.Li5d.deadline", i), () => false)),

@@ -137,6 +137,14 @@ async function appendSheets(form: Uint8Array, sheetsPdf: Uint8Array): Promise<Ui
   return doc.save();
 }
 
+/** Fill one form and add its attached sheets (used by the sheriff page's own SER-001 form). */
+export async function fillOneForm(spec: FormSpec, a: Answers, load: TemplateLoader): Promise<Uint8Array> {
+  const filled = await fillForm(spec, await load(spec.file), a);
+  if (!filled.sheets.length) return filled.bytes;
+  const sheetsPdf = await buildSheetsPdf(filled.sheets, { petitioner: a.P1, respondent: a.R1, caseNumber: a.S3 === "update" ? a.S4 : "" });
+  return appendSheets(filled.bytes, sheetsPdf);
+}
+
 export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promise<Packet> {
   const files: PacketFile[] = [];
   const problems: string[] = [];

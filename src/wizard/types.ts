@@ -553,6 +553,8 @@ export interface Answers {
   /** County where they will be served */
   V2: string;
   V3: string;
+  /** Papers to serve as typed on the sheriff page's own SER-001 form (item 5b); blank = work it out from the answers. */
+  V4: string;
   R15: {
     kind: "home" | "business";
     /** Blank street = use the home address (R14). */

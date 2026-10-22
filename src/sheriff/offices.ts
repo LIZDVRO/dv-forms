@@ -11,13 +11,25 @@
  * county has not published an address yet; call the civil unit, confirm the address
  * they use for § 26666.5 email requests, and add it here.
  */
+/**
+ * A county's online submission site. `separateFiles` means it has one upload box per
+ * document, so SER-001, the signed order and the other papers go up as separate PDFs.
+ */
+export interface Portal {
+  url: string;
+  label: string;
+  separateFiles?: boolean;
+  /** Largest file the portal accepts, in MB. */
+  maxFileMb?: number;
+}
+
 export interface SheriffOffice {
   county: string;
   name: string;
   /** Email for service requests, when the county has published one. */
   email: string | null;
   /** Online submission portal, for counties that use one instead of email. */
-  portal?: { url: string; label: string };
+  portal?: Portal;
   fax: string;
   phone: string;
   /** Where to drop papers off in person. */
@@ -32,18 +44,20 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
   Fresno: {
     county: "Fresno",
     name: "Fresno County Sheriff's Office, Civil Unit",
+    // Email submissions ended Jan 20, 2026 (Civil Unit auto-reply, Oct 22, 2026).
     email: null,
-    portal: { url: "https://civilconnect.fresnosheriff.org/", label: "Civil Connect" },
+    // Upload boxes and the 10 MB limit are from the portal's own code (wizard-step4.js), Oct 22, 2026.
+    portal: { url: "https://civilconnect.fresnosheriff.org/Wizard", label: "Civil Connect", separateFiles: true, maxFileMb: 10 },
     fax: "559-600-8322",
     phone: "559-600-8230",
-    address: "2200 Fresno Street, Fresno, CA 93721 (mail: P.O. Box 45025, Fresno, CA 93718)",
+    address: "770 E. Shaw Ave., Suite 300, Fresno, CA 93710 (window open Mon, Wed, Fri, 9 a.m.–3 p.m.; mail: P.O. Box 45025, Fresno, CA 93718)",
     notes: [
-      "Fresno takes electronic requests through its Civil Connect site, not by email.",
-      "Make one submission for each person to be served, and upload everything as one file.",
+      "Fresno takes electronic requests only through Civil Connect. It stopped taking them by email in January 2026.",
       "Your papers must have the court's seal and the judge's and clerk's signatures.",
-      "If the judge ordered a move-out or a child handover, call them too, and send it early in the day.",
+      "If the judge ordered a move-out or a child handover, also call the Civil Unit at 559-600-8230, and submit early in the day.",
+      "If the judge denied your temporary order, service may not be free. Call the Civil Unit before you submit.",
     ],
-    checked: "2026-10-16",
+    checked: "2026-10-22",
   },
   Tulare: {
     county: "Tulare",
