@@ -12,6 +12,9 @@ import { PDFCheckBox, PDFDocument, PDFTextField } from "pdf-lib";
 import { buildFilingPacket } from "../src/wizard/fill/packet";
 import { sampleAnswers } from "../src/wizard/sample";
 import { buildSheriffFiles, buildSheriffPdf, completeSer001, deadlineFrom, emailText } from "../src/sheriff/packet";
+import { newSer001Draft, papersText, readSer001Details } from "../src/sheriff/ser001";
+import { SER001 } from "../src/wizard/fill/forms/extras";
+import { fillOneForm } from "../src/wizard/fill/packet";
 
 const outDir = process.argv[2] ?? "tmp-sheriff";
 const load = async (p: string) => {
@@ -74,6 +77,39 @@ async function main() {
   const sepNoOthers = await buildSheriffFiles(asFile("SER-001.pdf", ser.bytes), [{ id: "o", file: asFile("DV-110.pdf", dv110.bytes) }], [], c, 10 * 1024 * 1024);
   checks.push(["separate: no empty third file", sepNoOthers.files.length === 2]);
   sep.files.forEach((f) => fs.writeFileSync(path.join(outDir, f.fileName), f.bytes));
+
+  // Contact details for Civil Connect come off the completed SER-001.
+  checks.push(
+    ["details: name", sep.details?.name === a.P1],
+    ["details: case number", sep.details?.caseNumber === c.caseNumber],
+    ["details: person to serve", sep.details?.personToServe === a.R1],
+  );
+
+  // The short SER-001 form on the sheriff page: same fill rules, item 5b from the checked papers.
+  const draft = newSer001Draft("Fresno");
+  draft.P1 = "Ana Test";
+  draft.P6 = { street: "PO Box 1", city: "Fresno", state: "CA", zip: "93701" };
+  draft.P7 = "559-555-0100";
+  draft.R1 = "Sam Test";
+  draft.R15.address = { street: "1 Main St", city: "Fresno", state: "CA", zip: "93721" };
+  draft.R18 = "Y";
+  const list = papersText(["DV-100", "DV-109", "DV-110", "DV-105"]);
+  const shortForm = await fillOneForm(SER001, { ...draft, V4: list, S5: "N" }, load);
+  const sf = (await PDFDocument.load(shortForm)).getForm();
+  const sfText = (n: string) => (sf.getField(n) as PDFTextField).getText() ?? "";
+  checks.push(
+    ["short form: 5b list", list === "Filed: DV-100, DV-105, DV-109, DV-110. Blank: DV-120, DV-120-INFO, DV-250, DV-125."],
+    ["short form: 5b on the form", sfText("SER-001[0].Page3[0].List5[0].Li5b[0].listForms[0]").startsWith("Filed: DV-100")],
+    ["short form: county", sfText("SER-001[0].Page1[0].List1[0].Li1[0].NameofCounty[0]") === "Fresno"],
+    ["short form: has gun", (sf.getField("SER-001[0].Page2[0].List3[0].Li3a[0].Li3aList[0].Li3a4[0].hasGun[0]") as PDFCheckBox).isChecked()],
+  );
+  const shortDone = await completeSer001(shortForm.buffer.slice(0) as ArrayBuffer, c);
+  const shortDetails = await readSer001Details(shortDone.bytes);
+  checks.push(
+    ["short form: completes", shortDone.status === "filled"],
+    ["short form: details", shortDetails?.name === "Ana Test" && shortDetails?.phone === "559-555-0100" && shortDetails?.caseNumber === c.caseNumber],
+  );
+  fs.writeFileSync(path.join(outDir, "short-form-SER-001.pdf"), shortDone.bytes);
 
   const mail = emailText(c, "Tulare");
   checks.push(["subject", mail.subject.includes("26FL01234")], ["body has no address", !mail.body.includes(a.R14.street || "@@")]);

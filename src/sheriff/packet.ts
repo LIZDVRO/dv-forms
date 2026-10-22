@@ -7,6 +7,8 @@ import { PDFDocument, PDFTextField, PDFCheckBox } from "pdf-lib";
 
 import { fmtDate } from "@/wizard/derive";
 
+import { readSer001Details, type Ser001Details } from "./ser001";
+
 export interface CaseDetails {
   caseNumber: string;
   /** A signature drawn on this page (PNG data URL), for a SER-001 not signed in the wizard. */
@@ -153,17 +155,20 @@ async function buildPart(title: string, ser: File | null, files: File[], c: Case
   const out = await PDFDocument.create();
   out.setTitle(title);
   let serStatus: SerStatus = "as-is";
+  let details: Ser001Details | null = null;
   if (ser) {
     if (isPdf(ser)) {
       const done = await completeSer001(await ser.arrayBuffer(), c);
       serStatus = done.status;
+      // Read the contact details before the form is flattened into the upload file.
+      details = await readSer001Details(done.bytes);
       await appendFile(out, ser, q, done.bytes);
     } else {
       await appendFile(out, ser, q);
     }
   }
   for (const f of files) await appendFile(out, f, q);
-  return { bytes: await out.save(), pages: out.getPageCount(), serStatus };
+  return { bytes: await out.save(), pages: out.getPageCount(), serStatus, details };
 }
 
 /** Build a part; if it is over `maxBytes` and has photos, build it again with smaller photos. */
@@ -185,7 +190,7 @@ export async function buildSheriffPdf(
   papers: Added[],
   c: CaseDetails,
   maxBytes = Infinity,
-): Promise<{ bytes: Uint8Array; pages: number; serStatus: SerStatus }> {
+): Promise<{ bytes: Uint8Array; pages: number; serStatus: SerStatus; details: Ser001Details | null }> {
   return buildWithin(`Request for sheriff service${caseTitle(c)}`, ser, papers.map((p) => p.file), c, maxBytes);
 }
 
@@ -208,7 +213,7 @@ export async function buildSheriffFiles(
   others: Added[],
   c: CaseDetails,
   maxBytes: number,
-): Promise<{ files: SheriffFile[]; serStatus: SerStatus }> {
+): Promise<{ files: SheriffFile[]; serStatus: SerStatus; details: Ser001Details | null }> {
   const tag = c.caseNumber.trim().replace(/[^\w-]+/g, "");
   const name = (n: number, what: string) => `${n}-${what}${tag ? `-${tag}` : ""}.pdf`;
   const serPart = await buildWithin(`SER-001${caseTitle(c)}`, ser, [], c, maxBytes);
@@ -221,7 +226,7 @@ export async function buildSheriffFiles(
     const otherPart = await buildWithin(`Other papers to serve${caseTitle(c)}`, null, others.map((p) => p.file), c, maxBytes);
     files.push({ slot: "other", fileName: name(3, "Other-papers"), bytes: otherPart.bytes, pages: otherPart.pages });
   }
-  return { files, serStatus: serPart.serStatus };
+  return { files, serStatus: serPart.serStatus, details: serPart.details };
 }
 
 /** Subject and message for the email to the sheriff. Kept short: SER-001 carries the details. */

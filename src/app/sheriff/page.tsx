@@ -17,9 +17,10 @@ import { fmtDate } from "@/wizard/derive";
 import { Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
 import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type Portal, type SheriffOffice } from "@/sheriff/offices";
 import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
+import { Ser001Form } from "@/sheriff/Ser001Form";
+import type { Ser001Details } from "@/sheriff/ser001";
 
 const QUICK_EXIT_URL = "https://us.shein.com/";
-const WIZARD_URL = "/wizard";
 /** Most email services refuse attachments over about 20–25 MB. */
 const EMAIL_LIMIT = 20 * 1024 * 1024;
 
@@ -42,11 +43,14 @@ function save(name: string, bytes: Uint8Array) {
 /** One combined PDF (sheriffs that take email), or separate files (one per portal upload box). */
 type Made =
   | { kind: "one"; bytes: Uint8Array; pages: number; serStatus: SerStatus; fileName: string }
-  | { kind: "separate"; files: SheriffFile[]; serStatus: SerStatus };
+  | { kind: "separate"; files: SheriffFile[]; serStatus: SerStatus; details: Ser001Details | null };
 
 export default function SheriffPage() {
   const [county, setCounty] = useState("");
   const [ser, setSer] = useState<File | null>(null);
+  /** SER-001 came from the short form on this page (so it still needs a signature). */
+  const [serHere, setSerHere] = useState(false);
+  const [showSerForm, setShowSerForm] = useState(false);
   const [order, setOrder] = useState<Added[]>([]);
   const [papers, setPapers] = useState<Added[]>([]);
   const [caseNumber, setCaseNumber] = useState("");
@@ -77,6 +81,8 @@ export default function SheriffPage() {
   const stateReset = useRef(() => {});
   stateReset.current = () => {
     setSer(null);
+    setSerHere(false);
+    setShowSerForm(false);
     setOrder([]);
     setPapers([]);
     setSignature("");
@@ -109,7 +115,8 @@ export default function SheriffPage() {
 
   const make = async () => {
     setError("");
-    if (!ser) return setError("Add your SER-001 first. The sheriff can't accept the request without it.");
+    if (!ser) return setError("Add your SER-001 first, or fill one out in step 2. The sheriff can't accept the request without it.");
+    if (serHere && !signature) return setError("Sign your SER-001 in step 2.");
     if (separate && !order.length) return setError("Add your signed temporary restraining order (DV-110).");
     if (!order.length && !papers.length) return setError("Add the papers the court gave back to you.");
     if (!caseNumber.trim()) return setError("Enter the case number from your papers.");
@@ -204,9 +211,9 @@ export default function SheriffPage() {
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">Send your papers to the sheriff</h1>
           <p className="mt-2 text-base text-slate-600">
-            The sheriff serves restraining orders for free, and must accept your request electronically. Do this as soon as the court
-            gives you back your signed papers. We put your papers together, and you send them yourself, by email or on the
-            sheriff&apos;s website.
+            Once the court gives back your stamped papers, use this page to send them to the sheriff electronically. The sheriff will
+            serve them on the other person for free. Do it as soon as you get them, because the papers must be served before your
+            court date.
           </p>
           <p className="mt-2 text-sm text-slate-500">
             Your files stay on this device. Nothing is sent to LIZ. Press <kbd className="rounded border bg-white px-1">Esc</kbd> or
@@ -240,27 +247,67 @@ export default function SheriffPage() {
         </Group>
 
         <Group title="2. Your SER-001">
-          <Question
-            label="Add the SER-001 from your LIZ forms"
-            hint='It was in the "Keep for later" folder of your download. We add the case number, court date and deadline for you.'
-          >
-            <FilePick
-              accept={ACCEPT}
-              label={ser ? "Change file" : "Choose SER-001"}
-              onFiles={(fs) => fs[0] && setSer(fs[0])}
+          <p className="text-base text-slate-700">
+            SER-001 asks the sheriff to serve your papers. It was in the &quot;Keep for later&quot; folder of your LIZ forms. We add the case
+            number, court date and deadline for you.
+          </p>
+          {serHere && ser ? (
+            <p className="text-base text-slate-800">
+              ✓ SER-001 filled out here.{" "}
+              <button type="button" onClick={() => setShowSerForm(true)} className="font-medium text-liz underline">
+                Change it
+              </button>
+            </p>
+          ) : (
+            <Question label="Add the SER-001 from your LIZ forms">
+              <FilePick
+                accept={ACCEPT}
+                label={ser ? "Change file" : "Choose SER-001"}
+                onFiles={(fs) => {
+                  if (!fs[0]) return;
+                  setSer(fs[0]);
+                  setSerHere(false);
+                  setShowSerForm(false);
+                }}
+              />
+              {ser && <p className="text-sm text-slate-700">✓ {ser.name}</p>}
+            </Question>
+          )}
+          {!showSerForm && !serHere && (
+            <p className="text-base text-slate-700">
+              Don&apos;t have it?{" "}
+              <button type="button" onClick={() => setShowSerForm(true)} className="font-medium text-liz underline">
+                Fill out SER-001 here
+              </button>{" "}
+              with what&apos;s on the papers the court gave back. It takes a few minutes.
+            </p>
+          )}
+          {/* Kept mounted once opened, so "Change it" brings back the answers already given. */}
+          {(showSerForm || serHere) && county && county !== "other" && (
+            <div className={showSerForm ? undefined : "hidden"}>
+              <Ser001Form
+                county={county}
+                onDone={(file) => {
+                  setSer(file);
+                  setSerHere(true);
+                  setShowSerForm(false);
+                }}
+              />
+            </div>
+          )}
+          {showSerForm && (!county || county === "other") && <Note tone="warn">Choose the county in step 1 first.</Note>}
+          {ser && (
+            <SignaturePad
+              label={serHere ? "Sign your SER-001" : "Sign SER-001"}
+              hint={
+                serHere
+                  ? "Draw your signature with your finger or mouse. The sheriff must accept an electronic signature."
+                  : "Only if you didn't sign it when you made your forms. The sheriff must accept an electronic signature."
+              }
+              value={signature}
+              onChange={setSignature}
             />
-            {ser && <p className="text-sm text-slate-700">✓ {ser.name}</p>}
-          </Question>
-          <SignaturePad
-            label="Sign SER-001"
-            hint="Only if you didn't sign it when you made your forms. The sheriff must accept an electronic signature."
-            value={signature}
-            onChange={setSignature}
-          />
-          <Note>
-            Don&apos;t have it? <a href={WIZARD_URL} className="font-medium text-liz underline">Make your forms again</a> and choose the sheriff
-            when asked who will serve. A SER-001 you filled out by hand works too: take a photo of each page.
-          </Note>
+          )}
         </Group>
 
         <Group title="3. From your Notice of Court Hearing (DV-109)">
@@ -355,7 +402,9 @@ export default function SheriffPage() {
         {made?.kind === "one" && (
           <Send office={office} made={made} mailto={mailto} canShareFiles={canShareFiles} onShare={share} copy={copy} copied={copied} subject={mail?.subject ?? ""} />
         )}
-        {made?.kind === "separate" && office?.portal && <PortalUpload office={office} portal={office.portal} files={made.files} />}
+        {made?.kind === "separate" && office?.portal && (
+          <PortalUpload office={office} portal={office.portal} files={made.files} details={made.details} caseNumber={caseNumber.trim()} />
+        )}
 
           </>
         )}
@@ -575,7 +624,19 @@ const SLOT_BOX: Record<SheriffFile["slot"], string> = {
  * Step-by-step for a portal with one upload box per document (Fresno's Civil Connect).
  * Its screens are Personal, File Type, Upload and Receipt.
  */
-function PortalUpload({ office, portal, files }: { office: SheriffOffice; portal: Portal; files: SheriffFile[] }) {
+function PortalUpload({
+  office,
+  portal,
+  files,
+  details,
+  caseNumber,
+}: {
+  office: SheriffOffice;
+  portal: Portal;
+  files: SheriffFile[];
+  details: Ser001Details | null;
+  caseNumber: string;
+}) {
   const limit = (portal.maxFileMb ?? Infinity) * 1024 * 1024;
   const tooBig = files.filter((f) => f.bytes.length > limit);
   const primary = "inline-flex items-center justify-center gap-2 rounded-xl bg-liz px-5 py-3 text-base font-semibold text-white hover:bg-liz/90";
@@ -616,7 +677,9 @@ function PortalUpload({ office, portal, files }: { office: SheriffOffice; portal
         </li>
         <li>Read their notice, type your initials, check the box, and choose <strong>Get started</strong>.</li>
         <li>
-          <strong>Personal:</strong> enter your name and contact details. Use a phone number and email the other person can&apos;t see.
+          <strong>Personal:</strong> enter your details. Use the same ones as on your SER-001, with a phone number and email the other
+          person can&apos;t see.
+          <CopyDetails details={details} caseNumber={caseNumber} />
         </li>
         <li>
           <strong>File Type:</strong> choose a restraining order. When it asks how you&apos;re paying, choose the option for a{" "}
@@ -663,6 +726,61 @@ function PortalUpload({ office, portal, files }: { office: SheriffOffice; portal
         </ul>
       </Group>
     </Group>
+  );
+}
+
+/**
+ * The details a sheriff's website asks for, read off SER-001, each with a Copy button.
+ * LIZ can't type into the sheriff's website, so this is the next best thing.
+ */
+function CopyDetails({ details, caseNumber }: { details: Ser001Details | null; caseNumber: string }) {
+  const [copied, setCopied] = useState("");
+  if (!details) {
+    return <p className="mt-1 text-sm text-slate-600">Your name, address, phone and email are on your SER-001, item 2.</p>;
+  }
+  const rows: [string, string][] = (
+    [
+      ["Your name", details.name],
+      ["Street address", details.street],
+      ["City", details.city],
+      ["State", details.state],
+      ["ZIP", details.zip],
+      ["Phone", details.phone],
+      ["Email", details.email],
+      ["Case number", details.caseNumber || caseNumber],
+      ["Person to be served", details.personToServe],
+    ] as [string, string][]
+  ).filter(([, v]) => v);
+  const copy = async (label: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(label);
+      setTimeout(() => setCopied(""), 2000);
+    } catch {
+      setCopied("");
+    }
+  };
+  return (
+    <div className="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <p className="text-sm text-slate-600">From your SER-001. Tap Copy, then paste into the matching box on the sheriff&apos;s site.</p>
+      <dl className="mt-2 divide-y divide-slate-200">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex items-center justify-between gap-3 py-1.5">
+            <div className="min-w-0">
+              <dt className="text-xs text-slate-500">{label}</dt>
+              <dd className="truncate text-sm text-slate-900">{value}</dd>
+            </div>
+            <button
+              type="button"
+              onClick={() => copy(label, value)}
+              className="shrink-0 rounded-lg border border-liz bg-white px-3 py-1 text-sm font-medium text-liz hover:bg-liz/5"
+            >
+              {copied === label ? "Copied" : "Copy"}
+            </button>
+          </div>
+        ))}
+      </dl>
+    </div>
   );
 }
 
