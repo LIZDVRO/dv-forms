@@ -1,5 +1,6 @@
 /**
- * Sheriff civil units for the counties the wizard serves, and how each one takes a
+ * Sheriff civil units for the counties the wizard serves, plus neighboring counties where
+ * the other person may live (service happens where they are), and how each one takes a
  * service request electronically.
  *
  * The law: since Jan 1, 2026 every sheriff must accept SER-001 and the papers to serve
@@ -104,6 +105,18 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
     address: "777 W. 22nd Street, Merced, CA 95340",
     notes: [],
     checked: "2026-10-16",
+  },
+  // Not one of LIZ's filing counties, but borders Tulare and Kings, so the other person may live there.
+  Kern: {
+    county: "Kern",
+    name: "Kern County Sheriff's Office, Civil Section",
+    // From the Civil Processing Unit page (kernsheriff.org/civil-processing-unit), Oct 22, 2026.
+    email: "Civil@KernSheriff.org",
+    fax: "661-392-6768",
+    phone: "661-392-6750",
+    address: "34970 McMurtrey Ave., 2nd Floor, Bakersfield, CA 93308 (open Mon–Fri, 8 a.m.–5 p.m.; drop box open 24 hours)",
+    notes: [],
+    checked: "2026-10-22",
   },
 };
 
