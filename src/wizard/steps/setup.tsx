@@ -33,8 +33,11 @@ export function Start({ errors }: StepProps) {
         button at any time. It clears everything.
       </Note>
       <p className="text-sm text-slate-600">
-        This version makes the filing forms (DV-100, DV-109, DV-110, CLETS-001, DV-900 for a phone transfer) and, if you ask
-        for custody, the child custody forms (DV-105, DV-140, and DV-108 and DV-145 to prevent abduction).
+        Based on your answers, this makes the forms that apply to you: the request and temporary order (DV-100, DV-101,
+        DV-109, DV-110, CLETS-001); child custody and visitation (DV-105, DV-105(A), DV-140, DV-150), with DV-108 and DV-145
+        to prevent child abduction; child support, spousal support and lawyer&apos;s fees (FL-150); transferring a phone
+        account (DV-900, DV-901); an interpreter (INT-300); keeping a child&apos;s information private (DV-160, DV-165, DV-170,
+        DV-175); the order after your court date (DV-130); and serving the papers (SER-001, DV-200, DV-250, DV-210).
       </p>
       <ConsentBoxes error={errors.consent} />
     </div>
