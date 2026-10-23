@@ -99,12 +99,15 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
   Merced: {
     county: "Merced",
     name: "Merced County Sheriff's Office, Civil Bureau",
-    email: null,
+    // Listed on the Civil Bureau page; the Civil Bureau confirmed by phone, Oct 23, 2026, that DV
+    // restraining order requests can be emailed here. (Merced also has a Tyler "Online Service Request"
+    // portal, but it requires creating an account, so email is the path offered.)
+    email: "MercedSheriffCivil@countyofmerced.com",
     fax: "",
     phone: "209-385-7639",
     address: "777 W. 22nd Street, Merced, CA 95340",
     notes: [],
-    checked: "2026-10-16",
+    checked: "2026-10-23",
   },
   // Not one of LIZ's filing counties, but borders Tulare and Kings, so the other person may live there.
   Kern: {
