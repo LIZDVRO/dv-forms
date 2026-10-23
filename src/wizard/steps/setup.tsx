@@ -20,15 +20,10 @@ export function Start({ errors }: StepProps) {
   return (
     <div className="space-y-5 text-base leading-relaxed text-slate-700">
       <p>
-        This will help you fill out the court forms to ask for a <strong>domestic violence restraining order</strong>{" "}in
-        California. We ask each question once and fill in every form for you.
+        This free service will help you fill out the court forms to ask for a{" "}
+        <strong>domestic violence restraining order</strong>{" "}in California. Many long, repetitive court forms become one
+        shorter set of plain-language questions. We ask each question once and fill in every form for you.
       </p>
-      <ul className="list-disc space-y-2 pl-5">
-        <li>It&apos;s free to file. A judge usually decides on temporary orders the same day or the next business day.</li>
-        <li>Your court date is usually about three weeks later. A long-term order can last up to five years.</li>
-        <li>You can ask for an order even if you are not a U.S. citizen.</li>
-        <li>You must be 12 or older to ask on your own. These forms do not end a marriage.</li>
-      </ul>
       <Note>
         <strong>Nothing is saved.</strong>{" "}Your answers stay on this screen only. If you close or refresh the page, they
         are gone. At the end you&apos;ll download your forms.
