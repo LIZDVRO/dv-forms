@@ -94,9 +94,7 @@ export function ConsentBoxes({ error }: { error?: string }) {
           <a href={TERMS_URL} target="_blank" rel="noopener noreferrer" className="font-medium text-liz underline" onClick={(e) => e.stopPropagation()}>
             User Agreement and Privacy Policy
           </a>
-          . I understand that LIZ does not give legal advice, and I agree to release all claims against LIZ, to resolve any dispute by
-          individual arbitration with the American Arbitration Association, waiving class actions and jury trials, to indemnify LIZ, and to
-          LIZ&apos;s collection of data about my use and answers.
+          .
         </Check>
       </div>
       {error && <p className="text-sm font-medium text-red-700">{error}</p>}
