@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { TERMS_URL, useConsent } from "@/legal/consent";
@@ -9,6 +8,7 @@ import { sampleAnswers } from "@/wizard/sample";
 import { FINISH, visibleSteps } from "@/wizard/steps";
 import { Finish } from "@/wizard/steps/finish";
 import { useWizard } from "@/wizard/store";
+import { LizLogo } from "@/components/LizLogo";
 
 const QUICK_EXIT_URL = "https://us.shein.com/";
 
@@ -115,7 +115,7 @@ export default function WizardPage() {
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <Image src="/liz-logo.png" alt="LIZ" width={36} height={36} className="h-9 w-auto" />
+            <LizLogo className="h-9 w-auto" />
             <span className="hidden text-sm font-medium text-slate-600 sm:inline">Restraining order forms</span>
           </div>
           <button

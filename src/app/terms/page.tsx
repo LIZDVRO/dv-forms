@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 
 import { AGREEMENT_EFFECTIVE, AGREEMENT_VERSION, PRIVACY_MD, TERMS_MD } from "@/legal/agreement";
 import { Markdown } from "@/legal/markdown";
 import { QuickExitButton } from "@/legal/quick-exit";
+import { LizLogo } from "@/components/LizLogo";
 
 export const metadata: Metadata = {
   title: "LIZ — User Agreement and Privacy Policy",
@@ -16,7 +16,7 @@ export default function TermsPage() {
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur print:hidden">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <Image src="/liz-logo.png" alt="LIZ" width={36} height={36} className="h-9 w-auto" />
+            <LizLogo className="h-9 w-auto" />
             <span className="hidden text-sm font-medium text-slate-600 sm:inline">User Agreement</span>
           </div>
           <QuickExitButton />
