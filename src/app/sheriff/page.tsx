@@ -9,7 +9,6 @@
  * papers as separate files). Gov. Code § 26666.5 requires every sheriff to accept requests
  * electronically.
  */
-import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ConsentBoxes, TERMS_URL, useConsent } from "@/legal/consent";
@@ -19,6 +18,7 @@ import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type Portal, type SheriffOffice } fr
 import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, ser001Signed, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
 import { Ser001Form } from "@/sheriff/Ser001Form";
 import type { Ser001Details } from "@/sheriff/ser001";
+import { LizLogo } from "@/components/LizLogo";
 
 const QUICK_EXIT_URL = "https://us.shein.com/";
 /** Most email services refuse attachments over about 20–25 MB. */
@@ -189,7 +189,7 @@ export default function SheriffPage() {
       <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <Image src="/liz-logo.png" alt="LIZ" width={36} height={36} className="h-9 w-auto" />
+            <LizLogo className="h-9 w-auto" />
             <span className="hidden text-sm font-medium text-slate-600 sm:inline">Send papers to the sheriff</span>
           </div>
           <button
