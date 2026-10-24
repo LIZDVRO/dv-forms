@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIZ — Break the cycle of abuse</title>
+<meta name="description" content="Request a California domestic violence restraining order quickly and easily. LIZ turns the court forms into one set of plain-language questions. Nothing you type is saved.">
+<meta name="referrer" content="no-referrer">
+<meta property="og:title" content="LIZ — Break the cycle of abuse">
+<meta property="og:description" content="Request a restraining order quickly and easily.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lizbreakfree.org/">
+<meta name="theme-color" content="#F7F5F2">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20282%20317%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23662D91%22%20stroke-width%3D%2240%22%3E%3Cpath%20d%3D%22M25.9%20157A115%20115%200%200%201%20126%2056.9%22/%3E%3Cpath%20d%3D%22M25.9%20185A115%20115%200%200%200%20126%20285.1%22/%3E%3Cpath%20d%3D%22M154%20285.1A115%20115%200%200%200%20254.1%20185%22/%3E%3C/g%3E%3Cpath%20d%3D%22M126%206L188%2058L126%20111Z%22%20fill%3D%22%23662D91%22/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#662D91; --accent-ink:#4A1C70; --ink:#15111A; --ink-2:#3F3946; --muted:#5E5766;
+    --bg:#F7F5F2; --card:#FFFFFF; --line:#E6E0EB; --chip:#F1EAF7; --exit:#C4261B;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+  a{color:var(--accent-ink)} a:hover{color:#26093D}
+  :focus-visible{outline:3px solid var(--accent);outline-offset:3px;border-radius:6px}
+  .skip{position:absolute;left:-999px;top:8px;background:#fff;padding:10px 14px;border-radius:8px;z-index:50}
+  .skip:focus{left:12px}
+
+  .page{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+  .mark{position:absolute;width:920px;height:1034px;left:max(-90px,calc(50% - 760px));top:-40px;opacity:.11;pointer-events:none}
+
+  header{position:sticky;top:0;z-index:20;padding:20px 40px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;background:transparent}
+  header .logo{display:block;line-height:0} .logo-svg{height:34px;width:auto;display:block}
+  .top-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 20px;font-size:15px;font-weight:500}
+  .top-actions a{text-decoration:none;color:#4A4352}
+  .exit{min-height:44px;padding:0 18px;border:0;border-radius:12px;background:var(--exit);color:#fff;font:inherit;font-weight:700;font-size:14px;cursor:pointer}
+  .exit:hover{background:#A51E15}
+
+  main{position:relative;flex:1;max-width:1360px;width:100%;margin:0 auto;padding:24px 40px 32px;display:flex;flex-wrap:wrap;gap:40px 56px;align-items:center}
+  .hero{flex:999 1 560px;min-width:0}
+  .eyebrow{margin:0 0 18px;font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+  h1{margin:0;font-weight:800;font-size:clamp(42px,6vw,86px);line-height:.96;letter-spacing:-.045em}
+  h1 .sub{display:block;margin-top:14px;font-size:.5em;line-height:1.08;letter-spacing:-.03em;color:var(--accent)}
+  .lede{margin:24px 0 0;max-width:560px;font-size:20px;line-height:1.5;color:var(--ink-2)}
+  .ctas{margin-top:34px;display:flex;flex-direction:column;gap:12px;max-width:560px}
+  .cta{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 28px;border-radius:18px;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+  .cta:hover{transform:translateY(-2px);box-shadow:0 18px 30px -22px rgba(21,17,26,.55)}
+  .cta .t{display:flex;flex-direction:column}
+  .cta-primary{min-height:72px;background:var(--accent);color:#fff}
+  .cta-primary:hover{color:#fff;background:#5A2682}
+  .cta-primary .big{font-size:21px;font-weight:700}
+  .cta-primary .small{font-size:14px;color:#E9DDF4}
+  .cta-secondary{min-height:64px;background:#fff;border:1.5px solid #D9D2E0;color:var(--ink)}
+  .cta-secondary:hover{color:var(--ink)}
+  .cta-secondary .big{font-size:18px;font-weight:700}
+  .cta-secondary .small{font-size:14px;color:var(--muted)}
+
+  .card{flex:1 1 380px;min-width:0;background:var(--card);border-radius:24px;box-shadow:0 30px 60px -40px rgba(21,17,26,.45);overflow:hidden}
+  [role=tablist]{display:flex;border-bottom:1px solid #ECE7F1}
+  [role=tab]{flex:1;min-height:52px;border:0;border-bottom:3px solid transparent;background:#fff;font:inherit;font-size:15px;font-weight:500;color:var(--muted);cursor:pointer;padding:0 8px}
+  [role=tab][aria-selected=true]{border-bottom-color:var(--accent);font-weight:700;color:var(--ink)}
+  [role=tabpanel]{padding:26px 28px 30px;min-height:300px}
+  [role=tabpanel][hidden]{display:none}
+  .steps{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:16px}
+  .steps li{display:flex;gap:14px;font-size:15px;line-height:1.5}
+  .num{flex:0 0 28px;height:28px;border-radius:8px;background:var(--chip);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px}
+  .stack{display:flex;flex-direction:column;gap:12px;font-size:15px;line-height:1.5}
+  .stack p{margin:0}
+  .stack .lead{font-size:18px;font-weight:700}
+  .stack .about{font-size:18px;line-height:1.45}
+  .stack .note{color:var(--muted)}
+  .btn-dark{align-self:flex-start;display:inline-flex;align-items:center;min-height:46px;padding:0 22px;border-radius:12px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700}
+  .btn-dark:hover{color:#fff;background:#000}
+  a[href^="tel:"]{white-space:nowrap}
+
+  footer{position:relative;border-top:1px solid var(--line);background:var(--bg)}
+  footer .row{padding:14px 40px;display:flex;flex-wrap:wrap;gap:6px 28px;justify-content:space-between;font-size:13px;color:var(--muted)}
+
+  /* Donate is hidden until a donation link is set (see DONATE_URL below). */
+  .donate[hidden]{display:none}
+
+  @media (max-width:640px){
+    header{padding:12px 20px;background:rgba(247,245,242,.92);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .logo-svg{height:28px}
+    main{padding:20px 20px 28px;gap:28px}
+    .lede{font-size:18px}
+    .cta{padding:12px 20px}
+    .cta-primary .big{font-size:19px}
+    [role=tabpanel]{padding:22px 20px 26px;min-height:0}
+    footer .row{padding:14px 20px}
+    .mark{width:560px;height:630px;left:-120px;top:20px}
+  }
+  @media (prefers-reduced-motion:reduce){.cta{transition:none}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="page">
+  <svg class="mark" aria-hidden="true" viewBox="0 0 282 317">
+    <path d="M25.9 157 A115 115 0 0 1 126 56.9" fill="none" stroke="#662D91" stroke-width="35"/>
+    <path d="M126 10 L182 58 L126 107 Z" fill="#662D91"/>
+    <path d="M25.9 185 A115 115 0 0 0 126 285.1" fill="none" stroke="#662D91" stroke-width="35"/>
+    <path d="M154 285.1 A115 115 0 0 0 254.1 185" fill="none" stroke="#662D91" stroke-width="35"/>
+  </svg>
+
+  <header>
+    <a class="logo" href="/" aria-label="LIZ home"><svg class="logo-svg" role="img" aria-label="LIZ" viewBox="0 0 853 307" fill="#662D91"><g transform="translate(14 -3) scale(.985 .97)"><path d="M25.9 157A115 115 0 0 1 126 56.9" fill="none" stroke="#662D91" stroke-width="35"/><path d="M126 10L182 58L126 107Z"/><path d="M25.9 185A115 115 0 0 0 126 285.1" fill="none" stroke="#662D91" stroke-width="35"/><path d="M154 285.1A115 115 0 0 0 254.1 185" fill="none" stroke="#662D91" stroke-width="35"/></g><path d="M375 43H399.5V282H547V303H375Z"/><path d="M574 43H598.5V303H574Z"/><path d="M629 43H832V65L655 281H832V303H629V281L806 65H629Z"/></svg></a>
+    <div class="top-actions">
+      <a class="donate" href="#" hidden>Donate</a>
+      <button class="exit" type="button" id="quick-exit" title="Leave this site now (Esc)">Quick exit · Esc</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="hero">
+      <p class="eyebrow">California restraining orders</p>
+      <h1>Break the cycle of abuse.<span class="sub">Request a restraining order quickly and easily.</span></h1>
+      <p class="lede">Answer one set of plain-language questions. LIZ generates every restraining order form you need — then file online or at court.</p>
+      <div class="ctas">
+        <a class="cta cta-primary" href="https://forms.lizbreakfree.org/">
+          <span class="t"><span class="big">I need a restraining order</span><span class="small">Start my forms to request a restraining order</span></span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="cta cta-secondary" href="https://efile.lizbreakfree.org/">
+          <span class="t"><span class="big">I need to e-file court documents</span><span class="small">File electronically from anywhere</span></span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+        <a class="cta cta-secondary" href="https://forms.lizbreakfree.org/sheriff">
+          <span class="t"><span class="big">I need to serve my papers</span><span class="small">Send your stamped court papers to the sheriff to serve</span></span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <section class="card" aria-label="More about LIZ">
+      <div role="tablist" aria-label="More about LIZ">
+        <button role="tab" id="tab-how" aria-controls="panel-how" aria-selected="true" tabindex="0">How it works</button>
+        <button role="tab" id="tab-safety" aria-controls="panel-safety" aria-selected="false" tabindex="-1">Safety</button>
+        <button role="tab" id="tab-about" aria-controls="panel-about" aria-selected="false" tabindex="-1">About LIZ</button>
+      </div>
+      <div role="tabpanel" id="panel-how" aria-labelledby="tab-how">
+        <ol class="steps">
+          <li><span class="num">1</span><span><strong>Answer the questions.</strong> Many long, repetitive court forms become one short set of plain-language questions.</span></li>
+          <li><span class="num">2</span><span><strong>Download your forms.</strong> LIZ generates every restraining order form you need, right online.</span></li>
+          <li><span class="num">3</span><span><strong>File with the court.</strong> Online through LIZ from anywhere, or in person at court.</span></li>
+          <li><span class="num">4</span><span><strong>Get a quick decision.</strong> A judge usually decides on a temporary restraining order the same or next business day.</span></li>
+          <li><span class="num">5</span><span><strong>Have the papers served.</strong> Send your stamped papers to the sheriff from your own email. The sheriff serves them for free.</span></li>
+        </ol>
+      </div>
+      <div role="tabpanel" id="panel-safety" aria-labelledby="tab-safety" hidden>
+        <div class="stack">
+          <p class="lead">In immediate danger? Call <a href="tel:911">911</a>.</p>
+          <p><strong>Leave fast.</strong> Press Esc or the red Quick exit button at any time.</p>
+          <p><strong>Nothing is saved.</strong> Your answers disappear when you close the page.</p>
+          <p><strong>Use a safe device</strong> if someone may check your phone or computer.</p>
+          <p><strong>Talk to someone.</strong> National DV Hotline <a href="tel:18007997233">1-800-799-7233</a> (TTY <a href="tel:18007873224">1-800-787-3224</a>).</p>
+        </div>
+      </div>
+      <div role="tabpanel" id="panel-about" aria-labelledby="tab-about" hidden>
+        <div class="stack">
+          <p class="about">LIZ is a 501(c)(3) nonprofit in Fresno, California, helping survivors of domestic violence break free from the cycle of abuse.</p>
+          <p class="note">LIZ helps with forms only and does not give legal advice.</p>
+          <a class="btn-dark donate" href="#" hidden>Donate</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="row">
+      <span>Not legal advice · Hotline <a href="tel:18007997233">1-800-799-7233</a></span>
+      <span>E-filing tech support <a href="tel:18014487268">(801) 448-7268</a> — no legal questions, please</span>
+    </div>
+  </footer>
+</div>
+
+<script>
+(function () {
+  // Set this to your donation page to show the Donate buttons.
+  var DONATE_URL = "https://gofund.me/72d07a9cd";
+  var QUICK_EXIT_URL = "https://us.shein.com/";
+
+  if (DONATE_URL) {
+    document.querySelectorAll(".donate").forEach(function (a) {
+      a.href = DONATE_URL; a.hidden = false;
+    });
+  }
+
+  // Quick exit: replace() keeps this page out of the Back button history.
+  function quickExit() { window.location.replace(QUICK_EXIT_URL); }
+  document.getElementById("quick-exit").addEventListener("click", quickExit);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") quickExit(); });
+
+  // Tell the forms site where this visit came from, for LIZ's statistics (Privacy Policy section 2).
+  // This page sends no referrer (Referrer-Policy: no-referrer), so links to forms.lizbreakfree.org
+  // carry it instead: ref = the outside website's domain (or lizbreakfree.org when there was none),
+  // plus any campaign tags (utm_source, utm_medium, utm_campaign) on the link that brought them here.
+  try {
+    var here = new URLSearchParams(location.search);
+    var pass = new URLSearchParams();
+    var from = "";
+    try { from = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+    pass.set("ref", from && !/(^|\.)lizbreakfree\.org$/.test(from) ? from : "lizbreakfree.org");
+    ["utm_source", "utm_medium", "utm_campaign"].forEach(function (k) {
+      var v = here.get(k);
+      if (v) pass.set(k, v.slice(0, 100));
+    });
+    document.querySelectorAll('a[href^="https://forms.lizbreakfree.org"]').forEach(function (a) {
+      var u = new URL(a.href);
+      pass.forEach(function (v, k) { u.searchParams.set(k, v); });
+      a.href = u.toString();
+    });
+  } catch (e) {}
+
+  // Accessible tabs.
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(tab) {
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute("aria-selected", on ? "true" : "false");
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute("aria-controls")).hidden = !on;
+    });
+  }
+  tabs.forEach(function (t, i) {
+    t.addEventListener("click", function () { select(t); });
+    t.addEventListener("keydown", function (e) {
+      var n = null;
+      if (e.key === "ArrowRight") n = tabs[(i + 1) % tabs.length];
+      if (e.key === "ArrowLeft") n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (n) { e.preventDefault(); select(n); n.focus(); }
+    });
+  });
+})();
+</script>
+</body>
+</html>
