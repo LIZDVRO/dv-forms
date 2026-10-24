@@ -647,6 +647,29 @@
         window.addEventListener("scroll", onScroll, { passive: true });
         onScroll();
       })();
+      // Tell the forms site where this visit came from, for LIZ's statistics (Privacy Policy section 2).
+      // This page sends no referrer (Referrer-Policy: no-referrer), so links to forms.lizbreakfree.org
+      // carry it instead: ref = the outside website's domain (or lizbreakfree.org when there was none),
+      // plus any campaign tags (utm_source, utm_medium, utm_campaign) on the link that brought them here.
+      (function () {
+        try {
+          var here = new URLSearchParams(location.search);
+          var pass = new URLSearchParams();
+          var from = "";
+          try { from = document.referrer ? new URL(document.referrer).hostname : ""; } catch (e) {}
+          pass.set("ref", from && !/(^|\.)lizbreakfree\.org$/.test(from) ? from : "lizbreakfree.org");
+          ["utm_source", "utm_medium", "utm_campaign"].forEach(function (k) {
+            var v = here.get(k);
+            if (v) pass.set(k, v.slice(0, 100));
+          });
+          var links = document.querySelectorAll('a[href^="https://forms.lizbreakfree.org"]');
+          for (var i = 0; i < links.length; i++) {
+            var u = new URL(links[i].href);
+            pass.forEach(function (v, k) { u.searchParams.set(k, v); });
+            links[i].href = u.toString();
+          }
+        } catch (e) {}
+      })();
       // Quick exit: Esc leaves immediately for a neutral site.
       document.addEventListener("keydown", function (e) {
         if (e.key === "Escape") {
