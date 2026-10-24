@@ -245,9 +245,9 @@ export async function buildSheriffFiles(
 }
 
 /** Subject and message for the email to the sheriff. Kept short: SER-001 carries the details. */
-export function emailText(c: CaseDetails, county: string): { subject: string; body: string } {
+export function emailText(c: CaseDetails, county: string, subjectPrefix?: string): { subject: string; body: string } {
   const caseNo = c.caseNumber.trim();
-  const subject = `Request for service - Domestic violence restraining order${caseNo ? ` - Case ${caseNo}` : ""}`;
+  const subject = `${subjectPrefix ? `${subjectPrefix} - ` : ""}Request for service - Domestic violence restraining order${caseNo ? ` - Case ${caseNo}` : ""}`;
   const lines = [
     `To the ${county} County Sheriff's Civil Unit:`,
     "",

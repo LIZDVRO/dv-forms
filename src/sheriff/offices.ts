@@ -8,9 +8,9 @@
  * (§ 26666), and may not charge a DV petitioner for the electronic transmission
  * (§ 26666.5(b)(2)). SER-001 and what is on it are confidential (§ 7927.430).
  *
- * Checked against each sheriff's civil page, Oct 16, 2026. Where `email` is null the
- * county has not published an address yet; call the civil unit, confirm the address
- * they use for § 26666.5 email requests, and add it here.
+ * Only counties with a confirmed electronic path (an email address or a portal) are listed;
+ * the page offers no others. Add a county once its sheriff publishes or confirms the address
+ * it uses for § 26666.5 email requests. Each entry says when and where it was checked.
  */
 /**
  * A county's online submission site. `separateFiles` means it has one upload box per
@@ -29,6 +29,8 @@ export interface SheriffOffice {
   name: string;
   /** Email for service requests, when the county has published one. */
   email: string | null;
+  /** Words the office asks to start the email subject with (Sonoma: "TRO"). */
+  subjectPrefix?: string;
   /** Online submission portal, for counties that use one instead of email. */
   portal?: Portal;
   fax: string;
@@ -86,16 +88,6 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
     notes: ["Kings asks for your papers at least 10 business days before the service deadline. Send them as soon as you get them."],
     checked: "2026-10-22",
   },
-  Madera: {
-    county: "Madera",
-    name: "Madera County Sheriff's Office, Civil Division",
-    email: null,
-    fax: "559-675-8413",
-    phone: "559-675-7737",
-    address: "2725 Falcon Drive, Madera, CA 93637",
-    notes: [],
-    checked: "2026-10-16",
-  },
   Merced: {
     county: "Merced",
     name: "Merced County Sheriff's Office, Civil Bureau",
@@ -121,6 +113,98 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
     notes: [],
     checked: "2026-10-22",
   },
+
+  // The counties below each say on their own civil page that they take service requests by email
+  // (checked Oct 23, 2026). They are listed because the other person may live there.
+  "San Bernardino": {
+    county: "San Bernardino",
+    name: "San Bernardino County Sheriff's Department, Civil Division",
+    // "We accept service requests in person, by mail, email, or fax." (wp.sbcounty.gov/sheriff/corrections/civil-process-services)
+    email: "civildocs@sbcsd.org",
+    fax: "909-387-5630",
+    phone: "909-387-5700",
+    address: "157 W. 5th Street, 3rd Floor, San Bernardino, CA 92415",
+    notes: [],
+    checked: "2026-10-23",
+  },
+  "San Francisco": {
+    county: "San Francisco",
+    name: "San Francisco Sheriff's Office, Civil Unit",
+    // "We accept service requests in person, by mail or electronically … sfso.civilfiling@sfgov.org" (sfsheriff.com/services/civil-section).
+    // Its $1.35/page printing fee can't be charged to a DV petitioner (Gov. Code § 26666.5(b)(2)).
+    email: "sfso.civilfiling@sfgov.org",
+    fax: "",
+    phone: "415-554-7235",
+    address: "City Hall, Room 456, 1 Dr. Carlton B. Goodlett Place, San Francisco, CA 94102",
+    notes: [
+      "San Francisco's website mentions a printing fee for emailed papers. It doesn't apply to domestic violence restraining orders (Gov. Code § 26666.5(b)(2)).",
+    ],
+    checked: "2026-10-23",
+  },
+  "Santa Clara": {
+    county: "Santa Clara",
+    name: "Santa Clara County Sheriff's Office, Civil Unit",
+    // Takes "electronic service requests" by email, as PDFs, since Jan 1, 2026
+    // (sheriff.santaclaracounty.gov/services/civil-services/civil-division-services-and-fees).
+    // Its $1.25/page fee for emailed papers can't be charged to a DV petitioner (§ 26666.5(b)(2)).
+    email: "civil.sheriff@shf.sccgov.org",
+    fax: "408-998-0636",
+    phone: "408-808-4800",
+    address: "55 West Younger Avenue, 2nd Floor, San Jose, CA 95110 (open Mon–Thu, 9 a.m.–3 p.m.)",
+    notes: [
+      "Santa Clara's website mentions a per-page fee for emailed papers. It doesn't apply to domestic violence restraining orders (Gov. Code § 26666.5(b)(2)).",
+    ],
+    checked: "2026-10-23",
+  },
+  Sonoma: {
+    county: "Sonoma",
+    name: "Sonoma County Sheriff's Office, Civil Bureau",
+    // TROs by email, fax or in person; subject line "TRO" and the case number
+    // (sonomasheriff.org/s/Methods-of-TRO-Submittal-instructions-website-ey7c.pdf). That PDF gives the old
+    // sonoma-county.org address; the Civil Bureau page now shows the sonomacounty.gov one (Oct 23, 2026).
+    email: "Sheriff-Civil@sonomacounty.gov",
+    subjectPrefix: "TRO",
+    fax: "707-526-0403",
+    phone: "707-565-2751",
+    address: "2796 Ventura Avenue, Santa Rosa, CA 95403",
+    notes: [],
+    checked: "2026-10-23",
+  },
+  "El Dorado": {
+    county: "El Dorado",
+    name: "El Dorado County Sheriff's Office, Civil Unit",
+    // "Welcome to our online civil service submission page! … submit your packet … here" (eldoradocounty.ca.gov/…/support_services/civil).
+    email: "edsocivil@eldoradosheriff.gov",
+    fax: "",
+    phone: "530-621-5665",
+    address: "200 Industrial Drive, Placerville, CA 95667 (South Lake Tahoe: 1360 Johnson Blvd., 530-573-3014)",
+    notes: [],
+    checked: "2026-10-23",
+  },
+  Nevada: {
+    county: "Nevada",
+    name: "Nevada County Sheriff's Office, Civil Services",
+    // "If the fee is waived for service, the documents, instruction letter and fee waiver may be … emailed to
+    // civil@nevadacountyca.gov." (nevadacountyca.gov/3891). DV service is free by law (Fam. Code § 6383(b)(3)).
+    email: "civil@nevadacountyca.gov",
+    fax: "530-470-0439",
+    phone: "530-265-1220",
+    address: "950 Maidu Ave., #280, Nevada City, CA 95959",
+    notes: [],
+    checked: "2026-10-23",
+  },
+  Tehama: {
+    county: "Tehama",
+    name: "Tehama County Sheriff's Office, Civil Division",
+    // "Documents can be sent to: civil@tehamaso.org" (tehamaso.org/civil-division).
+    email: "civil@tehamaso.org",
+    fax: "",
+    phone: "530-529-7930",
+    address: "22840 Antelope Blvd., Red Bluff, CA 96080",
+    notes: ["Tehama asks you to call the Civil Division at 530-529-7930 before you send papers for the first time."],
+    checked: "2026-10-23",
+  },
 };
 
-export const SHERIFF_COUNTIES = Object.keys(SHERIFF_OFFICES);
+/** Alphabetical, for the county picker. */
+export const SHERIFF_COUNTIES = Object.keys(SHERIFF_OFFICES).sort();

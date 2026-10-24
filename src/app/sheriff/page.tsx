@@ -158,7 +158,7 @@ export default function SheriffPage() {
     }
   };
 
-  const mail = office && made?.kind === "one" ? emailText(details, office.county) : null;
+  const mail = office && made?.kind === "one" ? emailText(details, office.county, office.subjectPrefix) : null;
   const mailto =
     office?.email && mail ? `mailto:${office.email}?subject=${encodeURIComponent(mail.subject)}&body=${encodeURIComponent(mail.body)}` : "";
 
@@ -250,16 +250,8 @@ export default function SheriffPage() {
                   {c}
                 </option>
               ))}
-              <option value="other">Another county</option>
             </select>
           </Question>
-          {county === "other" && (
-            <Note>
-              We don&apos;t have that sheriff&apos;s details yet. Every California sheriff must accept SER-001 and your papers by email. Call that
-              county sheriff&apos;s civil unit and ask for the email address for restraining order service requests. You can still make
-              the file below.
-            </Note>
-          )}
         </Group>
 
         <Group title="2. Your SER-001">
@@ -299,7 +291,7 @@ export default function SheriffPage() {
             </p>
           )}
           {/* Kept mounted once opened, so "Change it" brings back the answers already given. */}
-          {(showSerForm || serHere) && county && county !== "other" && (
+          {(showSerForm || serHere) && county && (
             <div className={showSerForm ? undefined : "hidden"}>
               <Ser001Form
                 county={county}
@@ -311,7 +303,7 @@ export default function SheriffPage() {
               />
             </div>
           )}
-          {showSerForm && (!county || county === "other") && <Note tone="warn">Choose the county in step 1 first.</Note>}
+          {showSerForm && !county && <Note tone="warn">Choose the county in step 1 first.</Note>}
           {needsSignature && (
             <SignaturePad
               label="Sign your SER-001"
