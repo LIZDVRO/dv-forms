@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { ConsentBoxes, TERMS_URL, useConsent } from "@/legal/consent";
 import { fmtDate } from "@/wizard/derive";
-import { Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
+import { Check, Group, Note, Question, SignaturePad, Text } from "@/wizard/ui/fields";
 import { SHERIFF_COUNTIES, SHERIFF_OFFICES, type Portal, type SheriffOffice } from "@/sheriff/offices";
 import { buildSheriffFiles, buildSheriffPdf, deadlineFrom, emailText, ser001Signed, type Added, type SerStatus, type SheriffFile } from "@/sheriff/packet";
 import { Ser001Form } from "@/sheriff/Ser001Form";
@@ -46,6 +46,8 @@ type Made =
   | { kind: "separate"; files: SheriffFile[]; serStatus: SerStatus; details: Ser001Details | null };
 
 export default function SheriffPage() {
+  // The page is only for orders where the judge granted a temporary restraining order.
+  const [troGranted, setTroGranted] = useState(false);
   const [county, setCounty] = useState("");
   const [ser, setSer] = useState<File | null>(null);
   /** SER-001 came from the short form on this page (so it still needs a signature). */
@@ -237,6 +239,24 @@ export default function SheriffPage() {
           </p>
         </div>
 
+        <section className="space-y-3 rounded-xl border-2 border-red-300 bg-red-50 p-4 sm:p-5">
+          <h2 className="text-lg font-semibold text-red-800">Only for a temporary restraining order the judge granted</h2>
+          <p className="text-base text-red-800">
+            This page is only for cases where the judge <strong>granted</strong>{" "}
+            a temporary restraining order (DV-110) that lasts until
+            your court hearing. Don&apos;t use it if the judge set a hearing but didn&apos;t grant a temporary order.
+          </p>
+          <p className="text-base text-red-800">
+            If no temporary order was granted, look up the civil unit of the sheriff&apos;s office in the county where the person you want
+            protection from lives. Contact them to ask how to submit your papers for service and how to pay any fees.
+          </p>
+          <Check checked={troGranted} onChange={setTroGranted}>
+            The judge granted my temporary restraining order (DV-110) until the hearing.
+          </Check>
+        </section>
+
+        {troGranted && (
+          <>
         <Group title="1. Which county?">
           <Question label="County where the other person will be served" hint="This is the county on your SER-001, item 1.">
             <select
@@ -250,9 +270,20 @@ export default function SheriffPage() {
                   {c}
                 </option>
               ))}
+              <option value="other">Another county</option>
             </select>
           </Question>
+          {county === "other" && (
+            <Note tone="warn">
+              We&apos;ve been working to add as many county sheriffs as we can. For counties not on this list, we haven&apos;t been able to
+              get the sheriff to confirm how they take papers electronically. Look up the civil unit of the sheriff&apos;s office in the
+              county where the person you want protection from lives, and contact them to ask how to submit your papers for service.
+            </Note>
+          )}
         </Group>
+
+        {county !== "other" && (
+          <>
 
         <Group title="2. Your SER-001">
           <p className="text-base text-slate-700">
@@ -413,6 +444,10 @@ export default function SheriffPage() {
         )}
         {made?.kind === "separate" && office?.portal && (
           <PortalUpload office={office} portal={office.portal} files={made.files} details={made.details} caseNumber={caseNumber.trim()} />
+        )}
+          </>
+        )}
+          </>
         )}
 
           </>
