@@ -13,6 +13,7 @@ import { buildFilingPacket } from "../src/wizard/fill/packet";
 import { sampleAnswers } from "../src/wizard/sample";
 import { buildSheriffFiles, buildSheriffPdf, completeSer001, deadlineFrom, emailText, ser001Signed } from "../src/sheriff/packet";
 import { newSer001Draft, papersText, readSer001Details } from "../src/sheriff/ser001";
+import { SHERIFF_COUNTIES, SHERIFF_OFFICES } from "../src/sheriff/offices";
 import { SER001 } from "../src/wizard/fill/forms/extras";
 import { fillOneForm } from "../src/wizard/fill/packet";
 
@@ -123,6 +124,14 @@ async function main() {
 
   const mail = emailText(c, "Tulare");
   checks.push(["subject", mail.subject.includes("26FL01234")], ["body has no address", !mail.body.includes(a.R14.street || "@@")]);
+  const sonoma = SHERIFF_OFFICES.Sonoma;
+  checks.push(
+    ["Sonoma subject starts with TRO", emailText(c, "Sonoma", sonoma.subjectPrefix).subject.startsWith("TRO - ")],
+    ["Madera and 'other' are gone", !SHERIFF_COUNTIES.includes("Madera") && !SHERIFF_COUNTIES.includes("other")],
+    ["every county has an email or a portal", SHERIFF_COUNTIES.every((k) => SHERIFF_OFFICES[k].email || SHERIFF_OFFICES[k].portal)],
+    ["every key matches its county", SHERIFF_COUNTIES.every((k) => SHERIFF_OFFICES[k].county === k)],
+    ["12 counties", SHERIFF_COUNTIES.length === 12],
+  );
 
   fs.writeFileSync(path.join(outDir, "Sheriff-request.pdf"), out.bytes);
   let failed = false;
