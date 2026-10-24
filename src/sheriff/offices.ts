@@ -58,7 +58,6 @@ export const SHERIFF_OFFICES: Record<string, SheriffOffice> = {
       "Fresno takes electronic requests only through Civil Connect. It stopped taking them by email in January 2026.",
       "Your papers must have the court's seal and the judge's and clerk's signatures.",
       "If the judge ordered a move-out or a child handover, also call the Civil Unit at 559-600-8230, and submit early in the day.",
-      "If the judge denied your temporary order, service may not be free. Call the Civil Unit before you submit.",
     ],
     checked: "2026-10-22",
   },
