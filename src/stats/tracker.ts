@@ -67,6 +67,9 @@ function deviceInfo(): DeviceInfo {
     // Unreadable referrer: leave it out.
   }
   const q = new URLSearchParams(location.search);
+  // The homepage sends no referrer, so its links pass the source as ?ref= (a domain only).
+  const ref = q.get("ref")?.trim().toLowerCase();
+  if (!referrer_domain && ref && /^[a-z0-9.-]{1,100}$/.test(ref)) referrer_domain = ref;
   return {
     device_type,
     os,
