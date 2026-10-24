@@ -51,14 +51,7 @@
         justify-content: space-between;
         gap: 24px;
         padding: 26px clamp(24px, 5.5vw, 88px);
-        position: sticky;
-        top: 0;
-        z-index: 50;
-        background: var(--bg);
-        border-bottom: 1px solid transparent;
-        transition: border-color 160ms ease;
       }
-      header.scrolled { border-bottom-color: var(--line); }
       .wordmark {
         text-decoration: none;
         white-space: nowrap;
@@ -104,7 +97,7 @@
       .hero {
         position: relative;
         overflow: hidden;
-        padding: clamp(56px, 11vh, 140px) clamp(24px, 5.5vw, 88px) clamp(72px, 12vh, 152px);
+        padding: clamp(20px, 3.5vh, 48px) clamp(24px, 5.5vw, 88px) clamp(27px, 4.25vh, 56px);
       }
       .hero::before {
         content: "";
@@ -123,7 +116,7 @@
       }
       .eyebrow {
         color: var(--ink-faint);
-        margin: 0 0 clamp(28px, 4.5vh, 52px);
+        margin: 0 0 clamp(20px, 2.8vh, 36px);
       }
       h1 {
         margin: 0;
@@ -132,7 +125,7 @@
         line-height: 0.94;
         letter-spacing: -0.045em;
       }
-      h1 .serif, .big-line .serif {
+      h1 .serif {
         font-family: "Newsreader", Georgia, serif;
         font-style: italic;
         font-weight: 500;
@@ -140,7 +133,7 @@
         color: var(--accent);
       }
       .second-line {
-        margin: clamp(26px, 4vh, 44px) 0 0;
+        margin: clamp(20px, 2.8vh, 34px) 0 0;
         font-size: clamp(21px, 2.6vw, 34px);
         font-weight: 400;
         letter-spacing: -0.015em;
@@ -149,7 +142,7 @@
         max-width: 22em;
       }
       .sub {
-        margin: clamp(30px, 4.5vh, 48px) 0 0;
+        margin: clamp(22px, 3vh, 38px) 0 0;
         font-size: 15px;
         line-height: 1.65;
         color: var(--ink-soft);
@@ -178,22 +171,69 @@
       }
       .text-link:hover { text-decoration-color: var(--ink); }
 
+      /* ---------- Hero action rows ---------- */
+      .hero-actions {
+        margin-top: clamp(24px, 3vh, 40px);
+        border-top: 1px solid var(--line);
+      }
+      .action-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+        text-decoration: none;
+      }
+      .action-text { min-width: 0; }
+      .action-title {
+        display: block;
+        font-size: clamp(26px, 3.6vw, 32px);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        transition: color 160ms ease;
+      }
+      .action-note {
+        display: block;
+        margin-top: 6px;
+        font-size: 17px;
+        font-weight: 400;
+        line-height: 1.55;
+        color: var(--ink-soft);
+      }
+      .action-arrow {
+        color: var(--accent);
+        font-size: 26px;
+        font-weight: 400;
+        line-height: 1;
+        flex-shrink: 0;
+        transition: transform 160ms ease;
+      }
+      .action-row:hover .action-title { color: var(--accent); }
+      .action-row:hover .action-arrow { transform: translateX(5px); }
+
       /* ---------- Sections ---------- */
       section {
         border-top: 1px solid var(--line);
-        padding: clamp(64px, 10vh, 120px) clamp(24px, 5.5vw, 88px);
+        padding: clamp(27px, 4.25vh, 51px) clamp(24px, 5.5vw, 88px);
       }
       .section-label {
-        color: var(--ink-soft);
-        margin: 0 0 clamp(36px, 6vh, 64px);
+        color: var(--ink-faint);
+        margin: 0 0 clamp(18px, 3vh, 32px);
+      }
+      /* These two section headings match the hero .second-line typography exactly */
+      #free-label,
+      #forward-label {
         font-size: clamp(21px, 2.6vw, 34px);
         font-weight: 400;
         letter-spacing: -0.015em;
         line-height: 1.25;
+        color: var(--ink-soft);
         text-transform: none;
       }
       .section-head {
-        margin: 0 0 clamp(28px, 4vh, 44px);
+        margin: 0 0 clamp(14px, 2vh, 22px);
         font-size: clamp(30px, 4.2vw, 52px);
         font-weight: 380;
         letter-spacing: -0.03em;
@@ -215,6 +255,50 @@
         margin: 0;
       }
       .body-text + .body-text { margin-top: 20px; }
+
+      /* ---------- Tabs (How it works / Safety / FAQ) ---------- */
+      /* The tabbed section sits directly after the three entry rows:
+         no hero bottom gap, no section divider line above it. */
+      .hero { padding-bottom: clamp(12px, 1.8vh, 20px); }
+      #learn {
+        border-top: none;
+        padding-top: clamp(12px, 1.8vh, 20px);
+      }
+      .tab-bar {
+        display: flex;
+        gap: clamp(26px, 4vw, 56px);
+        border-bottom: 1px solid var(--line);
+      }
+      .tab {
+        appearance: none;
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        margin: 0 0 -1px;
+        padding: 2px 2px 14px;
+        font: inherit;
+        font-size: clamp(18px, 2.2vw, 24px);
+        font-weight: 500;
+        letter-spacing: -0.015em;
+        line-height: 1.2;
+        color: var(--ink-faint);
+        cursor: pointer;
+        white-space: nowrap;
+        transition: color 160ms ease, border-color 160ms ease;
+      }
+      .tab:hover { color: var(--ink-soft); }
+      .tab[aria-selected="true"] {
+        color: var(--ink);
+        border-bottom-color: var(--accent);
+      }
+      .tab:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 4px;
+      }
+      .tab-panel { padding-top: clamp(20px, 3vh, 36px); }
+      .tab-panel[hidden] { display: none; }
+      .tab-panel .rows,
+      .tab-panel .faq { border-top: none; }
 
       /* ---------- Path rows / step rows ---------- */
       .rows { border-top: 1px solid var(--line); }
@@ -313,21 +397,10 @@
         max-width: 58ch;
       }
 
-      /* ---------- Final CTA ---------- */
-      .final-cta { text-align: left; }
-      .big-line {
-        margin: 0;
-        font-weight: 340;
-        font-size: clamp(64px, 12vw, 168px);
-        line-height: 0.96;
-        letter-spacing: -0.045em;
-      }
-      .final-cta .actions { margin-top: clamp(36px, 5vh, 56px); }
-
       /* ---------- Footer ---------- */
       footer {
         border-top: 1px solid var(--line);
-        padding: clamp(40px, 6vh, 64px) clamp(24px, 5.5vw, 88px) 32px;
+        padding: clamp(34px, 5vh, 54px) clamp(24px, 5.5vw, 88px) 28px;
       }
       .footer-grid {
         display: flex;
@@ -397,6 +470,16 @@
         html { scroll-behavior: auto; }
       }
 
+      /* ---------- Desktop: sticky header ---------- */
+      @media (min-width: 641px) {
+        header {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+          background: var(--bg);
+        }
+      }
+
       /* ---------- Mobile ---------- */
       @media (max-width: 640px) {
         header { padding-top: 20px; padding-bottom: 20px; }
@@ -405,9 +488,10 @@
         nav a.nav-item { display: none; }
         nav { gap: 20px; }
         h1 { font-size: clamp(64px, 19vw, 96px); }
-        .big-line { font-size: clamp(56px, 17vw, 88px); }
         .actions { gap: 24px; }
         .hero::before { opacity: 0.05; right: -100px; width: 88vw; }
+        .hero { padding-top: 18px; }
+        .action-row { padding: 14px 0; }
         .row { flex-direction: column; gap: 12px; }
         .step-row { flex-direction: row; }
         .footer-base { flex-direction: column; gap: 10px; }
@@ -418,11 +502,11 @@
     <header>
       <a class="wordmark" href="https://lizbreakfree.org" aria-label="LIZ Break Free. Home"><img src="data:image/png;base64,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" alt="LIZ Break Free" width="374" height="132" /></a>
       <nav aria-label="Primary">
-        <a class="nav-item" href="https://forms.lizbreakfree.org">Forms</a>
+        <a class="nav-item" href="https://forms.lizbreakfree.org/wizard?ref=lizbreakfree.org">Forms</a>
         <a class="nav-item" href="https://efile.lizbreakfree.org/ca/">E-file</a>
-        <a class="nav-item" href="https://forms.lizbreakfree.org/sheriff">Serve</a>
+        <a class="nav-item" href="https://forms.lizbreakfree.org/sheriff?ref=lizbreakfree.org">Serve</a>
         <a class="exit-link" href="https://www.weather.com" id="exitLink">Exit &#8599;</a>
-        <a class="pill" href="https://forms.lizbreakfree.org">Start</a>
+        <a class="pill" href="https://forms.lizbreakfree.org/wizard?ref=lizbreakfree.org">Start</a>
       </nav>
     </header>
 
@@ -432,88 +516,140 @@
         <p class="eyebrow micro rise">A nonprofit for survivors. California</p>
         <h1 class="rise rise-1">Break <span class="serif">free.</span></h1>
         <p class="second-line rise rise-2">Restraining orders, without the paperwork maze.</p>
-        <p class="sub rise rise-3">
-          Answer plain-language questions and LIZ builds your California
-          restraining order forms. Free for survivors, always.
-        </p>
-        <div class="actions rise rise-4">
-          <a class="pill" href="https://forms.lizbreakfree.org">Start my forms</a>
+        <div class="hero-actions rise rise-4" role="navigation" aria-label="Start here">
+          <a class="action-row" href="https://forms.lizbreakfree.org/wizard?ref=lizbreakfree.org">
+            <span class="action-text">
+              <span class="action-title">I need a restraining order</span>
+              <span class="action-note">Start my forms to request a restraining order</span>
+            </span>
+            <span class="action-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          <a class="action-row" href="https://efile.lizbreakfree.org/ca/">
+            <span class="action-text">
+              <span class="action-title">I need to e-file court documents</span>
+              <span class="action-note">File electronically from anywhere</span>
+            </span>
+            <span class="action-arrow" aria-hidden="true">&#8594;</span>
+          </a>
+          <a class="action-row" href="https://forms.lizbreakfree.org/sheriff?ref=lizbreakfree.org">
+            <span class="action-text">
+              <span class="action-title">I need to serve my papers</span>
+              <span class="action-note">Send your stamped court papers to the sheriff to serve</span>
+            </span>
+            <span class="action-arrow" aria-hidden="true">&#8594;</span>
+          </a>
         </div>
       </div>
 
-      <!-- 1. Three paths -->
-      <section aria-labelledby="paths-label">
-        <p class="section-label micro" id="paths-label">Where to start</p>
-        <div class="rows">
-          <div class="row">
-            <div class="row-main">
-              <p class="row-title">I need a restraining order</p>
-              <p class="row-note">Answer plain-language questions and LIZ builds your California forms.</p>
+      <!-- 2. Learn: How it works / Safety / FAQ tabs -->
+      <section aria-label="How it works, safety, and frequently asked questions" id="learn">
+        <div class="tab-bar" role="tablist" aria-label="Learn">
+          <button class="tab" type="button" role="tab" id="tab-how" aria-controls="panel-how" aria-selected="true">How it works</button>
+          <button class="tab" type="button" role="tab" id="tab-safety" aria-controls="panel-safety" aria-selected="false" tabindex="-1">Safety</button>
+          <button class="tab" type="button" role="tab" id="tab-faq" aria-controls="panel-faq" aria-selected="false" tabindex="-1">FAQ</button>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-how" aria-labelledby="tab-how">
+          <div class="rows">
+            <div class="row step-row">
+              <span class="step-num">01</span>
+              <div class="row-main">
+                <p class="row-title">Answer the questions.</p>
+                <p class="row-note">Many long, repetitive court forms become one short set of plain-language questions.</p>
+              </div>
             </div>
-            <a class="text-link" href="https://forms.lizbreakfree.org">Start my forms &#8594;</a>
-          </div>
-          <div class="row">
-            <div class="row-main">
-              <p class="row-title">I need to e-file court documents</p>
-              <p class="row-note">E-file your completed forms through LIZ for free, from wherever you are.</p>
+            <div class="row step-row">
+              <span class="step-num">02</span>
+              <div class="row-main">
+                <p class="row-title">Download your forms.</p>
+                <p class="row-note">LIZ generates every restraining order form you need, right online.</p>
+              </div>
             </div>
-            <a class="text-link" href="https://efile.lizbreakfree.org/ca/">E-file &#8594;</a>
-          </div>
-          <div class="row">
-            <div class="row-main">
-              <p class="row-title">I need to serve my papers</p>
-              <p class="row-note">The sheriff serves your papers for free. Once your forms are ready, send the stamped papers from your own email to arrange service.</p>
+            <div class="row step-row">
+              <span class="step-num">03</span>
+              <div class="row-main">
+                <p class="row-title">File with the court.</p>
+                <p class="row-note">Online through LIZ from anywhere, or in person at court.</p>
+              </div>
             </div>
-            <a class="text-link" href="https://forms.lizbreakfree.org/sheriff">Sheriff service &#8594;</a>
+            <div class="row step-row">
+              <span class="step-num">04</span>
+              <div class="row-main">
+                <p class="row-title">Get a quick decision.</p>
+                <p class="row-note">A judge usually decides on a temporary restraining order the same or next business day.</p>
+              </div>
+            </div>
+            <div class="row step-row">
+              <span class="step-num">05</span>
+              <div class="row-main">
+                <p class="row-title">Have the papers served.</p>
+                <p class="row-note">Upload your stamped papers, and LIZ will send them directly to the sheriff. The sheriff serves them for free.</p>
+              </div>
+            </div>
           </div>
         </div>
-      </section>
 
-      <!-- 2. How it works -->
-      <section aria-labelledby="how-label" id="how-it-works">
-        <p class="section-label micro" id="how-label">How it works</p>
-        <div class="rows">
-          <div class="row step-row">
-            <span class="step-num">01</span>
-            <div class="row-main">
-              <p class="row-title">Answer the questions</p>
-              <p class="row-note">Plain language, one set of questions, at your own pace.</p>
-            </div>
+        <div class="tab-panel" role="tabpanel" id="panel-safety" aria-labelledby="tab-safety" hidden>
+          <h2 class="section-head">You don&rsquo;t have to do this <span class="serif">alone.</span></h2>
+          <p class="body-text">
+            If you&rsquo;re not safe right now, help is available before, during, and
+            after the paperwork. Advocates at the National Domestic Violence Hotline
+            can help you think through a safety plan. You don&rsquo;t need to have
+            decided anything to call.
+          </p>
+          <div class="safety-lines">
+            <p><strong>In immediate danger.</strong> Call <a href="tel:911">911</a>.</p>
+            <p><strong>National Domestic Violence Hotline.</strong> <a href="tel:18007997233">1-800-799-7233</a> (TTY <a href="tel:18007873224">1-800-787-3224</a>). Free, confidential, 24/7.</p>
+            <p><strong>Need to leave this page fast?</strong> Use the Exit link at the top, or press Esc. Both go straight to weather.com.</p>
           </div>
-          <div class="row step-row">
-            <span class="step-num">02</span>
-            <div class="row-main">
-              <p class="row-title">Download your forms</p>
-              <p class="row-note">LIZ generates every form you need, filled in and ready.</p>
-            </div>
-          </div>
-          <div class="row step-row">
-            <span class="step-num">03</span>
-            <div class="row-main">
-              <p class="row-title">File with the court</p>
-              <p class="row-note">File online through LIZ for free, or in person at court.</p>
-            </div>
-          </div>
-          <div class="row step-row">
-            <span class="step-num">04</span>
-            <div class="row-main">
-              <p class="row-title">Get a quick decision</p>
-              <p class="row-note">A judge usually decides on a temporary order the same or next business day.</p>
-            </div>
-          </div>
-          <div class="row step-row">
-            <span class="step-num">05</span>
-            <div class="row-main">
-              <p class="row-title">Have the papers served</p>
-              <p class="row-note">The sheriff serves them for free.</p>
-            </div>
+        </div>
+
+        <div class="tab-panel" role="tabpanel" id="panel-faq" aria-labelledby="tab-faq" hidden>
+          <div class="faq">
+            <details>
+              <summary>Is this legal advice?</summary>
+              <p>
+                No. LIZ provides form help, not legal advice. LIZ turns your answers
+                into completed California court forms; it can&rsquo;t tell you what
+                to ask the court for or predict what a judge will decide.
+              </p>
+            </details>
+            <details>
+              <summary>Is it really free?</summary>
+              <p>
+                Yes. LIZ is a nonprofit, and survivors never pay — ever. LIZ is
+                funded by court-ordered payments from the person restrained and by
+                donors. If the court doesn&rsquo;t order payment, LIZ writes it off.
+              </p>
+            </details>
+            <details>
+              <summary>How long does a judge take?</summary>
+              <p>
+                A judge usually decides whether to grant a temporary restraining
+                order the same business day you file, or the next one.
+              </p>
+            </details>
+            <details>
+              <summary>Can I file from home?</summary>
+              <p>
+                Yes. You can answer the questions and e-file your forms online
+                through LIZ. Or, if you prefer, download the forms and file them in
+                person at the courthouse.
+              </p>
+            </details>
+            <details>
+              <summary>Is my information private?</summary>
+              <p>
+                Yes. We do not save your forms on our site.
+              </p>
+            </details>
           </div>
         </div>
       </section>
 
       <!-- 3. How LIZ stays free -->
       <section aria-labelledby="free-label">
-        <p class="section-label micro" id="free-label">How LIZ stays free</p>
+        <p class="section-label micro" id="free-label">How LIZ stays free:</p>
         <h2 class="section-head">Free for survivors. <span class="serif">Always.</span></h2>
         <p class="body-text">
           LIZ is a nonprofit. Preparing your forms costs us $250, and we ask the
@@ -525,7 +661,7 @@
 
       <!-- 4. Pay it forward -->
       <section aria-labelledby="forward-label">
-        <p class="section-label micro" id="forward-label">Pay it forward</p>
+        <p class="section-label micro" id="forward-label">Pay it forward:</p>
         <h2 class="section-head">Free, because someone <span class="serif">gave.</span></h2>
         <p class="body-text">
           LIZ stays free because people who can, give. A donation keeps forms
@@ -533,78 +669,10 @@
           you love, pay it forward.
         </p>
         <div class="actions">
-          <a class="pill" href="https://www.gofundme.com/f/cdrqa-liz-break-free">Donate</a>
+          <a class="pill" href="https://www.gofundme.com/f/cdrqa-liz-break-free/cl/o?utm_campaign=man_sharesheet_dash&utm_content=amp30-treatment-3-social&utm_medium=customer&utm_source=copy_link&lang=en_US&attribution_id=sl%3A8fd0d5ab-a30c-4250-a3ac-cce61694cd72&ts=1792864472">Donate</a>
         </div>
       </section>
 
-      <!-- 5. Questions -->
-      <section aria-labelledby="faq-label">
-        <p class="section-label micro" id="faq-label">Questions</p>
-        <div class="faq">
-          <details>
-            <summary>Is this legal advice?</summary>
-            <p>
-              No. LIZ provides form help, not legal advice. LIZ turns your answers
-              into completed California court forms; it can&rsquo;t tell you what
-              to ask the court for or predict what a judge will decide.
-            </p>
-          </details>
-          <details>
-            <summary>Is it really free?</summary>
-            <p>
-              Yes. LIZ is a nonprofit, and survivors never pay — ever. LIZ is
-              funded by court-ordered payments from the person restrained and by
-              donors. If the court doesn&rsquo;t order payment, LIZ writes it off.
-            </p>
-          </details>
-          <details>
-            <summary>How long does a judge take?</summary>
-            <p>
-              A judge usually decides whether to grant a temporary restraining
-              order the same business day you file, or the next one.
-            </p>
-          </details>
-          <details>
-            <summary>Can I file from home?</summary>
-            <p>
-              Yes. You can answer the questions and e-file your forms online
-              through LIZ. Or, if you prefer, download the forms and file them in
-              person at the courthouse.
-            </p>
-          </details>
-          <details>
-            <summary>Is my information private?</summary>
-            <p>
-              Yes. We do not save your forms on our site.
-            </p>
-          </details>
-        </div>
-      </section>
-
-      <!-- 6. Safety -->
-      <section aria-labelledby="safety-label">
-        <p class="section-label micro" id="safety-label">Safety</p>
-        <h2 class="section-head">You don&rsquo;t have to do this <span class="serif">alone.</span></h2>
-        <p class="body-text">
-          If you&rsquo;re not safe right now, help is available before, during, and
-          after the paperwork. Advocates at the National Domestic Violence Hotline
-          can help you think through a safety plan. You don&rsquo;t need to have
-          decided anything to call.
-        </p>
-        <div class="safety-lines">
-          <p><strong>In immediate danger.</strong> Call <a href="tel:911">911</a>.</p>
-          <p><strong>National Domestic Violence Hotline.</strong> <a href="tel:18007997233">1-800-799-7233</a> (TTY <a href="tel:18007873224">1-800-787-3224</a>). Free, confidential, 24/7.</p>
-          <p><strong>Need to leave this page fast?</strong> Use the Exit link at the top, or press Esc. Both go straight to weather.com.</p>
-        </div>
-      </section>
-
-      <!-- 7. Final CTA -->
-      <section class="final-cta" aria-label="Start">
-        <p class="big-line">Break <span class="serif">free.</span></p>
-        <div class="actions">
-          <a class="pill" href="https://forms.lizbreakfree.org">Start my forms</a>
-        </div>
-      </section>
     </main>
 
     <!-- 8. Footer -->
@@ -628,9 +696,9 @@
         <div class="footer-col">
           <p class="col-label micro">LIZ</p>
           <p>
-            <a href="https://forms.lizbreakfree.org">Forms</a><br />
+            <a href="https://forms.lizbreakfree.org/wizard?ref=lizbreakfree.org">Forms</a><br />
             <a href="https://efile.lizbreakfree.org/ca/">E-file</a><br />
-            <a href="https://www.gofundme.com/f/cdrqa-liz-break-free">Donate</a>
+            <a href="https://www.gofundme.com/f/cdrqa-liz-break-free/cl/o?utm_campaign=man_sharesheet_dash&utm_content=amp30-treatment-3-social&utm_medium=customer&utm_source=copy_link&lang=en_US&attribution_id=sl%3A8fd0d5ab-a30c-4250-a3ac-cce61694cd72&ts=1792864472">Donate</a>
           </p>
         </div>
       </div>
@@ -640,13 +708,6 @@
     </footer>
 
     <script>
-      // Sticky header: show a hairline under it once the page scrolls.
-      (function () {
-        var h = document.querySelector("header");
-        function onScroll() { h.classList.toggle("scrolled", window.scrollY > 4); }
-        window.addEventListener("scroll", onScroll, { passive: true });
-        onScroll();
-      })();
       // Tell the forms site where this visit came from, for LIZ's statistics (Privacy Policy section 2).
       // This page sends no referrer (Referrer-Policy: no-referrer), so links to forms.lizbreakfree.org
       // carry it instead: ref = the outside website's domain (or lizbreakfree.org when there was none),
@@ -676,6 +737,40 @@
           window.location.href = "https://www.weather.com";
         }
       });
+
+      // Tabs: How it works / Safety / FAQ. One panel visible at a time.
+      (function () {
+        var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+        if (!tabs.length) return;
+
+        function activate(tab, moveFocus) {
+          tabs.forEach(function (t) {
+            var selected = t === tab;
+            t.setAttribute("aria-selected", selected ? "true" : "false");
+            t.tabIndex = selected ? 0 : -1;
+            var panel = document.getElementById(t.getAttribute("aria-controls"));
+            if (panel) panel.hidden = !selected;
+          });
+          if (moveFocus) tab.focus();
+        }
+
+        tabs.forEach(function (tab, i) {
+          tab.addEventListener("click", function () {
+            activate(tab, false);
+          });
+          tab.addEventListener("keydown", function (e) {
+            var idx = null;
+            if (e.key === "ArrowRight") idx = (i + 1) % tabs.length;
+            else if (e.key === "ArrowLeft") idx = (i - 1 + tabs.length) % tabs.length;
+            else if (e.key === "Home") idx = 0;
+            else if (e.key === "End") idx = tabs.length - 1;
+            if (idx !== null) {
+              e.preventDefault();
+              activate(tabs[idx], true);
+            }
+          });
+        });
+      })();
     </script>
   </body>
 </html>
