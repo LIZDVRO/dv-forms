@@ -15,7 +15,7 @@ import { createInterface } from "node:readline";
 import { RhetoricClient } from "@rhetoriclabs/rhetoric";
 
 import { EFILE_COURTS } from "../src/efile/courts";
-import { FORM_FILING, Session, pickDvCaseType, pickFamilyCategory } from "../src/efile/rhetoric";
+import { FORM_FILING, Session, fillParties, pickDvCaseType, pickFamilyCategory } from "../src/efile/rhetoric";
 
 const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 const DEMO_EMAIL = process.env.RHETORIC_DEMO_EMAIL || "mustafa+prose-demo@rhetoric.law";
@@ -58,7 +58,7 @@ async function checkCourt(client: RhetoricClient, password: string, county: stri
       await s.press(s.action(/log ?in/i));
       if (s.field(/password/i)) { r.problem = `login failed: ${s.errors().join("; ")}`; return r; }
     }
-    if (/log ?in/i.test(s.title)) await s.next(); // "You're logged in" → Continue
+    if (/log ?in|create.*account/i.test(s.title) && s.action(/continue/i)) await s.next(); // "You're logged in"
     // Filing type
     const ft = s.field(/filing.?type/i);
     const types = (ft?.options ?? []).map((o: { label: string }) => o.label);
@@ -71,7 +71,7 @@ async function checkCourt(client: RhetoricClient, password: string, county: stri
       const c = pickFamilyCategory(opts);
       r.category = c?.label;
       if (!c) { r.problem = `no family category (offered: ${opts.map((o: { label: string }) => o.label).join(", ")})`; return r; }
-      await s.apply({ kind: "set_field", field: s.field(/case.?category/i).key, value: c.value }); await s.next();
+      await s.chooseWith(/case.?category/i, pickFamilyCategory, "Family case category"); await s.next();
     }
     // Case types (record both, choose "without" to continue)
     const ctField = s.field(/case.?type/i);
@@ -82,17 +82,8 @@ async function checkCourt(client: RhetoricClient, password: string, county: stri
     r.caseWithout = pickDvCaseType(ctOpts, false)?.label;
     if (!r.caseWith || !r.caseWithout) { r.problem = "DV case type not matched"; return r; }
     await s.chooseWith(/case.?type/i, (o) => pickDvCaseType(o, false), "DV case type"); await s.next();
-    // Parties: name both with test names, protected party as filer
-    for (let guard = 0; guard < 6 && /parties/i.test(s.title); guard++) {
-      const card = s.blocks.find((b: { id: string }) => s.data(b, /party type/i) && !String(s.data(b, /^name$/i) ?? "").trim());
-      if (!card) break;
-      await s.press(s.blockAction(card, /^edit$/i));
-      await s.chooseWith(/party.?kind/i, (o) => o.find((x) => /individual/i.test(x.label)), "Individual");
-      await s.set(/first.?name/i, "Test"); await s.set(/last.?name/i, "Sweep");
-      await s.press(s.action(/save/i));
-    }
-    const prot = s.blocks.find((b: { id: string }) => /protected/i.test(s.data(b, /party type/i) ?? ""));
-    if (prot && !/yes/i.test(s.data(prot, /filer/i) ?? "")) await s.press(s.blockAction(prot, /set as filer/i));
+    // Parties: test names only
+    if (/parties/i.test(s.title)) await fillParties(s, { petitioner: { first: "Test", last: "Protected" }, respondent: { first: "Test", last: "Restrained" } });
     await s.next();
     if (!/filing entries/i.test(s.title)) { r.problem = `reached "${s.title}" instead of filing entries`; return r; }
     // Filing codes: open the add form, read, cancel

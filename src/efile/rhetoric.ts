@@ -375,7 +375,7 @@ export async function fillAfterLogin(token: string, p: FillInput): Promise<FillR
   return end.ok ? { ok: true, step: end.step, filed } : end;
 }
 
-async function fillParties(s: Session, p: CaseInput) {
+export async function fillParties(s: Session, p: Pick<CaseInput, "petitioner" | "respondent">) {
   const done = new Set<string>();
   for (let guard = 0; guard < 8; guard++) {
     const card = s.blocks.find((b: Block) => s.data(b, /party type/i) && !done.has(b.id));
