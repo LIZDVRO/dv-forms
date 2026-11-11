@@ -291,7 +291,7 @@ export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: tr
   const s = new Session(token);
   await s.resume();
   if (ACTIVATION.test(s.title)) {
-    return { ok: false, step: s.title, problem: "Activate your eFileCA account first: open the email from eFileCA, click the link, then press \"I've activated my account\" below." };
+    return { ok: false, step: s.title, problem: "Check your email and click the activation link, then come back here and press \"I've activated my account.\"" };
   }
   if (/log ?in|create.*account/i.test(s.title)) {
     if (!s.action(/continue/i)) return { ok: false, step: s.title, problem: "Log in to eFileCA first." };

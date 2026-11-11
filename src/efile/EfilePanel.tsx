@@ -254,7 +254,7 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
           {phase === "login" && !error && (
             <p className="text-base text-slate-700">
               {activation
-                ? "Check your email: eFileCA sent you a link to activate your account. Click it, then press \"I've activated my account\" below. Your forms are added as soon as you're in."
+                ? "Check your email and click the activation link, then come back here and press \"I've activated my account.\""
                 : account === "new"
                   ? "Choose a password and create your eFileCA account below. eFileCA will then email you a link to activate it. Your forms are added as soon as you're in."
                   : "Log in to eFileCA below. Your forms are added as soon as you're in."}
