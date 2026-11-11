@@ -99,6 +99,8 @@ export default function WizardPage() {
       noteErrors(Object.keys(errs).length);
       return;
     }
+    // Staff testing: /wizard?sample=end skips from the agreement straight to the review step.
+    if (step === 0 && new URLSearchParams(window.location.search).get("sample") === "end") return moveTo(count);
     moveTo(step + 1);
   };
 
