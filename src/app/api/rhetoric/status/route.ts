@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { sessionStep } from "@/efile/rhetoric";
+import { describeError } from "@/efile/rhetoric";
 
 /** Rhetoric slows as a filing grows; one step has taken over a minute. */
 export const maxDuration = 30;
@@ -12,6 +13,6 @@ export async function POST(request: NextRequest) {
   try {
     return NextResponse.json(await sessionStep(sessionToken));
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Could not read the session" }, { status: 502 });
+    return NextResponse.json({ error: describeError(err, "status") }, { status: 502 });
   }
 }

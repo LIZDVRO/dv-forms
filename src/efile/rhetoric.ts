@@ -429,3 +429,15 @@ export async function fillParties(s: Session, p: Pick<CaseInput, "petitioner" | 
   const prot = s.blocks.find((b: Block) => /protected/i.test(s.data(b, /party type/i) ?? ""));
   if (prot && !/yes/i.test(s.data(prot, /filer/i) ?? "")) await s.press(s.blockAction(prot, /set as filer/i));
 }
+
+/**
+ * A readable message for a failed Rhetoric call. The SDK's errors say only
+ * "transport error"; the reason (e.g. "unexpected status code: 401") is in
+ * `cause`. Logged to Vercel's runtime logs without any filing data.
+ */
+export function describeError(err: unknown, where: string): string {
+  const e = err as { message?: string; cause?: { message?: string } } | undefined;
+  const msg = [e?.message, e?.cause?.message].filter(Boolean).join(": ") || "unknown error";
+  console.error(`[rhetoric ${where}] ${msg}`);
+  return msg;
+}
