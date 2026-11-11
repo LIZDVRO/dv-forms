@@ -69,6 +69,8 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
   });
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  /** Rhetoric is waiting for her to click the activation link in her email. */
+  const [activation, setActivation] = useState(false);
   const [session, setSession] = useState<{ sessionToken: string; court: string } | null>(null);
   const [phase, setPhase] = useState<Phase>("login");
   const [progress, setProgress] = useState<Progress | null>(null);
@@ -150,7 +152,8 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
     let stop = false;
     const timer = setInterval(async () => {
       try {
-        const st = await post<{ loggedIn: boolean }>("/api/rhetoric/status", { sessionToken: session.sessionToken });
+        const st = await post<{ loggedIn: boolean; activation?: boolean }>("/api/rhetoric/status", { sessionToken: session.sessionToken });
+        if (!stop) setActivation(!!st.activation);
         if (!stop && st.loggedIn) {
           clearInterval(timer);
           void fill(session.sessionToken);
@@ -250,9 +253,11 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
         <div className="mt-2 space-y-3">
           {phase === "login" && !error && (
             <p className="text-base text-slate-700">
-              {account === "new"
-                ? "Choose a password and create your eFileCA account below. Your forms are added as soon as you're in."
-                : "Log in to eFileCA below. Your forms are added as soon as you're in."}
+              {activation
+                ? "Check your email: eFileCA sent you a link to activate your account. Click it, then press \"I've activated my account\" below. Your forms are added as soon as you're in."
+                : account === "new"
+                  ? "Choose a password and create your eFileCA account below. eFileCA will then email you a link to activate it. Your forms are added as soon as you're in."
+                  : "Log in to eFileCA below. Your forms are added as soon as you're in."}
             </p>
           )}
           {phase === "filling" && progress && (
