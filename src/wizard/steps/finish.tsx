@@ -324,17 +324,17 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 <li>
                   {`${
                     a.sig
-                      ? "Print the forms and read them. Your signature is already on them."
-                      : "Print the forms, read them, and sign DV-100 (page 13) and any other form with a signature line."
-                  } Don't sign the order forms (${packet.files
+                      ? "Download your forms and check them carefully. Make sure every name, date and detail is right. Your signature is already on them."
+                      : "Download your forms and check them carefully. Make sure every name, date and detail is right, then sign DV-100 (page 13) and any other form with a signature line."
+                  } Leave the order forms unsigned (${packet.files
                     .map((f) => f.id)
                     .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900", "DV-165", "DV-130", "DV-150"].includes(id))
-                    .join(", ")}); the judge does.`}
+                    .join(", ")}); the judge signs those.`}
                 </li>
                 <li>
-                  {`E-file them through LIZ at efile.lizbreakfree.org, or take them to the ${a.S1 ? `${a.S1} County` : "county"} Superior Court clerk. Filing is free. Attach copies of any orders you listed${
+                  {`Create your e-filing account at efile.lizbreakfree.org and file your forms with the ${a.S1 ? `${a.S1} County` : "county"} court. Filing is free. Upload copies of any orders you listed${
                     a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""
-                  }.`}
+                  }. You can also file at the ${a.S1 ? `${a.S1} County` : "county"} Superior Court clerk's office instead.`}
                 </li>
                 <li>
                   Get your stamped papers back, usually the same or next business day. If you e-file through LIZ, the court emails them to
