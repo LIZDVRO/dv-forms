@@ -16,48 +16,57 @@ const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 const SECURITY = /^confidential$/i;
 
 /**
- * Filing code choices, best first. Courts name codes differently (Butte has
- * "Proposed Order" and "CLETS Info Sheet", Calaveras "Temporary Restraining
- * Order" and "Notice of Hearing"), and Chris (Nov 11): the code only needs to
- * describe the document generally. The first label a court offers wins; the
- * catch-alls at the end mean no form is left without a code.
+ * Filing code choices, best first. Courts name codes very differently (a test
+ * sweep of 40 courthouses, Nov 11: "Petition", "PETITION", "Request for
+ * Domestic Violence Restraining Order", "DV-110 Temporary Restraining Order
+ * (CLETS-TRO)", "Proposed Form 110 Temporary Restraining Order", "CLETS Info
+ * Sheet"...). Chris (Nov 11): the code only needs to describe the document
+ * generally. Order of preference for each form:
+ *   1. a code naming the form itself (DV-110, DV110, Form 110)
+ *   2. a code describing that document (Temporary Restraining Order)
+ *   3. a plain, general code (Order, Proposed Order, Request, Declaration)
+ * Codes for other kinds of case (dissolution, juvenile, elder abuse, support,
+ * name change...) are never used.
  */
-const NOT_OURS = /juvenile|adoption|support|dcss|uifsa|out.of.state|sister state|guardian|joint petition|vexatious|step.?parent|assisted reproduction|modification|zoom|summons|fee|remote|telephonic|address|e.?service/i;
-const C = {
-  petition: [/^petition$/i, /^domestic violence filing$/i, /petition/i, /^request for order$/i],
-  request: [/^request$/i, /^request for order$/i, /^domestic violence filing$/i, /^ex parte application/i, /^declaration$/i],
-  order: [/^order$/i, /^proposed order$/i, /proposed order/i, /^domestic violence filing$/i, /order/i],
-  tro: [/temporary restraining order/i, /^order$/i, /^proposed order$/i, /proposed order/i, /^domestic violence filing$/i, /order/i],
-  notice: [/^notice$/i, /^notice of hearing$/i, /^notice/i],
-  hearing: [/^notice of hearing$/i, /notice of hearing/i, /^notice$/i, /^order$/i, /^proposed order$/i],
-  income: [/^income and expense declaration$/i, /income and expense/i, /^financial statement$/i, /^declaration$/i],
-  clets: [/^clets-001$/i, /clets/i, /confidential information/i],
+const OTHER_CASE = /juvenile|elder|dependent adult|civil harass|workplace|gun\b|firearm|school|denied|dissol|parent(al)?.(child )?relationship|parental|terminat|change of name|name change|gender|emanci|adopt|support|guardian|bifurcat|vexatious|summary|nullity|separation|warrant|ivf|marry|hague|registration|register|foreign|publication|transfer (and|in)|uifsa|dcss|surrogacy|batterer|canadian|elder abuse|ea-110|telephon|remote|zoom|fee|address|e-?service|proof of service|summons|withholding|attorney|spouse|osc\b|amended|modif/i;
+
+/** A general code: its label is just the word(s), maybe with "Filed"/"Received" etc. */
+const generic = (...words: string[]) => {
+  const alt = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+")).join("|");
+  return new RegExp(`^(?:${alt})(?:\\s*[-–(:]?\\s*(?:filed|received|confidential|lodged|initial|petitioner'?s?|\\(petitioner\\)|ex parte))*\\)?$`, "i");
 };
-/** Last resorts for any form. */
-const CATCH_ALL = [/^domestic violence filing$/i, /^document.?-?.?other$/i, /other document/i, /^declaration$/i];
+const formNo = (n: string) => new RegExp(`\\bdv[-\\s]?${n}\\b|\\bform\\s+${n}\\b`, "i");
+
+const GEN = {
+  petition: [generic("petition", "verified petition"), /^domestic violence.*filing$/i],
+  request: [generic("request"), generic("request for order"), /request for order:?\s*(domestic violence|ex parte)/i, /(^|\s)request for order$/i, generic("ex parte filed"), generic("ex parte application"), generic("application"), generic("declaration"), generic("domestic violence filing")],
+  order: [generic("order"), generic("proposed order"), generic("proposed order/judgment"), /^proposed order\b/i, /^domestic violence.*filing$/i],
+  notice: [generic("notice"), generic("notice of hearing"), generic("notice of court hearing"), /^dv notice\b/i],
+};
+const CATCH_ALL = [/^domestic violence.*filing$/i, /^document\s*[-–]?\s*other$/i, generic("other document", "other", "rfo - other", "declaration/pleading"), generic("declaration")];
 
 export const FORM_FILING: Record<string, { codes: RegExp[]; description: string }> = {
-  "DV-100": { codes: C.petition, description: "DV-100 Request for Domestic Violence Restraining Order" },
-  "DV-101": { codes: C.request, description: "DV-101 Description of Abuse" },
-  "DV-105": { codes: C.request, description: "DV-105 Request for Child Custody and Visitation Orders" },
-  "DV-105(A)": { codes: C.request, description: "DV-105(A) City and State Where Children Lived" },
-  "DV-108": { codes: C.request, description: "DV-108 Request for Orders to Prevent Child Abduction" },
-  "DV-109": { codes: C.hearing, description: "DV-109 Notice of Court Hearing" },
-  "DV-110": { codes: C.tro, description: "DV-110 Temporary Restraining Order" },
-  "DV-140": { codes: C.order, description: "DV-140 Child Custody and Visitation Order" },
-  "DV-145": { codes: C.order, description: "DV-145 Order to Prevent Child Abduction" },
-  "DV-900": { codes: C.order, description: "DV-900 Order Transferring Wireless Phone Account" },
-  "FL-150": { codes: C.income, description: "FL-150 Income and Expense Declaration" },
-  "INT-300": { codes: C.request, description: "INT-300 Request for Interpreter" },
-  "DV-160": { codes: C.request, description: "DV-160 Request to Keep Minor's Information Confidential" },
-  "DV-165": { codes: C.order, description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
-  "DV-170": { codes: C.notice, description: "DV-170 Notice of Order Protecting Information of Minor" },
-  "CLETS-001": { codes: C.clets, description: "CLETS-001 Confidential CLETS Information" },
+  "DV-100": { codes: [formNo("100"), /request for domestic violence restraining order/i, /request:?\s*domestic violence restraining order/i, /\bdv request\b/i, /\bdv\b.*new case petition/i, /domestic violence.*(petition|request)/i, ...GEN.petition, ...GEN.request], description: "DV-100 Request for Domestic Violence Restraining Order" },
+  "DV-101": { codes: [formNo("101"), /description of abuse/i, ...GEN.request], description: "DV-101 Description of Abuse" },
+  "DV-105": { codes: [formNo("105"), /request for child custody/i, ...GEN.request], description: "DV-105 Request for Child Custody and Visitation Orders" },
+  "DV-105(A)": { codes: [formNo("105\\(?a\\)?"), ...GEN.request], description: "DV-105(A) City and State Where Children Lived" },
+  "DV-108": { codes: [formNo("108"), /prevent child abduction/i, ...GEN.request], description: "DV-108 Request for Orders to Prevent Child Abduction" },
+  "DV-109": { codes: [formNo("109"), /notice.*court hearing.*(domestic|dv)|dv notice.*court hearing/i, ...GEN.notice, ...GEN.order], description: "DV-109 Notice of Court Hearing" },
+  "DV-110": { codes: [formNo("110"), /temporary restraining order/i, ...GEN.order], description: "DV-110 Temporary Restraining Order" },
+  "DV-140": { codes: [formNo("140"), /custody and visitation order/i, ...GEN.order], description: "DV-140 Child Custody and Visitation Order" },
+  "DV-145": { codes: [formNo("145"), /order to prevent child abduction/i, ...GEN.order], description: "DV-145 Order to Prevent Child Abduction" },
+  "DV-900": { codes: [formNo("900"), /wireless|phone account/i, ...GEN.order], description: "DV-900 Order Transferring Wireless Phone Account" },
+  "FL-150": { codes: [/\bfl-?150\b/i, /income\s*(and|&)?\s*expense/i, generic("financial statement", "financial declaration"), generic("declaration")], description: "FL-150 Income and Expense Declaration" },
+  "INT-300": { codes: [/\bint-?300\b/i, /interpreter/i, ...GEN.request], description: "INT-300 Request for Interpreter" },
+  "DV-160": { codes: [formNo("160"), /keep minor'?s? info.*confidential/i, ...GEN.request], description: "DV-160 Request to Keep Minor's Information Confidential" },
+  "DV-165": { codes: [formNo("165"), /order on request to keep minor/i, ...GEN.order], description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
+  "DV-170": { codes: [formNo("170"), /notice of order protecting/i, ...GEN.notice], description: "DV-170 Notice of Order Protecting Information of Minor" },
+  "CLETS-001": { codes: [/clets-?001/i, /clets info|confidential clets|clets form|clets confidential|confidential - clets/i, /confidential information for law enforcement/i, generic("confidential information sheet")], description: "CLETS-001 Confidential CLETS Information" },
 };
 
 /** The court's best filing code for a form, by the ranked list above. */
 export function pickFilingCode<T extends { label: string }>(opts: T[], codes: RegExp[]): T | undefined {
-  const usable = opts.filter((o) => !NOT_OURS.test(o.label));
+  const usable = opts.filter((o) => !OTHER_CASE.test(o.label));
   for (const re of [...codes, ...CATCH_ALL]) {
     const hit = usable.find((o) => re.test(o.label.trim()));
     if (hit) return hit;
