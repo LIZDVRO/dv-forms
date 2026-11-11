@@ -7,7 +7,7 @@ import { PDFDocument } from "pdf-lib";
 import { custodyRequested, financesRequested, fmtDate } from "../derive";
 import type { Answers } from "../types";
 import { fillForm, type FormSpec } from "./engine";
-import { buildSheetsPdf } from "./attachments";
+import { buildSheetsPdf, sheetPageCount } from "./attachments";
 import { DV100 } from "./forms/dv100";
 import { FL150 } from "./forms/fl150";
 import { DV105, DV108, DV140, DV145, dv105a, residenceGroups } from "./forms/custody";
@@ -149,8 +149,17 @@ export async function buildFilingPacket(a: Answers, load: TemplateLoader): Promi
   const files: PacketFile[] = [];
   const problems: string[] = [];
   const caseNumber = a.S3 === "update" ? a.S4 : "";
+  // DV-101 is filled first so DV-100 item 32 can count its real pages (its own attached sheets included).
+  const dv101Spec = needsDV101(a) ? DV101 : undefined;
+  const dv101 = dv101Spec ? await fillForm(dv101Spec, await load(dv101Spec.file), a) : undefined;
+  let dv101Pages: number | undefined;
+  if (dv101) {
+    dv101Pages = (await PDFDocument.load(dv101.bytes)).getPageCount();
+    for (const s of dv101.sheets) dv101Pages += await sheetPageCount(s.text);
+  }
   for (const spec of filingForms(a)) {
-    const filled = await fillForm(spec, await load(spec.file), a);
+    const filled =
+      spec.id === "DV-101" && dv101 ? dv101 : await fillForm(spec, await load(spec.file), a, spec.id === "DV-100" ? dv101Pages : undefined);
     problems.push(...filled.problems.map((p) => `${spec.id} ${p}`));
     let bytes = filled.bytes;
     if (filled.sheets.length) {

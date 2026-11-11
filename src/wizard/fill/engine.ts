@@ -63,7 +63,7 @@ export interface FormSpec {
   /** First-line indent in points, by short field name, where a printed label shares the field's first line. */
   indents?: Record<string, number>;
   /** Fields set once the attached sheets are known (more-space boxes, page counts). */
-  after?: (ctx: { sheets: Sheet[]; pages: number }) => Binding[];
+  after?: (ctx: { sheets: Sheet[]; pages: number; dv101Pages?: number }) => Binding[];
 }
 
 export interface FilledForm {
@@ -169,7 +169,13 @@ function setSize(field: PDFTextField, size: number) {
   }
 }
 
-export async function fillForm(spec: FormSpec, template: ArrayBuffer | Uint8Array, answers: Answers): Promise<FilledForm> {
+export async function fillForm(
+  spec: FormSpec,
+  template: ArrayBuffer | Uint8Array,
+  answers: Answers,
+  /** Pages of DV-101 with its own attached sheets, for DV-100 item 32. */
+  dv101Pages?: number,
+): Promise<FilledForm> {
   const doc = await PDFDocument.load(template);
   const form = doc.getForm();
   const font = await doc.embedFont(StandardFonts.Helvetica);
@@ -262,7 +268,7 @@ export async function fillForm(spec: FormSpec, template: ArrayBuffer | Uint8Arra
   const sheets: Sheet[] = [...byTitle].map(([title, parts]) => ({ title, form: spec.id, text: parts.join("\n\n") }));
   let pages = 0;
   for (const s of sheets) pages += await sheetPageCount(s.text);
-  spec.after?.({ sheets, pages }).forEach(apply);
+  spec.after?.({ sheets, pages, dv101Pages }).forEach(apply);
 
   form.updateFieldAppearances(font);
 
