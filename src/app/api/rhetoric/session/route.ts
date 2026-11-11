@@ -9,6 +9,7 @@ import { RhetoricClient } from "@rhetoriclabs/rhetoric";
 
 import { EFILE_COURTS, isEfileCourt } from "@/efile/courts";
 import { prefillToLogin, type PrefillInput } from "@/efile/rhetoric";
+import { describeError } from "@/efile/rhetoric";
 
 export const maxDuration = 60;
 
@@ -34,6 +35,6 @@ export async function POST(request: NextRequest) {
     const { step } = await prefillToLogin(sessionToken, p);
     return NextResponse.json({ sessionToken, step, court: `${p.county} — ${court.label}` });
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Could not start e-filing" }, { status: 502 });
+    return NextResponse.json({ error: describeError(err, "session") }, { status: 502 });
   }
 }

@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { addForm } from "@/efile/rhetoric";
+import { describeError } from "@/efile/rhetoric";
 
 /** Rhetoric slows as a filing grows; one step has taken over a minute. */
 export const maxDuration = 300;
@@ -34,6 +35,6 @@ export async function POST(request: NextRequest) {
     );
     return NextResponse.json(out);
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : `Could not add ${body.form}` }, { status: 502 });
+    return NextResponse.json({ error: describeError(err, "add-form") }, { status: 502 });
   }
 }

@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { finishCase } from "@/efile/rhetoric";
+import { describeError } from "@/efile/rhetoric";
 
 /** Rhetoric slows as a filing grows; one step has taken over a minute. */
 export const maxDuration = 300;
@@ -12,6 +13,6 @@ export async function POST(request: NextRequest) {
   try {
     return NextResponse.json(await finishCase(sessionToken));
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Could not finish" }, { status: 502 });
+    return NextResponse.json({ error: describeError(err, "finish") }, { status: 502 });
   }
 }

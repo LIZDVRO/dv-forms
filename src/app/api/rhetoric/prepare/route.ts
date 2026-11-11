@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { prepareCase, type CaseInput } from "@/efile/rhetoric";
+import { describeError } from "@/efile/rhetoric";
 
 /** Rhetoric slows as a filing grows; one step has taken over a minute. */
 export const maxDuration = 120;
@@ -16,6 +17,6 @@ export async function POST(request: NextRequest) {
       await prepareCase(body.sessionToken, { minorChildren: !!body.minorChildren, petitioner: body.petitioner, respondent: body.respondent }),
     );
   } catch (err) {
-    return NextResponse.json({ error: err instanceof Error ? err.message : "Could not set up the case" }, { status: 502 });
+    return NextResponse.json({ error: describeError(err, "prepare") }, { status: 502 });
   }
 }
