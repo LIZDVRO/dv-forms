@@ -3,6 +3,7 @@
 import JSZip from "jszip";
 import { useState } from "react";
 
+import { SHERIFF_OFFICES } from "@/sheriff/offices";
 import { noteForms, notePrint, noteZip } from "@/stats/tracker";
 
 import { custodyRequested, derive, fmtDate } from "../derive";
@@ -123,6 +124,8 @@ const GROUPS: { key: PacketFile["group"]; title: string; intro: string }[] = [
 /** Step 11 · review, sign, and download. */
 export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
   const { a, set } = useWizard();
+  /** The county whose sheriff serves the papers (asked on the service step; defaults to the filing county). */
+  const sheriffCounty = a.V2 || a.S1;
   const [busy, setBusy] = useState(false);
   const [packet, setPacket] = useState<Packet | null>(null);
   const [error, setError] = useState("");
@@ -324,30 +327,44 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                 <li>
                   {`${
                     a.sig
-                      ? "Download your forms and check them carefully. Make sure every name, date and detail is right. Your signature is already on them."
-                      : "Download your forms and check them carefully. Make sure every name, date and detail is right, then sign DV-100 (page 13) and any other form with a signature line."
+                      ? "Download your forms and check them carefully for accuracy. Your signature is already on them."
+                      : "Download your forms and check them carefully for accuracy, then sign DV-100 (page 13) and any other form with a signature line."
                   } Leave the order forms unsigned (${packet.files
                     .map((f) => f.id)
                     .filter((id) => ["DV-109", "DV-110", "DV-140", "DV-145", "DV-900", "DV-165", "DV-130", "DV-150"].includes(id))
                     .join(", ")}); the judge signs those.`}
                 </li>
                 <li>
-                  {`Create your e-filing account at efile.lizbreakfree.org and file your forms with the ${a.S1 ? `${a.S1} County` : "county"} court. Filing is free. Upload copies of any orders you listed${
+                  {`Create your e-filing account at efile.lizbreakfree.org and file your forms with the ${a.S1 ? `${a.S1} County` : "county"} court. E-filing is free. Upload copies of any orders you listed${
                     a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""
-                  }. You can also file at the ${a.S1 ? `${a.S1} County` : "county"} Superior Court clerk's office instead.`}
+                  }. You can also print your forms and file in person at the ${a.S1 ? `${a.S1} County` : "county"} Superior Court instead.`}
                 </li>
                 <li>
                   Get your stamped papers back, usually the same or next business day. If you e-file through LIZ, the court emails them to
                   the address on your e-filing account. If you file at the courthouse, the clerk gives them to you. Your court date is on
-                  DV-109.
+                  form DV-109.
                 </li>
                 <li>
                   {a.V1 === "sheriff" ? (
-                    <>
-                      {`Have the ${a.V2 || a.S1} County sheriff serve them. Service is free. Go to lizbreakfree.org and choose `}
-                      <strong>I need to serve my papers</strong>
-                      {". You'll add SER-001 and your stamped papers (the court's PDFs, or photos of the pages), and send them to the sheriff from your own email. Keep SER-001 until then."}
-                    </>
+                    sheriffCounty === "Fresno" ? (
+                      <>
+                        {"Have the Fresno County sheriff serve them. Service is free. Upload form SER-001 and the stamped papers you received (PDFs, or photos) to the Fresno County Sheriff at "}
+                        <a href="https://civilconnect.fresnosheriff.org" target="_blank" rel="noreferrer" className="font-medium text-liz underline">
+                          civilconnect.fresnosheriff.org
+                        </a>
+                        {". Keep SER-001 until then."}
+                      </>
+                    ) : SHERIFF_OFFICES[sheriffCounty] ? (
+                      <>
+                        {`Have the ${sheriffCounty} County sheriff serve them. Service is free. Go to lizbreakfree.org and choose `}
+                        <strong>I need to serve my papers</strong>
+                        {". You'll add form SER-001 and the stamped papers you received (PDFs, or photos), and send them to the sheriff from your own email. Keep SER-001 until then."}
+                      </>
+                    ) : (
+                      <>
+                        {`Have the ${sheriffCounty || "county"} County sheriff serve them. Service is free. Contact the civil unit of the ${sheriffCounty || "county"} County sheriff's office and ask how to send them form SER-001 and the stamped papers you received. Keep SER-001 until then.`}
+                      </>
+                    )
                   ) : (
                     <>
                       {`Have someone 18 or older (not you) give copies to ${a.R1 || "the other person"} before the deadline on DV-109. The sheriff does this for free.`}
