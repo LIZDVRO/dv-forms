@@ -240,13 +240,18 @@ export async function prefillToLogin(token: string, p: PrefillInput): Promise<{ 
   return { step: s.title };
 }
 
+/** The new-account activation screen (Live, Nov 11: "Check your email"). */
+const ACTIVATION = /check your email|activat|verify your email|confirm your email/i;
+
 /** Where the session is now, without changing anything. */
-export async function sessionStep(token: string): Promise<{ step: string; loggedIn: boolean }> {
+export async function sessionStep(token: string): Promise<{ step: string; loggedIn: boolean; activation: boolean }> {
   const s = new Session(token);
   await s.resume();
+  // A new eFileCA account must be activated from an email first ("Check your email").
+  const activation = ACTIVATION.test(s.title);
   // Still on the login or sign-up screen (and not yet "You're logged in")?
-  const waiting = /log ?in|create.*account/i.test(s.title) && !s.action(/continue/i);
-  return { step: s.title, loggedIn: !waiting };
+  const waiting = activation || (/log ?in|create.*account/i.test(s.title) && !s.action(/continue/i));
+  return { step: s.title, loggedIn: !waiting, activation };
 }
 
 export type CaseInput = Omit<FillInput, "documents">;
@@ -285,6 +290,9 @@ export function pickDvCaseType(opts: Opt[], minorChildren: boolean): Opt | undef
 export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: true; step: string } | { ok: false; step: string; problem: string }> {
   const s = new Session(token);
   await s.resume();
+  if (ACTIVATION.test(s.title)) {
+    return { ok: false, step: s.title, problem: "Check your email and click the activation link, then come back here and press \"I've activated my account.\"" };
+  }
   if (/log ?in|create.*account/i.test(s.title)) {
     if (!s.action(/continue/i)) return { ok: false, step: s.title, problem: "Log in to eFileCA first." };
     await s.next();

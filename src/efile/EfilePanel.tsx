@@ -69,6 +69,11 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
   });
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  /** Rhetoric is waiting for her to click the activation link in her email. */
+  const [activation, setActivation] = useState(false);
+  /** Rhetoric's screen when the fill stopped; if she moves past it herself, filling resumes. */
+  const stoppedAt = useRef<string | null>(null);
+  const autoRetries = useRef(0);
   const [session, setSession] = useState<{ sessionToken: string; court: string } | null>(null);
   const [phase, setPhase] = useState<Phase>("login");
   const [progress, setProgress] = useState<Progress | null>(null);
@@ -117,6 +122,12 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
         petitioner: splitName(a.P1),
         respondent: splitName(a.R1),
       });
+      if (!prep.ok && /activation link/i.test(prep.problem)) {
+        // Not an error: she still has to activate her new account. Keep waiting.
+        setActivation(true);
+        setPhase("login");
+        return;
+      }
       if (!prep.ok) throw new Error(prep.problem);
       const copies: Record<string, number> = {};
       for (let i = 0; i < fileNow.length; i++) {
@@ -138,6 +149,10 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
       setPhase("login"); // shows "Try again"; a retry skips forms already added
+      stoppedAt.current = null;
+      post<{ step: string }>("/api/rhetoric/status", { sessionToken: token })
+        .then((st) => { stoppedAt.current = st.step; })
+        .catch(() => {});
     } finally {
       running.current = false;
       setElementKey((k) => k + 1); // reload the filing screen so it shows what was filled in
@@ -145,12 +160,20 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
   };
 
   // While she is on the login or sign-up screen, check every few seconds whether she's in.
+  // After a stop, keep checking: if she gets past the screen it stopped on (for example by
+  // activating her new account), filling resumes without her pressing "Try again".
   useEffect(() => {
-    if (!session || phase !== "login" || error) return;
+    if (!session || phase !== "login") return;
     let stop = false;
     const timer = setInterval(async () => {
       try {
-        const st = await post<{ loggedIn: boolean }>("/api/rhetoric/status", { sessionToken: session.sessionToken });
+        const st = await post<{ step: string; loggedIn: boolean; activation?: boolean }>("/api/rhetoric/status", { sessionToken: session.sessionToken });
+        if (!stop) setActivation(!!st.activation);
+        if (error) {
+          const moved = stoppedAt.current !== null && st.step !== stoppedAt.current;
+          if (stop || !st.loggedIn || !moved || autoRetries.current >= 3) return;
+          autoRetries.current += 1;
+        }
         if (!stop && st.loggedIn) {
           clearInterval(timer);
           void fill(session.sessionToken);
@@ -250,9 +273,11 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
         <div className="mt-2 space-y-3">
           {phase === "login" && !error && (
             <p className="text-base text-slate-700">
-              {account === "new"
-                ? "Choose a password and create your eFileCA account below. Your forms are added as soon as you're in."
-                : "Log in to eFileCA below. Your forms are added as soon as you're in."}
+              {activation
+                ? "Check your email and click the activation link, then come back here and press \"I've activated my account.\""
+                : account === "new"
+                  ? "Choose a password and create your eFileCA account below. eFileCA will then email you a link to activate it. Your forms are added as soon as you're in."
+                  : "Log in to eFileCA below. Your forms are added as soon as you're in."}
             </p>
           )}
           {phase === "filling" && progress && (
