@@ -1,15 +1,22 @@
 /**
  * Counties where the "File online now" (Rhetoric) panel appears, and the
  * Rhetoric court for each courthouse. Any county not listed keeps the Green
- * Filing link. Source: Rhetoric's LIVE court list, read Nov 10, 2026 (family
- * law or domestic violence courts only; child support, Family Court Services,
- * adoptions and civil-harassment courts left out).
+ * Filing link.
  *
- * `verified` means the whole path (new case, DV case type, parties, forms,
- * fee waiver) has been confirmed for that court. Merced so far.
- * Listed is not the same as accepting a NEW DV case (in test, Fresno Family
- * listed only "Existing case"), so verify each county before going live, or
- * turn on only the verified ones with EFILE_ONLY_VERIFIED below.
+ * Source: Rhetoric's list of live courts that accept a NEW Domestic Violence
+ * Prevention case (Mustafa Moiz, Nov 11, 2026: ca_dv_prevention_support.xlsx).
+ * Left out: Alameda and San Bernardino (no new DV cases), courthouses marked
+ * "existing cases only" (e.g. Butte - Oroville, Contra Costa Family Law main,
+ * LA Norwalk, SLO Grover Beach), and San Diego's child-support (DCSS) divisions.
+ *
+ * `verified`: checked on Rhetoric's test system (Nov 11, 2026 sweep,
+ * scripts/rhetoric-sweep.ts): "New case", Family, both DV case types, and a
+ * filing code for every form. Merced was also filed end to end. Not verified:
+ * Santa Barbara - Lompoc (test offered only "Existing case"). Removed: San
+ * Mateo's San Mateo courthouse (offered only Civil and Adoptions). Live court
+ * lists can differ from test; a failed fill shows "Try again" and the LIZ
+ * e-filing link. Only verified counties show the panel while
+ * EFILE_ONLY_VERIFIED is true.
  */
 export interface EfileCourt {
   code: string;
@@ -24,21 +31,13 @@ export interface EfileCounty {
 export const EFILE_ONLY_VERIFIED = true;
 
 export const EFILE_COURTS: Record<string, EfileCounty> = {
-  Alameda: { courts: [
-    { code: "alameda:fam", label: "Family Law (main)" },
-    { code: "alameda:famala", label: "Alameda" },
-    { code: "alameda:famhay", label: "Hayward" },
-  ] },
-  Butte: { courts: [{ code: "butte:chicfam", label: "Chico" }] },
-  Calaveras: { courts: [{ code: "calaveras:fam", label: "Family Law" }] },
-  Colusa: { courts: [{ code: "colusa:fam", label: "Family Law" }] },
-  "Contra Costa": { courts: [
-    { code: "contracosta:fl", label: "Family Law (main)" },
-    { code: "contracosta:flmc", label: "Martinez" },
-  ] },
-  Glenn: { courts: [{ code: "glenn:fam", label: "Family Law" }] },
-  "Los Angeles": { courts: [
-    { code: "losangeles:maavc", label: "Antelope Valley" },
+  Butte: { verified: true, courts: [{ code: "butte:chicfam", label: "Chico" }] },
+  Calaveras: { verified: true, courts: [{ code: "calaveras:fam", label: "Family Law" }] },
+  Colusa: { verified: true, courts: [{ code: "colusa:fam", label: "Family Law" }] },
+  "Contra Costa": { verified: true, courts: [{ code: "contracosta:flmc", label: "Martinez" }] },
+  Glenn: { verified: true, courts: [{ code: "glenn:fam", label: "Family Law" }] },
+  "Los Angeles": { verified: true, courts: [
+    { code: "losangeles:maavc", label: "Antelope Valley (Lancaster)" },
     { code: "losangeles:chatc", label: "Chatsworth" },
     { code: "losangeles:cc", label: "Compton" },
     { code: "losangeles:ggdc", label: "Governor George Deukmejian (Long Beach)" },
@@ -46,13 +45,13 @@ export const EFILE_COURTS: Record<string, EfileCounty> = {
     { code: "losangeles:pc", label: "Pasadena" },
     { code: "losangeles:pcs", label: "Pomona South" },
     { code: "losangeles:smc", label: "Santa Monica" },
-    { code: "losangeles:stanmc", label: "Stanley Mosk (SMC)" },
+    { code: "losangeles:stanmc", label: "Stanley Mosk (downtown Los Angeles)" },
     { code: "losangeles:tc", label: "Torrance" },
     { code: "losangeles:vnce", label: "Van Nuys East" },
     { code: "losangeles:wc", label: "Whittier" },
   ] },
-  Mariposa: { courts: [{ code: "mariposa:fam", label: "Family Law" }] },
-  Mendocino: { courts: [
+  Mariposa: { verified: true, courts: [{ code: "mariposa:fam", label: "Family Law" }] },
+  Mendocino: { verified: true, courts: [
     { code: "mendocino:ufam", label: "Ukiah" },
     { code: "mendocino:tmfam", label: "Ten Mile (Fort Bragg)" },
   ] },
@@ -60,42 +59,29 @@ export const EFILE_COURTS: Record<string, EfileCounty> = {
     { code: "merced:mercedfam", label: "Merced" },
     { code: "merced:losbanosfam", label: "Los Banos" },
   ] },
-  Napa: { courts: [{ code: "napa:fam", label: "Family Law" }] },
-  Orange: { courts: [
-    { code: "orange:dom", label: "Domestic Violence" },
-    { code: "orange:of", label: "Other Family" },
-  ] },
-  "San Bernardino": { courts: [
-    { code: "sanbernardino:fam", label: "Family Law (main)" },
-    { code: "sanbernardino:famsanber", label: "San Bernardino" },
-    { code: "sanbernardino:fambar", label: "Barstow" },
-    { code: "sanbernardino:famjotr", label: "Joshua Tree" },
-    { code: "sanbernardino:famneedles", label: "Needles" },
-    { code: "sanbernardino:famvict", label: "Victorville" },
-  ] },
-  "San Diego": { courts: [
+  Napa: { verified: true, courts: [{ code: "napa:fam", label: "Family Law" }] },
+  Orange: { verified: true, courts: [{ code: "orange:dom", label: "Domestic Violence" }] },
+  "San Diego": { verified: true, courts: [
     { code: "sandiego:fc", label: "Central" },
-    { code: "sandiego:fe", label: "East" },
-    { code: "sandiego:fn", label: "North" },
-    { code: "sandiego:fs", label: "South" },
+    { code: "sandiego:fe", label: "East (El Cajon)" },
+    { code: "sandiego:fn", label: "North (Vista)" },
+    { code: "sandiego:fs", label: "South (Chula Vista)" },
   ] },
-  "San Luis Obispo": { courts: [
+  "San Luis Obispo": { verified: true, courts: [
     { code: "slo:slofam", label: "San Luis Obispo" },
     { code: "slo:prfam", label: "Paso Robles" },
-    { code: "slo:gbfam", label: "Grover Beach" },
   ] },
-  "San Mateo": { courts: [
+  "San Mateo": { verified: true, courts: [
     { code: "sanmateo:rcfam", label: "Redwood City" },
-    { code: "sanmateo:smfam", label: "San Mateo" },
   ] },
   "Santa Barbara": { courts: [{ code: "santabarbara:lom", label: "Lompoc" }] },
-  "Santa Clara": { courts: [{ code: "santaclara:fam", label: "Family Law" }] },
-  "Santa Cruz": { courts: [{ code: "santacruz:fam", label: "Family Law" }] },
-  Sonoma: { courts: [{ code: "sonoma:fam", label: "Family Law" }] },
-  Stanislaus: { courts: [{ code: "stanislaus:fam", label: "Family Law" }] },
-  Sutter: { courts: [{ code: "sutter:fam", label: "Family Law" }] },
-  Tehama: { courts: [{ code: "tehama:fam", label: "Family Law" }] },
-  Yuba: { courts: [{ code: "yuba:fam", label: "Family Law" }] },
+  "Santa Clara": { verified: true, courts: [{ code: "santaclara:fam", label: "Family Law" }] },
+  "Santa Cruz": { verified: true, courts: [{ code: "santacruz:fam", label: "Family Law" }] },
+  Sonoma: { verified: true, courts: [{ code: "sonoma:fam", label: "Family Law" }] },
+  Stanislaus: { verified: true, courts: [{ code: "stanislaus:fam", label: "Family Law" }] },
+  Sutter: { verified: true, courts: [{ code: "sutter:fam", label: "Family Law" }] },
+  Tehama: { verified: true, courts: [{ code: "tehama:fam", label: "Family Law" }] },
+  Yuba: { verified: true, courts: [{ code: "yuba:fam", label: "Family Law" }] },
 };
 
 /** The county's e-filing courts, or undefined if the Rhetoric panel shouldn't appear. */

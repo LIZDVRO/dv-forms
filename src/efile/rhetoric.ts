@@ -16,27 +16,63 @@ const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 const SECURITY = /^confidential$/i;
 
 /**
- * Form -> filing code label. DV-100, DV-105, DV-160, DV-165 per Chris (Oct 27);
- * the rest are working guesses until Chris or Rhetoric confirm.
+ * Filing code choices, best first. Courts name codes very differently (a test
+ * sweep of 40 courthouses, Nov 11: "Petition", "PETITION", "Request for
+ * Domestic Violence Restraining Order", "DV-110 Temporary Restraining Order
+ * (CLETS-TRO)", "Proposed Form 110 Temporary Restraining Order", "CLETS Info
+ * Sheet"...). Chris (Nov 11): the code only needs to describe the document
+ * generally. Order of preference for each form:
+ *   1. a code naming the form itself (DV-110, DV110, Form 110)
+ *   2. a code describing that document (Temporary Restraining Order)
+ *   3. a plain, general code (Order, Proposed Order, Request, Declaration)
+ * Codes for other kinds of case (dissolution, juvenile, elder abuse, support,
+ * name change...) are never used.
  */
-export const FORM_FILING: Record<string, { code: RegExp; description: string }> = {
-  "DV-100": { code: /^petition$/i, description: "DV-100 Request for Domestic Violence Restraining Order" },
-  "DV-101": { code: /^request$/i, description: "DV-101 Description of Abuse" },
-  "DV-105": { code: /^request$/i, description: "DV-105 Request for Child Custody and Visitation Orders" },
-  "DV-105(A)": { code: /^request$/i, description: "DV-105(A) City and State Where Children Lived" },
-  "DV-108": { code: /^request$/i, description: "DV-108 Request for Orders to Prevent Child Abduction" },
-  "DV-109": { code: /^order$/i, description: "DV-109 Notice of Court Hearing" },
-  "DV-110": { code: /^order$/i, description: "DV-110 Temporary Restraining Order" },
-  "DV-140": { code: /^order$/i, description: "DV-140 Child Custody and Visitation Order" },
-  "DV-145": { code: /^order$/i, description: "DV-145 Order to Prevent Child Abduction" },
-  "DV-900": { code: /^order$/i, description: "DV-900 Order Transferring Wireless Phone Account" },
-  "FL-150": { code: /^income and expense declaration$/i, description: "FL-150 Income and Expense Declaration" },
-  "INT-300": { code: /^request$/i, description: "INT-300 Request for Interpreter" },
-  "DV-160": { code: /^request$/i, description: "DV-160 Request to Keep Minor's Information Confidential" },
-  "DV-165": { code: /^order$/i, description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
-  "DV-170": { code: /^notice$/i, description: "DV-170 Notice of Order Protecting Information of Minor" },
-  "CLETS-001": { code: /^clets-001$/i, description: "CLETS-001 Confidential CLETS Information" },
+const OTHER_CASE = /juvenile|elder|dependent adult|civil harass|workplace|gun\b|firearm|school|denied|dissol|parent(al)?.(child )?relationship|parental|terminat|change of name|name change|gender|emanci|adopt|support|guardian|bifurcat|vexatious|summary|nullity|separation|warrant|ivf|marry|hague|registration|register|foreign|publication|transfer (and|in)|uifsa|dcss|surrogacy|batterer|canadian|elder abuse|ea-110|telephon|remote|zoom|fee|address|e-?service|proof of service|summons|withholding|attorney|spouse|osc\b|amended|modif/i;
+
+/** A general code: its label is just the word(s), maybe with "Filed"/"Received" etc. */
+const generic = (...words: string[]) => {
+  const alt = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+")).join("|");
+  return new RegExp(`^(?:${alt})(?:\\s*[-–(:]?\\s*(?:filed|received|confidential|lodged|initial|petitioner'?s?|\\(petitioner\\)|ex parte))*\\)?$`, "i");
 };
+const formNo = (n: string) => new RegExp(`\\bdv[-\\s]?${n}\\b|\\bform\\s+${n}\\b`, "i");
+
+const GEN = {
+  petition: [generic("petition", "verified petition"), /^domestic violence.*filing$/i],
+  request: [generic("request"), generic("request for order"), /request for order:?\s*(domestic violence|ex parte)/i, /(^|\s)request for order$/i, generic("ex parte filed"), generic("ex parte application"), generic("application"), generic("declaration"), generic("domestic violence filing")],
+  order: [generic("order"), generic("proposed order"), generic("proposed order/judgment"), /^proposed order\b/i, /^domestic violence.*filing$/i],
+  notice: [generic("notice"), generic("notice of hearing"), generic("notice of court hearing"), /^dv notice\b/i],
+};
+const CATCH_ALL = [/^domestic violence.*filing$/i, /^document\s*[-–]?\s*other$/i, generic("other document", "other", "rfo - other", "declaration/pleading"), generic("declaration")];
+
+export const FORM_FILING: Record<string, { codes: RegExp[]; description: string }> = {
+  "DV-100": { codes: [formNo("100"), /request for domestic violence restraining order/i, /request:?\s*domestic violence restraining order/i, /\bdv request\b/i, /\bdv\b.*new case petition/i, /domestic violence.*(petition|request)/i, ...GEN.petition, ...GEN.request], description: "DV-100 Request for Domestic Violence Restraining Order" },
+  "DV-101": { codes: [formNo("101"), /description of abuse/i, ...GEN.request], description: "DV-101 Description of Abuse" },
+  "DV-105": { codes: [formNo("105"), /request for child custody/i, ...GEN.request], description: "DV-105 Request for Child Custody and Visitation Orders" },
+  "DV-105(A)": { codes: [formNo("105\\(?a\\)?"), ...GEN.request], description: "DV-105(A) City and State Where Children Lived" },
+  "DV-108": { codes: [formNo("108"), /prevent child abduction/i, ...GEN.request], description: "DV-108 Request for Orders to Prevent Child Abduction" },
+  "DV-109": { codes: [formNo("109"), /notice.*court hearing.*(domestic|dv)|dv notice.*court hearing/i, ...GEN.notice, ...GEN.order], description: "DV-109 Notice of Court Hearing" },
+  "DV-110": { codes: [formNo("110"), /temporary restraining order/i, ...GEN.order], description: "DV-110 Temporary Restraining Order" },
+  "DV-140": { codes: [formNo("140"), /custody and visitation order/i, ...GEN.order], description: "DV-140 Child Custody and Visitation Order" },
+  "DV-145": { codes: [formNo("145"), /order to prevent child abduction/i, ...GEN.order], description: "DV-145 Order to Prevent Child Abduction" },
+  "DV-900": { codes: [formNo("900"), /wireless|phone account/i, ...GEN.order], description: "DV-900 Order Transferring Wireless Phone Account" },
+  "FL-150": { codes: [/\bfl-?150\b/i, /income\s*(and|&)?\s*expense/i, generic("financial statement", "financial declaration"), generic("declaration")], description: "FL-150 Income and Expense Declaration" },
+  "INT-300": { codes: [/\bint-?300\b/i, /interpreter/i, ...GEN.request], description: "INT-300 Request for Interpreter" },
+  "DV-160": { codes: [formNo("160"), /keep minor'?s? info.*confidential/i, ...GEN.request], description: "DV-160 Request to Keep Minor's Information Confidential" },
+  "DV-165": { codes: [formNo("165"), /order on request to keep minor/i, ...GEN.order], description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
+  "DV-170": { codes: [formNo("170"), /notice of order protecting/i, ...GEN.notice], description: "DV-170 Notice of Order Protecting Information of Minor" },
+  "CLETS-001": { codes: [/clets-?001/i, /clets info|confidential clets|clets form|clets confidential|confidential - clets/i, /confidential information for law enforcement/i, generic("confidential information sheet")], description: "CLETS-001 Confidential CLETS Information" },
+};
+
+/** The court's best filing code for a form, by the ranked list above. */
+export function pickFilingCode<T extends { label: string }>(opts: T[], codes: RegExp[]): T | undefined {
+  const usable = opts.filter((o) => !OTHER_CASE.test(o.label));
+  for (const re of [...codes, ...CATCH_ALL]) {
+    const hit = usable.find((o) => re.test(o.label.trim()));
+    if (hit) return hit;
+  }
+  return undefined;
+}
 
 /** Extra copies (INT-300-2, DV-105(A)-2) file under the base form. */
 export const specFor = (form: string) => FORM_FILING[form] ?? FORM_FILING[form.replace(/-\d+$/, "")];
@@ -70,7 +106,7 @@ type Block = any;
 type Field = any;
 type Action = { action_id: string; label: string; primary?: boolean };
 
-class Session {
+export class Session {
   form: Form = null;
   version = 0;
   constructor(private token: string) {}
@@ -134,6 +170,19 @@ class Session {
     }
     const o = opts.find((o) => optionRe.test(o.label));
     if (!o) throw new Error(`"${this.title}": no "${optionRe.source}" choice for ${f.label}`);
+    await this.apply({ kind: "set_field", field: f.key, value: o.value });
+  }
+  /** Like choose(), but `pick` decides among the field's options (they differ by court). */
+  async chooseWith(fieldRe: RegExp, pick: (opts: { value: unknown; label: string }[]) => { value: unknown; label: string } | undefined, what: string) {
+    const f = this.field(fieldRe);
+    if (!f) throw new Error(`"${this.title}": no field ${fieldRe}`);
+    let opts: { value: unknown; label: string }[] = f.options ?? f.search?.results ?? [];
+    if (!opts.length && f.search) {
+      await this.apply({ kind: "search", field: f.key, query: "" });
+      opts = this.field(fieldRe)?.search?.results ?? [];
+    }
+    const o = pick(opts);
+    if (!o) throw new Error(`"${this.title}": no ${what} choice (offered: ${opts.map((x) => x.label).join("; ")})`);
     await this.apply({ kind: "set_field", field: f.key, value: o.value });
   }
   /**
@@ -202,6 +251,36 @@ export async function sessionStep(token: string): Promise<{ step: string; logged
 
 export type CaseInput = Omit<FillInput, "documents">;
 
+type Opt = { value: unknown; label: string };
+
+/** "Family" where offered; otherwise a family or domestic-violence category. */
+export function pickFamilyCategory(opts: Opt[]): Opt | undefined {
+  return opts.find((o) => /^family$/i.test(o.label.trim()))
+    ?? opts.find((o) => /family/i.test(o.label) && !/dcss|child support|probate|juvenile/i.test(o.label))
+    ?? opts.find((o) => /domestic violence/i.test(o.label));
+}
+
+/**
+ * The DV prevention case type, with or without minor children. Courts word it
+ * differently (Rhetoric's list, Nov 11, 2026):
+ *   "Domestic Violence Prevention with/without Minor Children" (Merced, most)
+ *   "DV Prevention w/ / w/o Minor Children" (Los Angeles, Glenn, San Mateo…)
+ *   "DV Prevention With / Without Minor Children" (Colusa, Contra Costa…)
+ *   "Domestic Violence With Child / Without Child" (Orange)
+ *   "Domestic Violence With Children" / plain "Domestic Violence" (San Luis Obispo)
+ * San Diego's "Domestic Violence Prevention - Limited" and registrations of
+ * out-of-state orders are never chosen.
+ */
+export function pickDvCaseType(opts: Opt[], minorChildren: boolean): Opt | undefined {
+  const dv = opts.filter(
+    (o) => /domestic violence|\bdv\b/i.test(o.label) && !/limited|registration|foreign|request for domestic/i.test(o.label),
+  );
+  const without = (o: Opt) => /\bwithout\b|w\/o\b/i.test(o.label);
+  const withKids = (o: Opt) => !without(o) && /\bwith\b|\bw\/(?!o)/i.test(o.label) && /child/i.test(o.label);
+  if (minorChildren) return dv.find(withKids);
+  return dv.find(without) ?? dv.find((o) => !withKids(o) && !without(o) && !/child/i.test(o.label));
+}
+
 /** Stage 2a: after login, set the filing type, case type and parties; end on the filing entries list. */
 export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: true; step: string } | { ok: false; step: string; problem: string }> {
   const s = new Session(token);
@@ -211,11 +290,9 @@ export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: tr
     await s.next();
   }
   if (/filing type/i.test(s.title)) { await s.choose(/filing.?type/i, /new case/i); await s.next(); }
-  if (/case category/i.test(s.title)) { await s.choose(/case.?category/i, /^family$/i); await s.next(); }
+  if (/case category/i.test(s.title)) { await s.chooseWith(/case.?category/i, pickFamilyCategory, "Family case category"); await s.next(); }
   if (/case type/i.test(s.title)) {
-    await s.choose(/case.?type/i, p.minorChildren
-      ? /domestic violence prevention with minor children/i
-      : /domestic violence prevention without minor children/i);
+    await s.chooseWith(/case.?type/i, (o) => pickDvCaseType(o, p.minorChildren), "domestic violence case type");
     await s.next();
   }
   if (/parties/i.test(s.title)) { await fillParties(s, p); await s.next(); }
@@ -247,7 +324,7 @@ export async function addForm(
   const before = s.blocks.length;
   await s.pressAction(/add filing entry/i);
   await s.waitFor(() => s.field(/filing.?code/i), "the filing code field");
-  await s.choose(/filing.?code/i, spec.code);
+  await s.chooseWith(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `filing code for ${doc.form}`);
   await s.set(/^description$/i, description);
   await s.pressAction(/save/i);
   const card = await s.waitFor(() => (s.blocks.length > before ? s.blocks[s.blocks.length - 1] : undefined), `${doc.form} entry`);
@@ -334,7 +411,7 @@ export async function fillAfterLogin(token: string, p: FillInput): Promise<FillR
   return end.ok ? { ok: true, step: end.step, filed } : end;
 }
 
-async function fillParties(s: Session, p: CaseInput) {
+export async function fillParties(s: Session, p: Pick<CaseInput, "petitioner" | "respondent">) {
   const done = new Set<string>();
   for (let guard = 0; guard < 8; guard++) {
     const card = s.blocks.find((b: Block) => s.data(b, /party type/i) && !done.has(b.id));
