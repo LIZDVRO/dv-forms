@@ -4,6 +4,8 @@ import JSZip from "jszip";
 import { useState } from "react";
 
 import { SHERIFF_OFFICES } from "@/sheriff/offices";
+import { efileCountyFor } from "@/efile/courts";
+import { EfilePanel } from "@/efile/EfilePanel";
 import { noteForms, notePrint, noteZip } from "@/stats/tracker";
 
 import { custodyRequested, derive, fmtDate } from "../derive";
@@ -126,6 +128,8 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
   const { a, set } = useWizard();
   /** The county whose sheriff serves the papers (asked on the service step; defaults to the filing county). */
   const sheriffCounty = a.V2 || a.S1;
+  /** This county files through Rhetoric (src/efile/courts.ts); others keep Green Filing. */
+  const rhetoric = !!efileCountyFor(a.S1);
   const [busy, setBusy] = useState(false);
   const [packet, setPacket] = useState<Packet | null>(null);
   const [error, setError] = useState("");
@@ -304,24 +308,29 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
               </button>
               <p className="mt-1 text-sm text-slate-600">To save, choose &quot;Save as PDF&quot; in the print window.</p>
             </div>
-            <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm print:hidden">
-              <h4 className="text-lg font-semibold text-slate-900">File online with LIZ</h4>
-              <p className="mt-1 text-base text-slate-700">
-                {`Skip the trip to the courthouse. E-file your forms with ${a.S1 ? `the ${a.S1} County` : "your"} court through the LIZ e-filing portal, from anywhere.`}
-              </p>
-              <p className="mt-1 text-sm text-slate-600">
-                Download your forms first. The portal opens in a new tab so this page and your forms stay open.
-              </p>
-              <a
-                href={EFILE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-3 inline-flex items-center gap-2 rounded-xl bg-liz px-5 py-3 text-base font-semibold text-white hover:bg-liz/90"
-              >
-                Go to e-filing
-                <span aria-hidden="true">→</span>
-              </a>
-            </div>
+            {/* Rhetoric's in-app e-filing for verified counties (src/efile/courts.ts); Green Filing everywhere else. */}
+            {rhetoric ? (
+              <EfilePanel a={a} packet={packet} />
+            ) : (
+              <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm print:hidden">
+                <h4 className="text-lg font-semibold text-slate-900">File online with LIZ</h4>
+                <p className="mt-1 text-base text-slate-700">
+                  {`Skip the trip to the courthouse. E-file your forms with ${a.S1 ? `the ${a.S1} County` : "your"} court through the LIZ e-filing portal, from anywhere.`}
+                </p>
+                <p className="mt-1 text-sm text-slate-600">
+                  Download your forms first. The portal opens in a new tab so this page and your forms stay open.
+                </p>
+                <a
+                  href={EFILE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-2 rounded-xl bg-liz px-5 py-3 text-base font-semibold text-white hover:bg-liz/90"
+                >
+                  Go to e-filing
+                  <span aria-hidden="true">→</span>
+                </a>
+              </div>
+            )}
             <Group title="What to do next">
               <ol className="list-decimal space-y-2 pl-5 text-base text-slate-700">
                 <li>
@@ -335,7 +344,11 @@ export function Finish({ goTo }: { goTo: (stepId: string) => void }) {
                     .join(", ")}); the judge signs those.`}
                 </li>
                 <li>
-                  {`Create your e-filing account at efile.lizbreakfree.org and file your forms with the ${a.S1 ? `${a.S1} County` : "county"} court. E-filing is free. Upload copies of any orders you listed${
+                  {`${
+                    rhetoric
+                      ? `File your forms with the ${a.S1} County court in the "File online now" box above. E-filing is free.`
+                      : `Create your e-filing account at efile.lizbreakfree.org and file your forms with the ${a.S1 ? `${a.S1} County` : "county"} court. E-filing is free.`
+                  } Upload copies of any orders you listed${
                     a.orders.O15 && a.C6 === "Y" ? ", including your current custody order" : ""
                   }. You can also print your forms and file in person at the ${a.S1 ? `${a.S1} County` : "county"} Superior Court instead.`}
                 </li>
