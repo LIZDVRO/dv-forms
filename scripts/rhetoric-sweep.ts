@@ -6,7 +6,7 @@
  *
  *   RHETORIC_API_KEY=<test key> npx tsx scripts/rhetoric-sweep.ts
  *
- * Asks once for the eFileCA demo password (hidden). Writes rhetoric-sweep.json
+ * Asks once for the eFileCA TEST account email and password (hidden). Writes rhetoric-sweep.json
  * and prints a summary per court.
  */
 import { writeFileSync } from "node:fs";
@@ -18,14 +18,35 @@ import { EFILE_COURTS } from "../src/efile/courts";
 import { FORM_FILING, Session, fillParties, pickDvCaseType, pickFamilyCategory } from "../src/efile/rhetoric";
 
 const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
-const DEMO_EMAIL = process.env.RHETORIC_DEMO_EMAIL || "mustafa+prose-demo@rhetoric.law";
 
+function ask(prompt: string): Promise<string> {
+  return new Promise((resolve) => {
+    const rl = createInterface({ input: process.stdin, output: process.stdout });
+    rl.question(prompt, (a) => { rl.close(); resolve(a.trim()); });
+  });
+}
+
+/** Reads a line without echoing it. */
 function askHidden(prompt: string): Promise<string> {
   return new Promise((resolve) => {
-    const rl = createInterface({ input: process.stdin, output: process.stdout, terminal: true });
     process.stdout.write(prompt);
-    (rl as unknown as { _writeToOutput: () => void })._writeToOutput = () => {};
-    rl.question("", (a) => { rl.close(); process.stdout.write("\n"); resolve(a.trim()); });
+    const stdin = process.stdin;
+    stdin.setRawMode?.(true);
+    stdin.resume();
+    stdin.setEncoding("utf8");
+    let value = "";
+    const onData = (chunk: string) => {
+      for (const ch of chunk) {
+        if (ch === "\r" || ch === "\n") {
+          stdin.setRawMode?.(false); stdin.pause(); stdin.off("data", onData);
+          process.stdout.write("\n"); resolve(value); return;
+        }
+        if (ch === "\u0003") { process.stdout.write("\n"); process.exit(130); }
+        if (ch === "\u007f" || ch === "\b") value = value.slice(0, -1);
+        else value += ch;
+      }
+    };
+    stdin.on("data", onData);
   });
 }
 
@@ -40,7 +61,7 @@ interface Result {
   ok: boolean; problem?: string;
 }
 
-async function checkCourt(client: RhetoricClient, password: string, county: string, court: { code: string; label: string }): Promise<Result> {
+async function checkCourt(client: RhetoricClient, email: string, password: string, county: string, court: { code: string; label: string }): Promise<Result> {
   const r: Result = { county, court: court.label, code: court.code, ok: false };
   const { filer } = await client.createFiler({});
   const { sessionToken } = await client.createFilingSession({ filerId: filer.id });
@@ -53,7 +74,7 @@ async function checkCourt(client: RhetoricClient, password: string, county: stri
     if (!listed && courtField?.options) { r.problem = "court not in the TEST list (codes differ from live)"; return r; }
     await s.set(/^court$/i, court.code); await s.next();
     if (s.field(/password/i)) {
-      await s.set(/^email$/i, DEMO_EMAIL);
+      await s.set(/^email$/i, email);
       await s.set(/password/i, password);
       await s.press(s.action(/log ?in/i));
       if (s.field(/password/i)) { r.problem = `login failed: ${s.errors().join("; ")}`; return r; }
@@ -104,13 +125,15 @@ async function checkCourt(client: RhetoricClient, password: string, county: stri
 async function main() {
   const key = process.env.RHETORIC_API_KEY?.trim();
   if (!key?.startsWith("ak_test_")) throw new Error("Set RHETORIC_API_KEY to the TEST key (ak_test_…). This check never uses the live key.");
-  const password = await askHidden("eFileCA demo password (typing is hidden): ");
+  console.log("Log in with the eFileCA TEST account you used on the staging site.");
+  const email = await ask("eFileCA test email: ");
+  const password = await askHidden("eFileCA test password (typing stays hidden): ");
   const client = new RhetoricClient({ url: API, token: key });
   const results: Result[] = [];
   for (const [county, c] of Object.entries(EFILE_COURTS)) {
     for (const court of c.courts) {
       process.stdout.write(`${county} — ${court.label} … `);
-      const r = await checkCourt(client, password, county, court);
+      const r = await checkCourt(client, email, password, county, court);
       results.push(r);
       console.log(r.ok ? "OK" : `PROBLEM: ${r.problem}`);
       writeFileSync("rhetoric-sweep.json", JSON.stringify(results, null, 2));
