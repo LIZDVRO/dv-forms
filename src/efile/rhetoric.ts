@@ -70,7 +70,7 @@ type Block = any;
 type Field = any;
 type Action = { action_id: string; label: string; primary?: boolean };
 
-class Session {
+export class Session {
   form: Form = null;
   version = 0;
   constructor(private token: string) {}
@@ -134,6 +134,19 @@ class Session {
     }
     const o = opts.find((o) => optionRe.test(o.label));
     if (!o) throw new Error(`"${this.title}": no "${optionRe.source}" choice for ${f.label}`);
+    await this.apply({ kind: "set_field", field: f.key, value: o.value });
+  }
+  /** Like choose(), but `pick` decides among the field's options (they differ by court). */
+  async chooseWith(fieldRe: RegExp, pick: (opts: { value: unknown; label: string }[]) => { value: unknown; label: string } | undefined, what: string) {
+    const f = this.field(fieldRe);
+    if (!f) throw new Error(`"${this.title}": no field ${fieldRe}`);
+    let opts: { value: unknown; label: string }[] = f.options ?? f.search?.results ?? [];
+    if (!opts.length && f.search) {
+      await this.apply({ kind: "search", field: f.key, query: "" });
+      opts = this.field(fieldRe)?.search?.results ?? [];
+    }
+    const o = pick(opts);
+    if (!o) throw new Error(`"${this.title}": no ${what} choice (offered: ${opts.map((x) => x.label).join("; ")})`);
     await this.apply({ kind: "set_field", field: f.key, value: o.value });
   }
   /**
@@ -202,6 +215,36 @@ export async function sessionStep(token: string): Promise<{ step: string; logged
 
 export type CaseInput = Omit<FillInput, "documents">;
 
+type Opt = { value: unknown; label: string };
+
+/** "Family" where offered; otherwise a family or domestic-violence category. */
+export function pickFamilyCategory(opts: Opt[]): Opt | undefined {
+  return opts.find((o) => /^family$/i.test(o.label.trim()))
+    ?? opts.find((o) => /family/i.test(o.label) && !/dcss|child support|probate|juvenile/i.test(o.label))
+    ?? opts.find((o) => /domestic violence/i.test(o.label));
+}
+
+/**
+ * The DV prevention case type, with or without minor children. Courts word it
+ * differently (Rhetoric's list, Nov 11, 2026):
+ *   "Domestic Violence Prevention with/without Minor Children" (Merced, most)
+ *   "DV Prevention w/ / w/o Minor Children" (Los Angeles, Glenn, San Mateo…)
+ *   "DV Prevention With / Without Minor Children" (Colusa, Contra Costa…)
+ *   "Domestic Violence With Child / Without Child" (Orange)
+ *   "Domestic Violence With Children" / plain "Domestic Violence" (San Luis Obispo)
+ * San Diego's "Domestic Violence Prevention - Limited" and registrations of
+ * out-of-state orders are never chosen.
+ */
+export function pickDvCaseType(opts: Opt[], minorChildren: boolean): Opt | undefined {
+  const dv = opts.filter(
+    (o) => /domestic violence|\bdv\b/i.test(o.label) && !/limited|registration|foreign|request for domestic/i.test(o.label),
+  );
+  const without = (o: Opt) => /\bwithout\b|w\/o\b/i.test(o.label);
+  const withKids = (o: Opt) => !without(o) && /\bwith\b|\bw\/(?!o)/i.test(o.label) && /child/i.test(o.label);
+  if (minorChildren) return dv.find(withKids);
+  return dv.find(without) ?? dv.find((o) => !withKids(o) && !without(o) && !/child/i.test(o.label));
+}
+
 /** Stage 2a: after login, set the filing type, case type and parties; end on the filing entries list. */
 export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: true; step: string } | { ok: false; step: string; problem: string }> {
   const s = new Session(token);
@@ -211,11 +254,9 @@ export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: tr
     await s.next();
   }
   if (/filing type/i.test(s.title)) { await s.choose(/filing.?type/i, /new case/i); await s.next(); }
-  if (/case category/i.test(s.title)) { await s.choose(/case.?category/i, /^family$/i); await s.next(); }
+  if (/case category/i.test(s.title)) { await s.chooseWith(/case.?category/i, pickFamilyCategory, "Family case category"); await s.next(); }
   if (/case type/i.test(s.title)) {
-    await s.choose(/case.?type/i, p.minorChildren
-      ? /domestic violence prevention with minor children/i
-      : /domestic violence prevention without minor children/i);
+    await s.chooseWith(/case.?type/i, (o) => pickDvCaseType(o, p.minorChildren), "domestic violence case type");
     await s.next();
   }
   if (/parties/i.test(s.title)) { await fillParties(s, p); await s.next(); }

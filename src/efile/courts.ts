@@ -1,15 +1,17 @@
 /**
  * Counties where the "File online now" (Rhetoric) panel appears, and the
  * Rhetoric court for each courthouse. Any county not listed keeps the Green
- * Filing link. Source: Rhetoric's LIVE court list, read Nov 10, 2026 (family
- * law or domestic violence courts only; child support, Family Court Services,
- * adoptions and civil-harassment courts left out).
+ * Filing link.
  *
- * `verified` means the whole path (new case, DV case type, parties, forms,
- * fee waiver) has been confirmed for that court. Merced so far.
- * Listed is not the same as accepting a NEW DV case (in test, Fresno Family
- * listed only "Existing case"), so verify each county before going live, or
- * turn on only the verified ones with EFILE_ONLY_VERIFIED below.
+ * Source: Rhetoric's list of live courts that accept a NEW Domestic Violence
+ * Prevention case (Mustafa Moiz, Nov 11, 2026: ca_dv_prevention_support.xlsx).
+ * Left out: Alameda and San Bernardino (no new DV cases), courthouses marked
+ * "existing cases only" (e.g. Butte - Oroville, Contra Costa Family Law main,
+ * LA Norwalk, SLO Grover Beach), and San Diego's child-support (DCSS) divisions.
+ *
+ * `verified`: the whole path has been confirmed for that court (case type,
+ * filing codes, fee waiver). Only verified counties show the panel while
+ * EFILE_ONLY_VERIFIED is true.
  */
 export interface EfileCourt {
   code: string;
@@ -24,21 +26,13 @@ export interface EfileCounty {
 export const EFILE_ONLY_VERIFIED = true;
 
 export const EFILE_COURTS: Record<string, EfileCounty> = {
-  Alameda: { courts: [
-    { code: "alameda:fam", label: "Family Law (main)" },
-    { code: "alameda:famala", label: "Alameda" },
-    { code: "alameda:famhay", label: "Hayward" },
-  ] },
   Butte: { courts: [{ code: "butte:chicfam", label: "Chico" }] },
   Calaveras: { courts: [{ code: "calaveras:fam", label: "Family Law" }] },
   Colusa: { courts: [{ code: "colusa:fam", label: "Family Law" }] },
-  "Contra Costa": { courts: [
-    { code: "contracosta:fl", label: "Family Law (main)" },
-    { code: "contracosta:flmc", label: "Martinez" },
-  ] },
+  "Contra Costa": { courts: [{ code: "contracosta:flmc", label: "Martinez" }] },
   Glenn: { courts: [{ code: "glenn:fam", label: "Family Law" }] },
   "Los Angeles": { courts: [
-    { code: "losangeles:maavc", label: "Antelope Valley" },
+    { code: "losangeles:maavc", label: "Antelope Valley (Lancaster)" },
     { code: "losangeles:chatc", label: "Chatsworth" },
     { code: "losangeles:cc", label: "Compton" },
     { code: "losangeles:ggdc", label: "Governor George Deukmejian (Long Beach)" },
@@ -46,7 +40,7 @@ export const EFILE_COURTS: Record<string, EfileCounty> = {
     { code: "losangeles:pc", label: "Pasadena" },
     { code: "losangeles:pcs", label: "Pomona South" },
     { code: "losangeles:smc", label: "Santa Monica" },
-    { code: "losangeles:stanmc", label: "Stanley Mosk (SMC)" },
+    { code: "losangeles:stanmc", label: "Stanley Mosk (downtown Los Angeles)" },
     { code: "losangeles:tc", label: "Torrance" },
     { code: "losangeles:vnce", label: "Van Nuys East" },
     { code: "losangeles:wc", label: "Whittier" },
@@ -61,28 +55,16 @@ export const EFILE_COURTS: Record<string, EfileCounty> = {
     { code: "merced:losbanosfam", label: "Los Banos" },
   ] },
   Napa: { courts: [{ code: "napa:fam", label: "Family Law" }] },
-  Orange: { courts: [
-    { code: "orange:dom", label: "Domestic Violence" },
-    { code: "orange:of", label: "Other Family" },
-  ] },
-  "San Bernardino": { courts: [
-    { code: "sanbernardino:fam", label: "Family Law (main)" },
-    { code: "sanbernardino:famsanber", label: "San Bernardino" },
-    { code: "sanbernardino:fambar", label: "Barstow" },
-    { code: "sanbernardino:famjotr", label: "Joshua Tree" },
-    { code: "sanbernardino:famneedles", label: "Needles" },
-    { code: "sanbernardino:famvict", label: "Victorville" },
-  ] },
+  Orange: { courts: [{ code: "orange:dom", label: "Domestic Violence" }] },
   "San Diego": { courts: [
     { code: "sandiego:fc", label: "Central" },
-    { code: "sandiego:fe", label: "East" },
-    { code: "sandiego:fn", label: "North" },
-    { code: "sandiego:fs", label: "South" },
+    { code: "sandiego:fe", label: "East (El Cajon)" },
+    { code: "sandiego:fn", label: "North (Vista)" },
+    { code: "sandiego:fs", label: "South (Chula Vista)" },
   ] },
   "San Luis Obispo": { courts: [
     { code: "slo:slofam", label: "San Luis Obispo" },
     { code: "slo:prfam", label: "Paso Robles" },
-    { code: "slo:gbfam", label: "Grover Beach" },
   ] },
   "San Mateo": { courts: [
     { code: "sanmateo:rcfam", label: "Redwood City" },
