@@ -122,6 +122,12 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
         petitioner: splitName(a.P1),
         respondent: splitName(a.R1),
       });
+      if (!prep.ok && /activation link/i.test(prep.problem)) {
+        // Not an error: she still has to activate her new account. Keep waiting.
+        setActivation(true);
+        setPhase("login");
+        return;
+      }
       if (!prep.ok) throw new Error(prep.problem);
       const copies: Record<string, number> = {};
       for (let i = 0; i < fileNow.length; i++) {
