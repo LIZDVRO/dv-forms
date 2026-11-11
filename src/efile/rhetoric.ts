@@ -16,27 +16,54 @@ const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 const SECURITY = /^confidential$/i;
 
 /**
- * Form -> filing code label. DV-100, DV-105, DV-160, DV-165 per Chris (Oct 27);
- * the rest are working guesses until Chris or Rhetoric confirm.
+ * Filing code choices, best first. Courts name codes differently (Butte has
+ * "Proposed Order" and "CLETS Info Sheet", Calaveras "Temporary Restraining
+ * Order" and "Notice of Hearing"), and Chris (Nov 11): the code only needs to
+ * describe the document generally. The first label a court offers wins; the
+ * catch-alls at the end mean no form is left without a code.
  */
-export const FORM_FILING: Record<string, { code: RegExp; description: string }> = {
-  "DV-100": { code: /^petition$/i, description: "DV-100 Request for Domestic Violence Restraining Order" },
-  "DV-101": { code: /^request$/i, description: "DV-101 Description of Abuse" },
-  "DV-105": { code: /^request$/i, description: "DV-105 Request for Child Custody and Visitation Orders" },
-  "DV-105(A)": { code: /^request$/i, description: "DV-105(A) City and State Where Children Lived" },
-  "DV-108": { code: /^request$/i, description: "DV-108 Request for Orders to Prevent Child Abduction" },
-  "DV-109": { code: /^order$/i, description: "DV-109 Notice of Court Hearing" },
-  "DV-110": { code: /^order$/i, description: "DV-110 Temporary Restraining Order" },
-  "DV-140": { code: /^order$/i, description: "DV-140 Child Custody and Visitation Order" },
-  "DV-145": { code: /^order$/i, description: "DV-145 Order to Prevent Child Abduction" },
-  "DV-900": { code: /^order$/i, description: "DV-900 Order Transferring Wireless Phone Account" },
-  "FL-150": { code: /^income and expense declaration$/i, description: "FL-150 Income and Expense Declaration" },
-  "INT-300": { code: /^request$/i, description: "INT-300 Request for Interpreter" },
-  "DV-160": { code: /^request$/i, description: "DV-160 Request to Keep Minor's Information Confidential" },
-  "DV-165": { code: /^order$/i, description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
-  "DV-170": { code: /^notice$/i, description: "DV-170 Notice of Order Protecting Information of Minor" },
-  "CLETS-001": { code: /^clets-001$/i, description: "CLETS-001 Confidential CLETS Information" },
+const NOT_OURS = /juvenile|adoption|support|dcss|uifsa|out.of.state|sister state|guardian|joint petition|vexatious|step.?parent|assisted reproduction|modification|zoom|summons|fee|remote|telephonic|address|e.?service/i;
+const C = {
+  petition: [/^petition$/i, /^domestic violence filing$/i, /petition/i, /^request for order$/i],
+  request: [/^request$/i, /^request for order$/i, /^domestic violence filing$/i, /^ex parte application/i, /^declaration$/i],
+  order: [/^order$/i, /^proposed order$/i, /proposed order/i, /^domestic violence filing$/i, /order/i],
+  tro: [/temporary restraining order/i, /^order$/i, /^proposed order$/i, /proposed order/i, /^domestic violence filing$/i, /order/i],
+  notice: [/^notice$/i, /^notice of hearing$/i, /^notice/i],
+  hearing: [/^notice of hearing$/i, /notice of hearing/i, /^notice$/i, /^order$/i, /^proposed order$/i],
+  income: [/^income and expense declaration$/i, /income and expense/i, /^financial statement$/i, /^declaration$/i],
+  clets: [/^clets-001$/i, /clets/i, /confidential information/i],
 };
+/** Last resorts for any form. */
+const CATCH_ALL = [/^domestic violence filing$/i, /^document.?-?.?other$/i, /other document/i, /^declaration$/i];
+
+export const FORM_FILING: Record<string, { codes: RegExp[]; description: string }> = {
+  "DV-100": { codes: C.petition, description: "DV-100 Request for Domestic Violence Restraining Order" },
+  "DV-101": { codes: C.request, description: "DV-101 Description of Abuse" },
+  "DV-105": { codes: C.request, description: "DV-105 Request for Child Custody and Visitation Orders" },
+  "DV-105(A)": { codes: C.request, description: "DV-105(A) City and State Where Children Lived" },
+  "DV-108": { codes: C.request, description: "DV-108 Request for Orders to Prevent Child Abduction" },
+  "DV-109": { codes: C.hearing, description: "DV-109 Notice of Court Hearing" },
+  "DV-110": { codes: C.tro, description: "DV-110 Temporary Restraining Order" },
+  "DV-140": { codes: C.order, description: "DV-140 Child Custody and Visitation Order" },
+  "DV-145": { codes: C.order, description: "DV-145 Order to Prevent Child Abduction" },
+  "DV-900": { codes: C.order, description: "DV-900 Order Transferring Wireless Phone Account" },
+  "FL-150": { codes: C.income, description: "FL-150 Income and Expense Declaration" },
+  "INT-300": { codes: C.request, description: "INT-300 Request for Interpreter" },
+  "DV-160": { codes: C.request, description: "DV-160 Request to Keep Minor's Information Confidential" },
+  "DV-165": { codes: C.order, description: "DV-165 Order on Request to Keep Minor's Information Confidential" },
+  "DV-170": { codes: C.notice, description: "DV-170 Notice of Order Protecting Information of Minor" },
+  "CLETS-001": { codes: C.clets, description: "CLETS-001 Confidential CLETS Information" },
+};
+
+/** The court's best filing code for a form, by the ranked list above. */
+export function pickFilingCode<T extends { label: string }>(opts: T[], codes: RegExp[]): T | undefined {
+  const usable = opts.filter((o) => !NOT_OURS.test(o.label));
+  for (const re of [...codes, ...CATCH_ALL]) {
+    const hit = usable.find((o) => re.test(o.label.trim()));
+    if (hit) return hit;
+  }
+  return undefined;
+}
 
 /** Extra copies (INT-300-2, DV-105(A)-2) file under the base form. */
 export const specFor = (form: string) => FORM_FILING[form] ?? FORM_FILING[form.replace(/-\d+$/, "")];
@@ -288,7 +315,7 @@ export async function addForm(
   const before = s.blocks.length;
   await s.pressAction(/add filing entry/i);
   await s.waitFor(() => s.field(/filing.?code/i), "the filing code field");
-  await s.choose(/filing.?code/i, spec.code);
+  await s.chooseWith(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `filing code for ${doc.form}`);
   await s.set(/^description$/i, description);
   await s.pressAction(/save/i);
   const card = await s.waitFor(() => (s.blocks.length > before ? s.blocks[s.blocks.length - 1] : undefined), `${doc.form} entry`);

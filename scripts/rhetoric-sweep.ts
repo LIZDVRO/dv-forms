@@ -15,7 +15,7 @@ import { createInterface } from "node:readline";
 import { RhetoricClient } from "@rhetoriclabs/rhetoric";
 
 import { EFILE_COURTS } from "../src/efile/courts";
-import { FORM_FILING, Session, fillParties, pickDvCaseType, pickFamilyCategory } from "../src/efile/rhetoric";
+import { FORM_FILING, Session, pickFilingCode, fillParties, pickDvCaseType, pickFamilyCategory } from "../src/efile/rhetoric";
 
 const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 
@@ -50,14 +50,13 @@ function askHidden(prompt: string): Promise<string> {
   });
 }
 
-/** The code labels our forms need, by the regex FORM_FILING uses. */
-const NEEDED = [...new Map(Object.values(FORM_FILING).map((f) => [f.code.source, f.code])).values()];
+
 
 interface Result {
   county: string; court: string; code: string;
   newCase?: boolean; category?: string;
   caseWith?: string; caseWithout?: string; caseTypes?: string[];
-  filingCodes?: string[]; missingCodes?: string[];
+  filingCodes?: string[]; chosen?: Record<string, string>; missingCodes?: string[];
   ok: boolean; problem?: string;
 }
 
@@ -111,10 +110,16 @@ async function checkCourt(client: RhetoricClient, email: string, password: strin
     await s.pressAction(/add filing entry/i);
     const fc = await s.waitFor(() => s.field(/filing.?code/i), "filing code field");
     r.filingCodes = (fc.options ?? fc.search?.results ?? []).map((o: { label: string }) => o.label);
-    r.missingCodes = NEEDED.filter((re) => !r.filingCodes!.some((l) => re.test(l))).map((re) => re.source.replace(/[\^$]/g, ""));
+    const opts = (r.filingCodes ?? []).map((label) => ({ label }));
+    r.chosen = {};
+    r.missingCodes = [];
+    for (const [form, spec] of Object.entries(FORM_FILING)) {
+      const hit = pickFilingCode(opts, spec.codes);
+      if (hit) r.chosen[form] = hit.label; else r.missingCodes.push(form);
+    }
     await s.press(s.action(/cancel/i));
     r.ok = r.missingCodes.length === 0;
-    if (!r.ok) r.problem = `missing filing codes: ${r.missingCodes.join(", ")}`;
+    if (!r.ok) r.problem = `no filing code for: ${r.missingCodes.join(", ")}`;
     return r;
   } catch (e) {
     r.problem = e instanceof Error ? e.message : String(e);
