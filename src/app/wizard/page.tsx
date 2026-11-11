@@ -78,9 +78,18 @@ export default function WizardPage() {
     return () => window.removeEventListener("beforeunload", onLeave);
   }, [dirty]);
 
-  // Staff testing: /wizard?sample fills in a made-up case.
+  // Staff testing: /wizard?sample fills in a made-up case (?sample=end skips to review; &county=… picks the county).
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).has("sample")) load(sampleAnswers());
+    const q = new URLSearchParams(window.location.search);
+    if (!q.has("sample")) return;
+    const sample = sampleAnswers();
+    // ?sample&county=Kings files the sample case in that county, with that county's sheriff serving.
+    const county = q.get("county");
+    if (county) {
+      sample.S1 = county;
+      sample.V2 = county;
+    }
+    load(sample);
   }, [load]);
 
   const moveTo = useCallback(
