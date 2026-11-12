@@ -186,6 +186,7 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
             contentBase64: toBase64(f.bytes),
             copy: copyOf[i],
             answers: picks.current,
+            minorChildren: derive(a).custodyKids.length > 0,
           });
           lastScreen = r.step;
           if (handOff(r)) return;
