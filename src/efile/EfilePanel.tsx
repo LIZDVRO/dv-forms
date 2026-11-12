@@ -8,8 +8,12 @@
  *    right court, and (for a new account) with the eFileCA sign-up form filled in.
  * 2. She logs in or creates her account on Rhetoric's screen. LIZ never sees the password.
  * 3. As soon as she is logged in, filling starts on its own: case type, parties,
- *    then each "File now" form as a confidential entry, one form per request,
- *    with progress shown. She then adds a payment method, reviews and submits.
+ *    then each "File now" form as its own entry, one form per request, with
+ *    progress shown, then the fee waiver. She reviews and submits.
+ * The bot never gives up on its own: when it meets a choice it can't make (or a
+ * screen it doesn't know), it fills everything else, shows her that one choice
+ * on Rhetoric's screen, and carries on by itself as soon as she picks. Her pick
+ * is reused for the rest of the filing.
  * Nothing is saved: the forms pass through to Rhetoric and are not kept.
  */
 import { useEffect, useRef, useState } from "react";
@@ -48,8 +52,21 @@ async function post<T>(url: string, body: unknown): Promise<T> {
   return out as T;
 }
 
-type Step = { ok: true; step: string } | { ok: false; step: string; problem: string };
-type Phase = "login" | "filling" | "done";
+interface Needs { screen: string; field: string | null; what: string }
+type Step = { ok: true; step: string } | { ok: false; step: string; problem: string } | { ok: false; step: string; needs: Needs };
+type Phase = "login" | "filling" | "choose" | "done";
+/** Where filling picks up: the case setup, form number `i`, or the fee screens. */
+interface ResumeAt { stage: "prepare" | "forms" | "finish"; i: number }
+
+/** Plain words for a stop (technical details go to the browser console only). */
+function plainStop(screen: string | undefined, detail: string): string {
+  console.error("[e-filing]", detail);
+  if (/network|fetch|failed to fetch|timed? ?out|502|503|504/i.test(detail)) {
+    return "The connection to the court's filing system dropped for a moment.";
+  }
+  if (/\$\d/.test(detail)) return detail; // the fee total check is already in plain words
+  return screen ? `The filing paused on the "${screen}" step.` : "The filing paused.";
+}
 interface Progress { done: number; total: number; current: string }
 
 export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
@@ -79,6 +96,10 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
   const [progress, setProgress] = useState<Progress | null>(null);
   const [elementKey, setElementKey] = useState(0);
   const running = useRef(false);
+  const resumeAt = useRef<ResumeAt>({ stage: "prepare", i: 0 });
+  /** Her own picks, by field label, reused whenever the same question comes up again. */
+  const picks = useRef<Record<string, string>>({});
+  const [waiting, setWaiting] = useState<Needs | null>(null);
 
   const start = async () => {
     setError("");
@@ -108,47 +129,79 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
     }
   };
 
-  /** Case type and parties, then each form, then on to payment. Safe to run again after an error. */
+  /**
+   * Case type and parties, then each form, then on to payment. Picks up where it
+   * left off (after her choice, a pause, or "Try again"); forms already added are
+   * never added twice.
+   */
   const fill = async (token: string) => {
     if (running.current) return;
     running.current = true;
     setError("");
+    setWaiting(null);
     setPhase("filling");
-    setProgress({ done: 0, total: fileNow.length, current: "your case details" });
-    try {
-      const prep = await post<Step>("/api/rhetoric/prepare", {
-        sessionToken: token,
-        minorChildren: derive(a).custodyKids.length > 0,
-        petitioner: splitName(a.P1),
-        respondent: splitName(a.R1),
-      });
-      if (!prep.ok && /activation link/i.test(prep.problem)) {
-        // Not an error: she still has to activate her new account. Keep waiting.
-        setActivation(true);
-        setPhase("login");
-        return;
+    let lastScreen: string | undefined;
+    /** A choice or screen for her: show it and wait. True if handed off. */
+    const handOff = (r: Step): boolean => {
+      if ("needs" in r) {
+        setWaiting(r.needs);
+        setPhase("choose");
+        return true;
       }
-      if (!prep.ok) throw new Error(prep.problem);
-      const copies: Record<string, number> = {};
-      for (let i = 0; i < fileNow.length; i++) {
-        const f = fileNow[i];
-        copies[f.id] = (copies[f.id] ?? 0) + 1;
-        setProgress({ done: i, total: fileNow.length, current: f.id });
-        await post("/api/rhetoric/add-form", {
+      return false;
+    };
+    try {
+      if (resumeAt.current.stage === "prepare") {
+        setProgress({ done: 0, total: fileNow.length, current: "your case details" });
+        const prep = await post<Step>("/api/rhetoric/prepare", {
           sessionToken: token,
-          form: f.id,
-          fileName: f.fileName,
-          contentBase64: toBase64(f.bytes),
-          copy: copies[f.id],
+          minorChildren: derive(a).custodyKids.length > 0,
+          petitioner: splitName(a.P1),
+          respondent: splitName(a.R1),
+          answers: picks.current,
         });
+        lastScreen = prep.step;
+        if (!prep.ok && "problem" in prep && /activation link/i.test(prep.problem)) {
+          // Not an error: she still has to activate her new account. Keep waiting.
+          setActivation(true);
+          setPhase("login");
+          return;
+        }
+        if (handOff(prep)) return;
+        if (!prep.ok) throw new Error("problem" in prep ? prep.problem : "");
+        resumeAt.current = { stage: "forms", i: 0 };
+      }
+      if (resumeAt.current.stage === "forms") {
+        const copyOf: number[] = [];
+        const seen: Record<string, number> = {};
+        for (const f of fileNow) copyOf.push((seen[f.id] = (seen[f.id] ?? 0) + 1));
+        for (let i = resumeAt.current.i; i < fileNow.length; i++) {
+          const f = fileNow[i];
+          resumeAt.current = { stage: "forms", i };
+          setProgress({ done: i, total: fileNow.length, current: f.id });
+          const r = await post<Step>("/api/rhetoric/add-form", {
+            sessionToken: token,
+            form: f.id,
+            fileName: f.fileName,
+            contentBase64: toBase64(f.bytes),
+            copy: copyOf[i],
+            answers: picks.current,
+          });
+          lastScreen = r.step;
+          if (handOff(r)) return;
+          if (!r.ok) throw new Error("problem" in r ? r.problem : "");
+        }
+        resumeAt.current = { stage: "finish", i: 0 };
       }
       setProgress({ done: fileNow.length, total: fileNow.length, current: "" });
-      const end = await post<Step>("/api/rhetoric/finish", { sessionToken: token });
-      if (!end.ok) throw new Error(end.problem);
+      const end = await post<Step>("/api/rhetoric/finish", { sessionToken: token, answers: picks.current });
+      lastScreen = end.step;
+      if (handOff(end)) return;
+      if (!end.ok) throw new Error("problem" in end ? end.problem : "");
       setPhase("done");
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
-      setPhase("login"); // shows "Try again"; a retry skips forms already added
+      setError(plainStop(lastScreen, e instanceof Error ? e.message : String(e)));
+      setPhase("login"); // keeps watching; resumes on its own once she gets past this screen
       stoppedAt.current = null;
       post<{ step: string }>("/api/rhetoric/status", { sessionToken: token })
         .then((st) => { stoppedAt.current = st.step; })
@@ -158,6 +211,32 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
       setElementKey((k) => k + 1); // reload the filing screen so it shows what was filled in
     }
   };
+
+  // Waiting on her choice: check every few seconds; carry on as soon as she has picked.
+  useEffect(() => {
+    if (!session || phase !== "choose" || !waiting) return;
+    let stop = false;
+    const timer = setInterval(async () => {
+      try {
+        const r = await post<{ answered: boolean; choice?: { field: string; label: string } }>("/api/rhetoric/check", {
+          sessionToken: session.sessionToken,
+          screen: waiting.screen,
+          field: waiting.field,
+        });
+        if (stop || !r.answered) return;
+        if (r.choice) picks.current[r.choice.field] = r.choice.label;
+        clearInterval(timer);
+        void fill(session.sessionToken);
+      } catch {
+        // A missed check is fine; the next one will try again.
+      }
+    }, POLL_MS);
+    return () => {
+      stop = true;
+      clearInterval(timer);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, phase, waiting]);
 
   // While she is on the login or sign-up screen, check every few seconds whether she's in.
   // After a stop, keep checking: if she gets past the screen it stopped on (for example by
@@ -295,6 +374,18 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
               <p className="mt-2 text-sm text-slate-600">This can take a few minutes. Keep this page open. You can read the steps below while you wait.</p>
             </div>
           )}
+          {phase === "choose" && waiting && (
+            <div className="rounded-lg border border-amber-300 bg-amber-50 p-3" role="status" aria-live="polite">
+              <p className="text-base font-medium text-slate-900">
+                {waiting.field
+                  ? `Please choose ${waiting.what} ("${waiting.field}") in the box below. Filing continues as soon as you pick.`
+                  : `Please finish the "${waiting.screen}" step in the box below. Filing continues as soon as you're done.`}
+              </p>
+              {progress && progress.total > 0 && (
+                <p className="mt-1 text-sm text-slate-600">{`${progress.done} of ${progress.total} forms added so far. Everything else is already filled in.`}</p>
+              )}
+            </div>
+          )}
           {phase === "done" && (
             <p className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-base text-slate-800">
               {`Your case and ${fileNow.length} forms are filled in, with a fee waiver: your total is $0.00. Finish below: press Next, check the three agreement boxes, review everything, and submit.`}
@@ -302,7 +393,10 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
           )}
           {error && (
             <div className="rounded-lg border border-red-200 bg-red-50 p-3">
-              <p className="text-base text-red-800">{`Something stopped the filing: ${error}`}</p>
+              <p className="text-base text-red-800">{error}</p>
+              <p className="mt-1 text-base text-slate-800">
+                You can finish that step yourself in the box below, and filling picks up again on its own. Or press Try again.
+              </p>
               <button
                 type="button"
                 onClick={() => void fill(session.sessionToken)}
@@ -311,12 +405,12 @@ export function EfilePanel({ a, packet }: { a: Answers; packet: Packet }) {
                 Try again
               </button>
               <p className="mt-1 text-sm text-slate-600">Forms already added aren&apos;t added twice.</p>
-              <p className="mt-2 text-sm text-slate-700">
-                Still stuck? Download your forms above and file them through the{" "}
-                <a href="https://efile.lizbreakfree.org/" target="_blank" rel="noopener noreferrer" className="font-medium text-liz underline">
+              <p className="mt-2 text-xs text-slate-500">
+                If the court&apos;s filing system is down, you can also file through the{" "}
+                <a href="https://efile.lizbreakfree.org/" target="_blank" rel="noopener noreferrer" className="underline">
                   LIZ e-filing portal
-                </a>{" "}
-                instead.
+                </a>
+                .
               </p>
             </div>
           )}
