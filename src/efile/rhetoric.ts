@@ -76,13 +76,29 @@ export const FORM_FILING: Record<string, { codes: RegExp[]; description: string 
 };
 
 /** The court's best filing code for a form, by the ranked list above. */
-export function pickFilingCode<T extends { label: string }>(opts: T[], codes: RegExp[]): T | undefined {
+export function pickFilingCode<T extends { label: string }>(opts: T[], codes: RegExp[], minorChildren?: boolean): T | undefined {
   const usable = opts.filter((o) => !OTHER_CASE.test(o.label));
-  for (const re of [...codes, ...CATCH_ALL]) {
-    const hit = usable.find((o) => re.test(o.label.trim()));
-    if (hit) return hit;
+  // Some courts split a code by children ("DV w/ Minor Child - New Case Petition" and
+  // "DV w/o Minor Child - ..."). Never take the one that contradicts the case type
+  // while any other acceptable code exists; take it only as a very last resort.
+  const contradicts = (o: T) => minorChildren !== undefined && kidsKind(o.label) !== "neutral" && kidsKind(o.label) !== (minorChildren ? "with" : "without");
+  for (const allowContradiction of [false, true]) {
+    for (const re of [...codes, ...CATCH_ALL]) {
+      const hits = usable.filter((o) => re.test(o.label.trim()) && (allowContradiction || !contradicts(o)));
+      if (!hits.length) continue;
+      // Prefer the code that names the case's own kind (with or without children).
+      return hits.find((o) => minorChildren !== undefined && kidsKind(o.label) === (minorChildren ? "with" : "without")) ?? hits[0];
+    }
   }
   return undefined;
+}
+
+/** Whether a court's label is for cases with minor children, without, or says neither. */
+export function kidsKind(label: string): "with" | "without" | "neutral" {
+  if (!/child|minor|kid/i.test(label)) return "neutral";
+  if (/\bwithout\b|\bw\/o\b|\bno (minor )?child/i.test(label)) return "without";
+  if (/\bwith\b|\bw\/(?!o)/i.test(label)) return "with";
+  return "neutral";
 }
 
 /** Extra copies (INT-300-2, DV-105(A)-2) file under the base form. */
@@ -423,6 +439,7 @@ export async function addForm(
   doc: FillInput["documents"][number],
   copy = 1,
   answers?: Answers,
+  minorChildren?: boolean,
 ): Promise<StageResult<{ added: boolean }>> {
   const spec = specFor(doc.form);
   if (!spec) throw new Error(`no filing code set for ${doc.form}`);
@@ -450,11 +467,11 @@ export async function addForm(
         uploaded = true;
       } else if (isEntryCodeScreen(s)) {
         if (s.field(/^description$/i) && !s.field(/^description$/i).value) await s.set(/^description$/i, description);
-        await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `the filing code for ${doc.form}`);
+        await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes, minorChildren), `the filing code for ${doc.form}`);
         await s.pressAction(/save/i);
       } else if (docCardOf(s)) {
         // The entry itself: open its document, or save it once the document is in.
-        if (s.field(/filing.?code/i)) await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `the filing code for ${doc.form}`, true);
+        if (s.field(/filing.?code/i)) await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes, minorChildren), `the filing code for ${doc.form}`, true);
         if (uploaded) await s.pressAction(/save/i);
         else await s.press(s.blockAction(docCardOf(s), /edit/i));
       } else {
@@ -551,7 +568,7 @@ export async function fillAfterLogin(token: string, p: FillInput): Promise<FillR
   for (const doc of p.documents) {
     const key = specFor(doc.form)?.description ?? doc.form;
     seen[key] = (seen[key] ?? 0) + 1;
-    const r = await addForm(token, doc, seen[key]);
+    const r = await addForm(token, doc, seen[key], undefined, p.minorChildren);
     if (!r.ok) return { ok: false, step: r.step, problem: res(r) };
     filed.push(doc.form);
   }

@@ -3,7 +3,7 @@
  * (screens modelled on the test and live systems). No network.
  *   npx tsx scripts/sim-rhetoric.test.ts
  */
-import { addForm, checkAnswered, finishCase, prepareCase } from "../src/efile/rhetoric";
+import { addForm, checkAnswered, finishCase, pickFilingCode, FORM_FILING, prepareCase } from "../src/efile/rhetoric";
 
 type Opt = { value: string; label: string };
 interface Fld { key: string; label: string; kind: "field"; options?: Opt[]; value?: unknown }
@@ -150,6 +150,14 @@ async function run() {
     surprise = false; // she finished it
     const r2 = await prepareCase("t", { minorChildren: false, ...names });
     check(r2.ok, "  after she finishes it: case setup carries on to the forms");
+  }
+  // 5. Codes split by children (LA): the petition code matches the case type.
+  {
+    const la = ["DV w/ Minor Child - New Case Petition", "DV w/o Minor Child - New Case Petition", "Declaration"].map((label) => ({ label }));
+    check(pickFilingCode(la, FORM_FILING["DV-100"].codes, false)?.label === "DV w/o Minor Child - New Case Petition", "LA DV-100, no children: the w/o petition code");
+    check(pickFilingCode(la, FORM_FILING["DV-100"].codes, true)?.label === "DV w/ Minor Child - New Case Petition", "LA DV-100, with children: the w/ petition code");
+    const onlyWith = ["DV w/ Minor Child - New Case Petition", "PETITION"].map((label) => ({ label }));
+    check(pickFilingCode(onlyWith, FORM_FILING["DV-100"].codes, false)?.label === "PETITION", "Only a w/ code exists, no children: falls back to the plain Petition code");
   }
   console.log(failed ? `\n${failed} FAILED` : "\nALL PASSED");
   process.exit(failed ? 1 : 0);

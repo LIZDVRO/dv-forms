@@ -19,6 +19,7 @@ export async function POST(request: NextRequest) {
     contentBase64?: string;
     copy?: number;
     answers?: Record<string, string>;
+    minorChildren?: boolean;
   };
   if (!body.sessionToken || !body.form || !body.fileName || !body.contentBase64) {
     return NextResponse.json({ error: "Missing session or form" }, { status: 400 });
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       { form: body.form, fileName: body.fileName, contentBase64: body.contentBase64 },
       body.copy ?? 1,
       body.answers,
+      typeof body.minorChildren === "boolean" ? body.minorChildren : undefined,
     );
     const what = out.ok ? (out.added ? "added" : "already there") : "needs" in out ? `waiting on her: ${out.needs.field ?? out.needs.screen}` : `stopped: ${out.problem}`;
     console.log(`[efile] ${body.form}${(body.copy ?? 1) > 1 ? ` (copy ${body.copy})` : ""}: ${what}`);
