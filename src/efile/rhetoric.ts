@@ -12,8 +12,19 @@
 
 const API = process.env.RHETORIC_API_URL || "https://api.rhetoric.law";
 
-/** Every document is filed Confidential (Chris, Oct 27). */
-const SECURITY = /^confidential$/i;
+/**
+ * Document security, best first (Chris, Nov 11): Confidential; then the court's
+ * family-law designation (Los Angeles offers only "None" and "FL_General Family
+ * Law"); then anything other than None; None only if nothing else exists.
+ */
+export function pickSecurity<T extends { label: string }>(opts: T[]): T | undefined {
+  const notNone = (o: T) => !/^\s*(none|public)\s*$/i.test(o.label);
+  return opts.find((o) => /confidential/i.test(o.label))
+    ?? opts.find((o) => /^fl[_\s-]*general family law$/i.test(o.label.trim()))
+    ?? opts.find((o) => notNone(o) && /family|domestic|\bdv\b/i.test(o.label))
+    ?? opts.find(notNone)
+    ?? opts[0];
+}
 
 /**
  * Filing code choices, best first. Courts name codes very differently (a test
@@ -106,9 +117,25 @@ type Block = any;
 type Field = any;
 type Action = { action_id: string; label: string; primary?: boolean };
 
+/**
+ * The bot reached something it can't decide or finish by itself. It has filled
+ * everything else it could; she makes this one choice (or finishes this one
+ * screen) on Rhetoric's screen, and filling continues on its own.
+ */
+export class NeedsChoice extends Error {
+  constructor(public screen: string, public field: string | null, public what: string) {
+    super(field ? `choose ${field} on "${screen}"` : `finish "${screen}"`);
+    this.name = "NeedsChoice";
+  }
+}
+
+/** Her earlier choices, by field label: asked once, reused for the rest of the filing. */
+export type Answers = Record<string, string>;
+
 export class Session {
   form: Form = null;
   version = 0;
+  answers: Answers = {};
   constructor(private token: string) {}
 
   private async call(op: string, body: unknown, tries = 5): Promise<any> {
@@ -210,7 +237,41 @@ export class Session {
   async next() {
     const from = this.title;
     await this.press(this.primary());
-    if (this.title === from) throw new Error(`"${from}": ${this.errors().join("; ") || "did not advance"}`);
+    // Didn't move on (a required answer we don't have, or a check failed): hand this screen to her.
+    if (this.title === from) throw new NeedsChoice(from, null, "this step");
+  }
+
+  /** The option list of a choice field, searching when the list is empty. */
+  async optionsOf(fieldRe: RegExp): Promise<{ value: unknown; label: string }[]> {
+    const f = this.field(fieldRe);
+    if (!f) return [];
+    let opts: { value: unknown; label: string }[] = f.options ?? f.search?.results ?? [];
+    if (!opts.length && f.search) {
+      await this.apply({ kind: "search", field: f.key, query: "" });
+      opts = this.field(fieldRe)?.search?.results ?? [];
+    }
+    return opts;
+  }
+
+  /**
+   * Set a choice field: her earlier answer for this field if she gave one, else
+   * `pick`. If neither works and nothing is chosen yet, ask her (NeedsChoice).
+   * `keepCurrent`: a value already chosen (by her, or Rhetoric's default) stands.
+   */
+  async pickOrAsk(fieldRe: RegExp, pick: (opts: { value: unknown; label: string }[]) => { value: unknown; label: string } | undefined, what: string, keepCurrent = false) {
+    const f = this.field(fieldRe);
+    if (!f) return;
+    const has = f.value !== undefined && f.value !== null && f.value !== "";
+    if (has && keepCurrent) return;
+    const opts = await this.optionsOf(fieldRe);
+    const remembered = this.answers[f.label];
+    const o = (remembered && opts.find((x) => x.label === remembered)) || pick(opts);
+    if (o) {
+      if (o.value !== f.value) await this.apply({ kind: "set_field", field: this.field(fieldRe).key, value: o.value });
+      return;
+    }
+    if (has) return;
+    throw new NeedsChoice(this.title, f.label, what);
   }
 }
 
@@ -286,73 +347,125 @@ export function pickDvCaseType(opts: Opt[], minorChildren: boolean): Opt | undef
   return dv.find(without) ?? dv.find((o) => !withKids(o) && !without(o) && !/child/i.test(o.label));
 }
 
-/** Stage 2a: after login, set the filing type, case type and parties; end on the filing entries list. */
-export async function prepareCase(token: string, p: CaseInput): Promise<{ ok: true; step: string } | { ok: false; step: string; problem: string }> {
+/** What a stage returns: done, waiting on her (a choice or a screen), or stopped for good. */
+export type StageResult<T = object> =
+  | ({ ok: true; step: string } & T)
+  | { ok: false; step: string; needs: { screen: string; field: string | null; what: string } }
+  | { ok: false; step: string; problem: string };
+
+/** Run a stage; a NeedsChoice becomes "waiting on her", not an error. */
+async function stage<T extends object>(token: string, answers: Answers | undefined, run: (s: Session) => Promise<StageResult<T>>): Promise<StageResult<T>> {
   const s = new Session(token);
-  await s.resume();
-  if (ACTIVATION.test(s.title)) {
-    return { ok: false, step: s.title, problem: "Check your email and click the activation link, then come back here and press \"I've activated my account.\"" };
+  s.answers = answers ?? {};
+  try {
+    await s.resume();
+    return await run(s);
+  } catch (e) {
+    if (e instanceof NeedsChoice) return { ok: false, step: e.screen, needs: { screen: e.screen, field: e.field, what: e.what } };
+    throw e;
   }
-  if (/log ?in|create.*account/i.test(s.title)) {
-    if (!s.action(/continue/i)) return { ok: false, step: s.title, problem: "Log in to eFileCA first." };
-    await s.next();
-  }
-  if (/filing type/i.test(s.title)) { await s.choose(/filing.?type/i, /new case/i); await s.next(); }
-  if (/case category/i.test(s.title)) { await s.chooseWith(/case.?category/i, pickFamilyCategory, "Family case category"); await s.next(); }
-  if (/case type/i.test(s.title)) {
-    await s.chooseWith(/case.?type/i, (o) => pickDvCaseType(o, p.minorChildren), "domestic violence case type");
-    await s.next();
-  }
-  if (/parties/i.test(s.title)) { await fillParties(s, p); await s.next(); }
-  if (!/filing entries/i.test(s.title)) return { ok: false, step: s.title, problem: "Unexpected screen before the forms." };
-  return { ok: true, step: s.title };
 }
 
 /**
- * Stage 2b: add one form as a confidential filing entry. `copy` is 1 for the
- * first form with this description, 2 for the second (e.g. INT-300 twice), so a
- * retry never adds a form that is already there. Returns timings for tuning.
+ * Stage 2a: after login, set the filing type, case type and parties; end on the
+ * filing entries list. Works from whichever of these screens she is on.
+ */
+export async function prepareCase(token: string, p: CaseInput, answers?: Answers): Promise<StageResult> {
+  return stage<object>(token, answers, async (s): Promise<StageResult> => {
+    for (let guard = 0; guard < 12; guard++) {
+      const t = s.title;
+      if (ACTIVATION.test(t)) {
+        return { ok: false, step: t, problem: "Check your email and click the activation link, then come back here and press \"I've activated my account.\"" };
+      }
+      if (/log ?in|create.*account/i.test(t)) {
+        if (!s.action(/continue/i)) return { ok: false, step: t, problem: "Log in to eFileCA first." };
+        await s.next();
+      } else if (/filing type/i.test(t)) {
+        await s.pickOrAsk(/filing.?type/i, (o) => o.find((x) => /new case/i.test(x.label)), "the filing type");
+        await s.next();
+      } else if (/case category/i.test(t)) {
+        await s.pickOrAsk(/case.?category/i, pickFamilyCategory, "the case category");
+        await s.next();
+      } else if (/case type/i.test(t)) {
+        await s.pickOrAsk(/case.?type/i, (o) => pickDvCaseType(o, p.minorChildren), "the case type");
+        await s.next();
+      } else if (/edit party/i.test(t)) {
+        await fillPartyForm(s, p);
+      } else if (/parties/i.test(t)) {
+        await fillParties(s, p);
+        await s.next();
+      } else if (/filing entries/i.test(t)) {
+        return { ok: true, step: t };
+      } else {
+        // A screen we haven't met before: she finishes it, then filling continues.
+        throw new NeedsChoice(t, null, "this step");
+      }
+    }
+    throw new NeedsChoice(s.title, null, "this step");
+  });
+}
+
+const docCardOf = (s: Session) => s.blocks.find((b: Block) => s.data(b, /^document$/i) !== undefined);
+const isDocScreen = (s: Session) => !!s.field(/^document$/i);
+const isEntryCodeScreen = (s: Session) => !!s.field(/filing.?code/i) && !docCardOf(s);
+const isEntryList = (s: Session) => /filing entries/i.test(s.title) && !!s.action(/add filing entry/i);
+
+/**
+ * Stage 2b: add one form as its own filing entry (lead document, most
+ * confidential security the court offers). `copy` is 1 for the first form with
+ * this description, 2 for the second (e.g. INT-300 twice), so a retry never
+ * adds a form that is already there. Picks up from any screen of the entry: the
+ * list, the filing code form, the entry, or the document form (after she made a
+ * choice the bot couldn't).
  */
 export async function addForm(
   token: string,
   doc: FillInput["documents"][number],
   copy = 1,
-): Promise<{ added: boolean; ms: { total: number; upload: number; processing: number }; bytes: number }> {
-  const t0 = Date.now();
+  answers?: Answers,
+): Promise<StageResult<{ added: boolean }>> {
   const spec = specFor(doc.form);
   if (!spec) throw new Error(`no filing code set for ${doc.form}`);
   const description = spec.description.slice(0, 100);
   const bytes = Buffer.from(doc.contentBase64, "base64").length;
-  const s = new Session(token);
-  await s.resume();
-  await s.waitFor(() => (/filing entries/i.test(s.title) && s.action(/add filing entry/i)) || undefined, "the filing entries list");
-  const have = s.blocks.filter((b: Block) => s.data(b, /^filing code$/i) !== undefined && s.data(b, /^document 1$/i) && s.data(b, /^description$/i) === description).length;
-  if (have >= copy) return { added: false, ms: { total: Date.now() - t0, upload: 0, processing: 0 }, bytes };
-
-  const before = s.blocks.length;
-  await s.pressAction(/add filing entry/i);
-  await s.waitFor(() => s.field(/filing.?code/i), "the filing code field");
-  await s.chooseWith(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `filing code for ${doc.form}`);
-  await s.set(/^description$/i, description);
-  await s.pressAction(/save/i);
-  const card = await s.waitFor(() => (s.blocks.length > before ? s.blocks[s.blocks.length - 1] : undefined), `${doc.form} entry`);
-  await s.press(s.blockAction(card, /^edit$/i));
-  const docCard = await s.waitFor(() => s.blocks.find((b: Block) => s.data(b, /^document$/i) !== undefined), "the document card");
-  await s.press(s.blockAction(docCard, /edit/i));
-  await s.waitFor(() => s.field(/security/i), "the document form");
-  await s.choose(/security/i, SECURITY);
-  await s.set(/^description$/i, doc.form);
-  const tUp = Date.now();
-  await s.set(/^document$/i, { file_name: doc.fileName, content_type: "application/pdf", content: doc.contentBase64, size_bytes: bytes });
-  const upload = Date.now() - tUp;
-  const tProc = Date.now();
-  await s.pressAction(/save/i); // document
-  await s.waitFor(() => (/filing entry/i.test(s.title) && s.action(/save/i)) || undefined, "the entry form");
-  await s.pressAction(/save/i); // entry
-  const processing = Date.now() - tProc;
-  const errs = s.errors();
-  if (errs.length) throw new Error(`${doc.form}: ${errs.join("; ")}`);
-  return { added: true, ms: { total: Date.now() - t0, upload, processing }, bytes };
+  return stage<{ added: boolean }>(token, answers, async (s): Promise<StageResult<{ added: boolean }>> => {
+    let uploaded = false;
+    for (let guard = 0; guard < 16; guard++) {
+      if (isEntryList(s)) {
+        const ours = s.blocks.filter((b: Block) => s.data(b, /^description$/i) === description);
+        const done = ours.filter((b: Block) => s.data(b, /^document 1$/i)).length;
+        if (uploaded || done >= copy) return { ok: true, step: s.title, added: uploaded };
+        const unfinished = ours.find((b: Block) => !s.data(b, /^document 1$/i));
+        if (unfinished && s.blockAction(unfinished, /^edit$/i)) await s.press(s.blockAction(unfinished, /^edit$/i));
+        else await s.pressAction(/add filing entry/i);
+      } else if (isDocScreen(s)) {
+        // Fill everything we can first; any choice left over goes to her last.
+        if (s.field(/^description$/i) && !s.field(/^description$/i).value) await s.set(/^description$/i, doc.form);
+        if (!s.field(/^document$/i).value) {
+          await s.set(/^document$/i, { file_name: doc.fileName, content_type: "application/pdf", content: doc.contentBase64, size_bytes: bytes });
+        }
+        await s.pickOrAsk(/filing.?component/i, (o) => o.find((x) => /lead/i.test(x.label)), `the filing component for ${doc.form}`, true);
+        await s.pickOrAsk(/security/i, pickSecurity, `the security level for ${doc.form}`);
+        await s.pressAction(/save/i);
+        uploaded = true;
+      } else if (isEntryCodeScreen(s)) {
+        if (s.field(/^description$/i) && !s.field(/^description$/i).value) await s.set(/^description$/i, description);
+        await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `the filing code for ${doc.form}`);
+        await s.pressAction(/save/i);
+      } else if (docCardOf(s)) {
+        // The entry itself: open its document, or save it once the document is in.
+        if (s.field(/filing.?code/i)) await s.pickOrAsk(/filing.?code/i, (o) => pickFilingCode(o, spec.codes), `the filing code for ${doc.form}`, true);
+        if (uploaded) await s.pressAction(/save/i);
+        else await s.press(s.blockAction(docCardOf(s), /edit/i));
+      } else {
+        // Rhetoric's in-between screen while it processes; wait for a known one.
+        const from = s.title;
+        await s.waitFor(() => (s.title !== from || isEntryList(s) || isDocScreen(s) || isEntryCodeScreen(s) ? true : undefined), "the next screen")
+          .catch(() => { throw new NeedsChoice(from, null, "this step"); });
+      }
+    }
+    throw new NeedsChoice(s.title, null, "this step");
+  });
 }
 
 /**
@@ -360,19 +473,32 @@ export async function addForm(
  * (DV filings are free), and stop on "Review fees" once it shows $0.00. The
  * disclaimers, final review and Submit are hers to do.
  */
-export async function finishCase(token: string): Promise<{ ok: true; step: string; total: string } | { ok: false; step: string; problem: string }> {
-  const s = new Session(token);
-  await s.resume();
-  if (/filing entries/i.test(s.title)) {
-    await s.waitFor(() => (/filing entries/i.test(s.title) && s.primary()) || undefined, "the filing entries list");
-    await s.next();
-  }
-  if (/service/i.test(s.title)) await s.next(); // no e-service: the sheriff or a server serves
-  if (/payment account/i.test(s.title)) await payWithFeeWaiver(s);
-  if (!/review fees/i.test(s.title)) return { ok: false, step: s.title, problem: "Unexpected screen; finish it on the filing screen below." };
-  const total = feeTotal(s);
-  if (total !== "$0.00") return { ok: false, step: s.title, problem: `The fees show ${total ?? "an unknown total"} instead of $0.00.` };
-  return { ok: true, step: s.title, total };
+export async function finishCase(token: string, answers?: Answers): Promise<StageResult<{ total: string }>> {
+  return stage<{ total: string }>(token, answers, async (s): Promise<StageResult<{ total: string }>> => {
+    for (let guard = 0; guard < 10; guard++) {
+      const t = s.title;
+      if (/review fees/i.test(t)) {
+        const total = feeTotal(s);
+        if (total !== "$0.00") return { ok: false, step: t, problem: `The fees show ${total ?? "an unknown total"} instead of $0.00. Check the payment method below.` };
+        return { ok: true, step: t, total };
+      }
+      if (/filing entries/i.test(t)) {
+        await s.waitFor(() => (/filing entries/i.test(s.title) && s.primary()) || undefined, "the filing entries list");
+        await s.next();
+      } else if (/service/i.test(t)) {
+        await s.next(); // no e-service: the sheriff or a server serves
+      } else if (/payment/i.test(t) && s.field(/payment.?account/i)) {
+        await payWithFeeWaiver(s);
+      } else if (s.field(/payment.?type|payment method/i)) {
+        await s.pickOrAsk(/payment.?type|payment method/i, (o) => o.find((x) => WAIVER.test(x.label)), "the payment method");
+        if (s.field(/account.?name|nickname/i) && !s.field(/account.?name|nickname/i).value) await s.set(/account.?name|nickname/i, "Fee waiver");
+        await s.pressAction(/^add$/i);
+      } else {
+        throw new NeedsChoice(t, null, "this step");
+      }
+    }
+    throw new NeedsChoice(s.title, null, "this step");
+  });
 }
 
 /** Rhetoric's fee waiver payment method zeroes all eFileCA fees. Reuse hers if she has one. */
@@ -381,16 +507,28 @@ async function payWithFeeWaiver(s: Session) {
   const waiverIn = () => (s.field(/payment.?account/i)?.options ?? []).find((o: { label: string }) => WAIVER.test(o.label));
   if (!waiverIn()) {
     await s.pressAction(/add payment method/i);
-    await s.waitFor(() => s.field(/payment.?type|payment method/i), "the payment method form");
-    await s.choose(/payment.?type|payment method/i, WAIVER);
-    await s.set(/account.?name|nickname/i, "Fee waiver");
-    await s.pressAction(/^add$/i);
-    await s.waitFor(() => waiverIn(), "the fee waiver account");
+    return; // the payment method form is handled on the next pass
   }
-  const acct = s.field(/payment.?account/i);
-  const waiver = waiverIn();
-  if (acct.value !== waiver.value) await s.apply({ kind: "set_field", field: acct.key, value: waiver.value });
+  await s.pickOrAsk(/payment.?account/i, () => waiverIn(), "the payment account");
   await s.next();
+}
+
+/**
+ * Has she answered what the filing was waiting on? `field` null means a whole
+ * screen: answered once she has left it. A choice field: answered once it has a
+ * value (her pick is returned, to reuse) or she has left the screen.
+ */
+export async function checkAnswered(token: string, screen: string, field: string | null): Promise<{ answered: boolean; choice?: { field: string; label: string } }> {
+  const s = new Session(token);
+  await s.resume();
+  if (s.title !== screen) return { answered: true };
+  if (!field) return { answered: false };
+  const f = s.fields().find((x: Field) => x.label === field);
+  if (!f) return { answered: true };
+  if (f.value === undefined || f.value === null || f.value === "") return { answered: false };
+  const opts: { value: unknown; label: string }[] = f.options ?? f.search?.results ?? [];
+  const label = opts.find((o) => o.value === f.value)?.label;
+  return { answered: true, choice: label ? { field, label } : undefined };
 }
 
 /** "Total: $0.00" from the fees screen. */
@@ -405,37 +543,50 @@ function feeTotal(s: Session): string | undefined {
 
 /** All of stage 2 in one call (used by the test script). */
 export async function fillAfterLogin(token: string, p: FillInput): Promise<FillResult> {
+  const res = (r: StageResult<object>) => ("problem" in r ? r.problem : "needs" in r ? `needs ${r.needs.field ?? r.needs.screen}` : "");
   const prep = await prepareCase(token, p);
-  if (!prep.ok) return prep;
+  if (!prep.ok) return { ok: false, step: prep.step, problem: res(prep) };
   const filed: string[] = [];
   const seen: Record<string, number> = {};
   for (const doc of p.documents) {
     const key = specFor(doc.form)?.description ?? doc.form;
     seen[key] = (seen[key] ?? 0) + 1;
-    await addForm(token, doc, seen[key]);
+    const r = await addForm(token, doc, seen[key]);
+    if (!r.ok) return { ok: false, step: r.step, problem: res(r) };
     filed.push(doc.form);
   }
   const end = await finishCase(token);
-  return end.ok ? { ok: true, step: end.step, filed } : end;
+  return end.ok ? { ok: true, step: end.step, filed } : { ok: false, step: end.step, problem: res(end) };
 }
 
 export async function fillParties(s: Session, p: Pick<CaseInput, "petitioner" | "respondent">) {
+  // Edit each party once (a retry skips any that already show a name).
   const done = new Set<string>();
-  for (let guard = 0; guard < 8; guard++) {
-    const card = s.blocks.find((b: Block) => s.data(b, /party type/i) && !done.has(b.id));
+  for (let guard = 0; guard < 8 && /parties/i.test(s.title); guard++) {
+    const card = s.blocks.find((b: Block) => s.data(b, /party type/i) && !done.has(b.id) && s.blockAction(b, /^edit$/i));
     if (!card) break;
-    const who = /protected/i.test(s.data(card, /party type/i) ?? "") ? p.petitioner : p.respondent;
     done.add(card.id);
+    if (String(s.data(card, /^(full )?name$/i) ?? "").trim()) continue;
     await s.press(s.blockAction(card, /^edit$/i));
-    await s.choose(/party.?kind/i, /individual/i);
-    await s.set(/first.?name/i, who.first);
-    if (who.middle) await s.set(/middle.?name/i, who.middle);
-    await s.set(/last.?name/i, who.last);
-    await s.press(s.action(/save/i));
-    if (/edit party/i.test(s.title)) throw new Error(`party not saved: ${s.errors().join("; ")}`);
+    await fillPartyForm(s, p, /protected/i.test(s.data(card, /party type/i) ?? ""));
   }
   const prot = s.blocks.find((b: Block) => /protected/i.test(s.data(b, /party type/i) ?? ""));
-  if (prot && !/yes/i.test(s.data(prot, /filer/i) ?? "")) await s.press(s.blockAction(prot, /set as filer/i));
+  if (prot && !/yes/i.test(s.data(prot, /filer/i) ?? "") && s.blockAction(prot, /set as filer/i)) await s.press(s.blockAction(prot, /set as filer/i));
+}
+
+/** The "Edit party" form. Which party: the form's own party type, else `protectedParty`. */
+async function fillPartyForm(s: Session, p: Pick<CaseInput, "petitioner" | "respondent">, protectedParty?: boolean) {
+  const typeText = [s.title, ...s.blocks.map((b: Block) => s.data(b, /party type/i) ?? "")].join(" ");
+  const known = protectedParty !== undefined || /protected|restrained/i.test(typeText);
+  if (!known) throw new NeedsChoice(s.title, null, "this party's details");
+  const isProtected = protectedParty ?? /protected/i.test(typeText);
+  const who = isProtected ? p.petitioner : p.respondent;
+  await s.pickOrAsk(/party.?kind/i, (o) => o.find((x) => /individual/i.test(x.label)), "the party type");
+  if (s.field(/first.?name/i) && !s.field(/first.?name/i).value) await s.set(/first.?name/i, who.first);
+  if (who.middle && s.field(/middle.?name/i) && !s.field(/middle.?name/i).value) await s.set(/middle.?name/i, who.middle);
+  if (s.field(/last.?name/i) && !s.field(/last.?name/i).value) await s.set(/last.?name/i, who.last);
+  await s.pressAction(/save/i);
+  if (/edit party/i.test(s.title)) throw new NeedsChoice(s.title, null, "this party's details");
 }
 
 /**

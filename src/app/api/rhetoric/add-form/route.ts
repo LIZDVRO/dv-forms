@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     fileName?: string;
     contentBase64?: string;
     copy?: number;
+    answers?: Record<string, string>;
   };
   if (!body.sessionToken || !body.form || !body.fileName || !body.contentBase64) {
     return NextResponse.json({ error: "Missing session or form" }, { status: 400 });
@@ -27,12 +28,10 @@ export async function POST(request: NextRequest) {
       body.sessionToken,
       { form: body.form, fileName: body.fileName, contentBase64: body.contentBase64 },
       body.copy ?? 1,
+      body.answers,
     );
-    console.log(
-      `[efile] ${body.form}${(body.copy ?? 1) > 1 ? ` (copy ${body.copy})` : ""}: ${out.added ? "added" : "already there"}, ` +
-        `${Math.round(out.bytes / 1024)} KB, upload ${(out.ms.upload / 1000).toFixed(1)} s, ` +
-        `processing ${(out.ms.processing / 1000).toFixed(1)} s, total ${(out.ms.total / 1000).toFixed(1)} s`,
-    );
+    const what = out.ok ? (out.added ? "added" : "already there") : "needs" in out ? `waiting on her: ${out.needs.field ?? out.needs.screen}` : `stopped: ${out.problem}`;
+    console.log(`[efile] ${body.form}${(body.copy ?? 1) > 1 ? ` (copy ${body.copy})` : ""}: ${what}`);
     return NextResponse.json(out);
   } catch (err) {
     return NextResponse.json({ error: describeError(err, "add-form") }, { status: 502 });
